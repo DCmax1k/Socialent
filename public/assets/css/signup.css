@@ -1,0 +1,139 @@
+body {
+  height: 100vh;
+  width: 100%;
+  background-image: url('../../images/loginBackground.svg');
+  background-position: center;
+  background-size: cover;
+}
+
+#alertCont {
+  position: absolute;
+  top: -200px;
+  min-height: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+  padding: 10px;
+  border: 2px solid rgb(255, 0, 0);
+  border-radius: 5px;
+  background-color: rgb(255, 112, 112);
+  transition: top 0.3s ease;
+}
+
+#alertCont.active {
+  top: 50px;
+}
+
+#formCont {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 400px;
+  width: 600px;
+  background-color: rgba(15, 76, 117, 0.9);
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 15px;
+  border: 1px solid #bbe1fa;
+}
+
+#formCont h1 {
+  text-align: center;
+  margin: 20px;
+}
+#formCont button {
+  width: 90%;
+  cursor: pointer;
+  margin: 20px;
+  height: 30px;
+  outline: none;
+  border: 2px solid rgba(255, 255, 255, 0);
+  border-radius: 5px;
+  font-size: 20px;
+  transition: background-color 0.3s ease;
+}
+
+#formCont button:hover {
+  background-color: rgb(143, 168, 185);
+}
+
+.form-row {
+  width: 90%;
+  display: flex;
+  justify-content: space-between;
+  margin: 10px;
+  color: white;
+  font-size: 20px;
+  position: relative;
+}
+.form-row > input {
+  width: 75%;
+  outline: none;
+  border-radius: 5px;
+  height: 25px;
+  padding: 3px;
+  border: 2px solid white;
+  transition: border 0.3s ease;
+}
+.form-row > input:focus {
+  border: 2px solid #3282b8;
+}
+
+#charCount {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: black;
+  font-size: 10px;
+}
+
+.input-info {
+  position: absolute;
+  font-size: 10px;
+  right: 10px;
+  bottom: -13px;
+}
+
+#passwordEye {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  color: black;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+#formCont > a {
+  color: white;
+}
+
+@media screen and (max-width: 600px) {
+  #formCont {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  #formCont {
+    height: 600px;
+  }
+  .form-row {
+    display: flex;
+    flex-direction: column;
+  }
+  .form-row > input {
+    width: 100%;
+  }
+  #passwordEye {
+    top: 75%;
+    transform: translateY(-50%);
+  }
+  #charCount {
+    top: 75%;
+    transform: translateY(-50%);
+  }
+}

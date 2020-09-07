@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= account.username %> - Socialent</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/account.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+      integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="background"></div>
+    <!-- Edit Profile -->
+    <% if (loggedin) { %>
+    <div id="editProfileCont">
+      <i id="closeEditProfileCont" class="fas fa-times"></i>
+      <h1>Edit Profile</h1>
+      <div>
+        <div id="changeNameCont">
+          <i id="selectName" class="pencil c fas fa-pencil-alt"></i>
+          <i
+            id="submitName"
+            class="pencil c fas fa-check"
+            style="display: none"
+          ></i>
+          <input
+            id="changeNameInput"
+            class="editProfileInputBlend"
+            type="text"
+            value="<%= user.name %>"
+          />
+        </div>
+        <div id="changeEmailCont">
+          <div id="changeEmailTop">
+            <i id="selectEmail" class="pencil c fas fa-pencil-alt"></i>
+            <i
+              id="submitEmail"
+              class="pencil c fas fa-check"
+              style="display: none"
+            ></i>
+            <input
+              id="changeEmailInput"
+              class="editProfileInputBlend"
+              type="email"
+              value="<%= user.emailData.email %>"
+            />
+          </div>
+          <button class="d-back" id="verifyEmailBtn">Verify Email</button>
+        </div>
+        <div id="bioCont">
+          <h1>Bio <button class="c-back d" id="updateBio">Update</button></h1>
+          <textarea id="bio"><%= JSON.stringify(user.description) %> </textarea>
+        </div>
+        <div id="changePasswordCont">
+          <h1>
+            Change Password
+            <i id="submitChangePassword" class="fas fa-location-arrow"></i>
+          </h1>
+          <input
+            id="currentPassword"
+            type="password"
+            placeholder="Current Password"
+          />
+          <input id="newPassword" type="password" placeholder="New Password" />
+        </div>
+      </div>
+    </div>
+    <% } %>
+
+    <div id="bodyCont">
+      <div id="profile">
+        <% if (account.profileImg === 'none') { %>
+        <img src="/images/profilePlaceholder.svg" alt="Profile Image" />
+        <% } else { %>
+        <img src="<%= account.profileImg %> " alt="Profile Image" />
+        <% } %>
+        <div id="profileInfo">
+          <div id="numbers">
+            <div id="numberOfPosts">
+              <%= accountsPosts.length %>
+              <span>Post<%= accountsPosts.length === 1 ? '' : 's' %></span>
+            </div>
+            <div id="followers">
+              <%= accountsFollowers.length %>
+              <span
+                >Follower<%= accountsFollowers.length === 1 ? '' : 's' %></span
+              >
+            </div>
+            <div id="following">
+              <%= account.following.length %>
+              <span>Following</span>
+            </div>
+          </div>
+          <div id="belowNumbers">
+            <div id="nameAndBio">
+              <h1><%= account.name %></h1>
+              <p id="description"><%= JSON.stringify(account.description) %></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- prettier-ignore -->
+      <% if (loggedin) { %>
+      <% if (JSON.stringify(account._id) !== JSON.stringify(user._id)) { %>
+        <% if (user.following.includes(account._id)) { %>
+      <button id="followBtn" data-account-id="<%= account._id %>">
+        Following
+      </button>
+      <% } else {%>
+      <button id="followBtn" data-account-id="<%= account._id %>">
+        Follow
+      </button>
+      <% } %> <% } else { %>
+      <button data-account-id="<%= account._id %>" id="editProfileBtn">
+        Edit Profile
+      </button>
+      <% } %>
+      <!-- prettier-ignore -->
+      <% } else { %>
+      <button id="loginBtn">Login</button>
+      <% } %>
+
+      <hr />
+
+      <!-- Start of Posts -->
+      <div id="postsGrid">
+        <% accountsPosts.reverse().forEach(post => { %>
+        <div class="imgHolder" onclick="openPost('<%= post._id %>')">
+          <img
+            src="<%= post.img %>"
+            alt="Post Image"
+            data-post-id="<%= post._id %>"
+          />
+        </div>
+
+        <% }) %>
+      </div>
+    </div>
+    <script src="/assets/js/main.js"></script>
+    <% if (loggedin) { %>
+    <script src="/assets/js/deviceverification.js"></script>
+    <%- include('partials/sideNavBar') %> <% } %> <%- include('partials/footer')
+    %>
+    <script src="/assets/js/account.js"></script>
+  </body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socialent</title>
+
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/index.css" />
+  </head>
+  <body>
+    <div id="leftBody" class="d-back">
+      <img src="/images/grouplogo.svg" alt="background-img" id="leftBodyImg" />
+      <h1 id="joinTitle">Join<br />Socialent<br />today</h1>
+    </div>
+    <div id="rightBody">
+      <h1 id="rightBodyTitle">See whats happenning today</h1>
+      <div id="rightBodyLinks">
+        <div id="signupDiv" class="buttonDiv c-back">
+          <a id="signupLink" class="d button" href="/signup">Sign up</a>
+        </div>
+        <div id="loginDiv" class="buttonDiv">
+          <a id="loginLink" class="c button" href="/login">Login</a>
+        </div>
+      </div>
+    </div>
+    <%- include('./partials/footer.ejs') %>
+    <script src="/assets/js/main.js"></script>
+  </body>
+</html>

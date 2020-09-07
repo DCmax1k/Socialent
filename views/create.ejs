@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create new post - Socialent</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/create.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+      integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="background"></div>
+
+    <div id="formCont">
+      <h1>Create a new post</h1>
+      <div id="form">
+        <input type="file" id="file" style="display: none" />
+        <div class="row">
+          * Photo &nbsp;
+          <button id="customBtn">Choose a file</button> &nbsp;
+          <p id="customText">No file chosen</p>
+        </div>
+        <div class="row">Description - Optional</div>
+        <div class="row">
+          <textarea id="description"></textarea>
+        </div>
+
+        <div class="row">
+          <button id="submit">Submit</button>
+        </div>
+      </div>
+    </div>
+
+    <%- include('partials/sideNavBar') %> <%- include('partials/footer') %>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/deviceverification.js"></script>
+    <script src="/assets/js/create.js"></script>
+  </body>
+</html>

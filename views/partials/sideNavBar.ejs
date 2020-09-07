@@ -1,0 +1,154 @@
+<div id="sideNavBar" class="b-back">
+  <i id="openMenu" class="fas fa-bars"></i>
+  <div id="logoutBtn">
+    <i class="fas fa-sign-out-alt d"></i>
+  </div>
+  <div id="searchBtn" class="d-back">
+    <i class="fas fa-search b"></i>
+  </div>
+  <div id="homeBtn" class="d-back">
+    <i class="fas fa-home b"></i>
+  </div>
+  <div id="createBtn" class="d-back">
+    <i class="fas fa-plus b"></i>
+  </div>
+  <div id="profileBtn">
+    <img
+      src="<% if (user.profileImg === 'none') { %>
+       /images/profilePlaceholder.svg
+      <% } else {  %>
+        <%= user.profileImg %> 
+      <% } %> "
+      height="40px"
+      width="40px"
+      alt="Profile Btn"
+      style="border-radius: 50%; background-color: #2e2e2e"
+    />
+  </div>
+</div>
+<style>
+  #sideNavBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  #searchBtn,
+  #homeBtn,
+  #createBtn {
+    height: 50px;
+    width: 50px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  #profileBtn {
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    bottom: 50px;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  #logoutBtn {
+    position: fixed;
+    top: 5px;
+    left: 25px;
+    transform: translateX(-50%);
+    font-size: 20px;
+    z-index: 1;
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+  }
+  #openMenu {
+    position: absolute;
+    top: 20px;
+    left: 75px;
+    transform: translateX(-50%);
+    cursor: pointer;
+    color: black;
+    font-size: 20px;
+    display: none;
+  }
+
+  @media screen and (max-width: 500px) {
+    #sideNavBar {
+      transform: translateX(-100%);
+    }
+    #sideNavBar.active {
+      transform: translateX(0);
+    }
+    #openMenu {
+      display: inline-block;
+    }
+  }
+</style>
+<script>
+  const logoutBtn = document.getElementById('logoutBtn');
+  const homeBtn = document.getElementById('homeBtn');
+  const createBtn = document.getElementById('createBtn');
+  const userID = window.location.href.split('=')[1];
+  const profileBtn = document.getElementById('profileBtn');
+  const openMenu = document.getElementById('openMenu');
+  const sideNavBar = document.getElementById('sideNavBar');
+
+  openMenu.addEventListener('click', () => {
+    sideNavBar.classList.toggle('active');
+    openMenu.classList.toggle('fa-bars');
+    openMenu.classList.toggle('fa-times');
+  });
+
+  searchBtn.addEventListener('click', () => {
+    window.location.href = '/search?k=<%= user._id %>';
+  });
+  homeBtn.addEventListener('click', () => {
+    window.location.href = '/home?k=<%= user._id %>';
+  });
+  createBtn.addEventListener('click', () => {
+    window.location.href = '/create?k=<%= user._id %>';
+  });
+
+  profileBtn.addEventListener('click', () => {
+    window.location.href = `/account/<%= user.username %>?k=<%= user._id %>`;
+  });
+
+  // Logout
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      const response = await fetch('/home/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: userID,
+        }),
+      });
+      const resJSON = await response.json();
+      if (resJSON.status === 'logged out') {
+        window.location.href = '/';
+      } else {
+        alert('An Error Occured');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+</script>

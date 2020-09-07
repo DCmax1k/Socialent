@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup - Socialent</title>
+
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/signup.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+      integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="alertCont">
+      <h1>Error</h1>
+      <p id="alertMsg">
+        <i class="fas fa-exclamation-circle"></i> Please fill out all fields!
+      </p>
+    </div>
+    <div id="formCont">
+      <h1 class="d">Sign up</h1>
+      <div class="form-row" id="emailCont">
+        <p>Email</p>
+        <input id="email" type="email" />
+      </div>
+      <div class="form-row" id="nameCont">
+        <p>Full name</p>
+        <input id="name" type="text" />
+      </div>
+      <div class="form-row" id="usernameCont">
+        <p>Username</p>
+        <input id="username" type="text" />
+        <p id="charCount">15 characters left</p>
+      </div>
+      <div class="form-row" id="passwordCont">
+        <p>Password</p>
+        <input id="password" type="password" />
+        <p class="input-info">Must be at least 8 characters</p>
+        <i id="passwordEye" class="fas fa-eye"></i>
+      </div>
+      <button id="submit" class="d-back a" type="submit">Submit</button>
+      <a href="/login">Already have an account? Login</a>
+    </div>
+    <%- include('./partials/footer.ejs') %>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/signup.js"></script>
+  </body>
+</html>

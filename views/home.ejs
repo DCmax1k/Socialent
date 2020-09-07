@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home - Socialent</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+      integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="background"></div>
+
+    <!-- Start of posts -->
+    <div class="all-posts">
+      <% postsFollowing.reverse().forEach(post => { %>
+      <div class="post-cont">
+        <a
+          href="/account/<%= post.author.username %>?k=<%= user._id %>"
+          class="author"
+        >
+          <img
+            class="author-img"
+            src="<% if (post.author.profileImg === 'none') { %>
+          /images/profilePlaceholder.svg
+         <% } else {  %>
+           <%= post.author.profileImg %> 
+         <% } %> "
+            alt="Profile Picture"
+          />
+          <%= post.author.username %>
+        </a>
+        <div class="post-img">
+          <img src="<%= post.img %> " alt="Post" />
+        </div>
+        <div class="bottom-btns">
+          <div class="like-btn">
+            <!-- prettier-ignore -->
+            <i
+          data-post-id="<%= post._id %>" <% if (post.likes.includes(user._id)) {%> style="color: red;" data-post-liked="true" <% } %>  class="fas fa-heart"></i>
+            <p data-post-id="<%= post._id %>">
+              <%= post.likes.length %> <% if (post.likes.length === 1) { %> Like
+              <% } else { %> Likes <% } %>
+            </p>
+          </div>
+          <div class="share-btn">
+            <i data-post-id="<%= post._id %>" class="fas fa-share"></i>
+            <p id="copyPost" data-post-id="<%= post._id %>">
+              Copied post link to clipboard!
+            </p>
+          </div>
+        </div>
+        <div class="description">
+          <b><%= post.author.username %></b> &nbsp; <%=
+          JSON.stringify(post.description) %>
+        </div>
+        <div class="view-comments">
+          <p data-post-id="<%= post._id %>" class="view-comments-btn c">
+            View <% if (post.comments.length !== 1) {%>all<% } %> <%=
+            post.comments.length %> comment<% if (post.comments.length !== 1)
+            {%>s<% } %>
+          </p>
+        </div>
+        <div class="date-created">
+          <p><%= post.date.toLocaleDateString() %></p>
+        </div>
+        <div class="add-comment">
+          <input
+            data-post-id="<%= post._id %>"
+            type="text"
+            placeholder="Add a comment..."
+          />
+          <i
+            data-post-id="<%= post._id %>"
+            class="submit-comment fas fa-arrow-circle-up"
+          ></i>
+        </div>
+        <div data-post-id="<%= post._id %>" class="all-comments">
+          <h1>&nbsp;All Comments:</h1>
+          <hr />
+          <div data-post-id="<%= post._id %>" class="comments-area">
+            <% post.comments.reverse().forEach(comment => {%>
+            <div class="comment">
+              <b><%= comment[0] %></b>&nbsp;<%= comment[1] %>
+              <p class="comment-date"><%= comment[2] %></p>
+            </div>
+            <hr class="light-hr" />
+            <% }) %>
+          </div>
+
+          <span><span></span></span>
+        </div>
+      </div>
+      <% }) %> <% if (postsFollowing.length == 0) {%>
+      <h1 id="noPosts">
+        Create a post or start following people to see posts here!
+      </h1>
+      <% } %>
+    </div>
+
+    <%- include('partials/sideNavBar') %> <%- include('partials/footer') %>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/deviceverification.js"></script>
+    <script src="/assets/js/home.js"></script>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+#leftBody {
+  width: 50%;
+  height: 100vh;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+#rightBody {
+  width: 50%;
+  height: 100vh;
+  overflow: hidden;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+#leftBodyImg {
+  height: 500px;
+  position: absolute;
+  bottom: -30px;
+  right: 0;
+}
+
+#joinTitle {
+  font-size: 100px;
+  font-weight: normal;
+  position: absolute;
+  left: 100px;
+  top: 75px;
+}
+
+#rightBodyTitle {
+  position: absolute;
+  top: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  text-align: center;
+}
+#rightBodyLinks {
+  position: absolute;
+  top: 250px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.button {
+  text-decoration: none;
+  text-align: center;
+  font-size: 20px;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.buttonDiv {
+  border-radius: 99999999px;
+  width: 350px;
+  height: 40px;
+  border: 1px solid #3282b8;
+
+  margin: 20px;
+}
+
+@media screen and (max-width: 1000px) {
+  #rightBody {
+    width: 100%;
+    height: 500px;
+  }
+  #leftBody {
+    width: 100%;
+    top: 500px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  #rightBodyTitle {
+    font-size: 25px;
+  }
+  #joinTitle {
+    left: 20px;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  #joinTitle {
+    font-size: 70px;
+  }
+  #rightBodyLinks > a {
+    width: 90%;
+  }
+  #rightBodyLinks {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+  }
+  .buttonDiv {
+    width: 95%;
+  }
+}
+
+@media screen and (max-width: 275px) {
+  #joinTitle {
+    font-size: 50px;
+  }
+}

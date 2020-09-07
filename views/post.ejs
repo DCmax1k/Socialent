@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post - Socialent</title>
+
+    <link rel="stylesheet" href="/assets/css/post.css" />
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.14.0/css/all.css"
+      integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <div id="background"></div>
+
+    <!-- POST Content -->
+    <div id="postCont">
+      <div id="imgCont">
+        <img
+          src="<%= post.img %>"
+          alt="Post Image"
+          style="max-height: 400px; width: 100%"
+        />
+      </div>
+
+      <div id="postInfo">
+        <!-- Username -->
+        <div id="username">
+          <img
+            src="<%= post.author.profileImg %>"
+            alt="Profile Image"
+            style="
+              background-color: #2e2e2e;
+              border-radius: 50%;
+              height: 30px;
+              width: 30px;
+            "
+          />
+          <h1><%= post.author.username %></h1>
+        </div>
+
+        <!-- Comments -->
+        <div id="commentsCont">
+          <% post.comments.reverse().forEach(comment => { %>
+          <div class="comment">
+            <p><b><%= comment[0] %></b> <%= comment[1] %></p>
+            <span><%= comment[2] %></span>
+          </div>
+          <% }) %>
+        </div>
+        <div id="likeAndShare">
+          <% if (loggedin) { %>
+          <div id="likeBtn">
+            <!-- prettier-ignore -->
+            <i class="fas fa-heart" data-post-id="<%= post._id %>" <% if (likedpost) { %>
+              data-post-liked="true" style="color: red;" <% } else {%>
+              data-post-liked="false" style="color: #c4c4c4;" <% } %>></i
+            >
+            <!-- prettier-ignore -->
+            <p><%= post.likes.length %> <% if (post.likes.length === 1) { %> Like<% } else { %> Likes <% } %></p>
+          </div>
+          <% } %>
+          <div id="shareBtn">
+            <i data-post-id="<%= post._id %>" class="fas fa-share"></i>
+            <p>Copied post link to clipboard!</p>
+          </div>
+        </div>
+        <div id="description">
+          <b><%= post.author.username %></b> &nbsp;<%= post.description %>
+        </div>
+        <div id="postDate"><%= post.date.toLocaleDateString() %></div>
+        <% if (loggedin) { %>
+        <div id="addAComment">
+          <input type="text" id="commentInput" placeholder="Add a comment..." />
+          <i class="fas fa-arrow-circle-up" id="submitComment"></i>
+        </div>
+        <% } else { %>
+        <a
+          href="/login"
+          style="
+            color: #0f4c75;
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+          "
+          >Log in!</a
+        >
+        <% } %>
+      </div>
+    </div>
+
+    <% if (loggedin) { %>
+    <script src="/assets/js/deviceverification.js"></script>
+    <%- include('partials/sideNavBar') %> <% } %> <%- include('partials/footer')
+    %>
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/post.js"></script>
+  </body>
+</html>
