@@ -18,6 +18,7 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  margin-bottom: 150px;
 }
 
 #postCont hr {
@@ -29,10 +30,15 @@
 #imgCont {
   height: 400px;
   width: 400px;
+  overflow: hidden;
   background-color: #2e2e2e;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+#imgCont > img {
+  width: 100%;
 }
 
 #postInfo {
@@ -205,7 +211,6 @@
     width: 300px;
     height: 700px;
     flex-direction: column;
-    margin-bottom: 100px;
     margin-top: 50px;
   }
 

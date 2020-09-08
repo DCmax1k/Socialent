@@ -7,6 +7,32 @@ const commentsAreas = document.querySelectorAll('.comments-area');
 const addCommentInputs = document.querySelectorAll('.add-comment > input');
 const submitCommentBtns = document.querySelectorAll('.submit-comment');
 const descriptions = document.querySelectorAll('.description');
+const shareBtns = document.querySelectorAll('.share-btn > i');
+const copyPosts = document.querySelectorAll('.copy-post');
+
+// Share post
+shareBtns.forEach((shareBtn) => {
+  shareBtn.addEventListener('click', () => {
+    copyPosts.forEach((copyPost) => {
+      if (
+        copyPost.getAttribute('data-post-id') ===
+        shareBtn.getAttribute('data-post-id')
+      ) {
+        const postID = copyPost.getAttribute('data-post-id');
+        const node = document.createElement('textarea');
+        node.value = `${domain}/post/${postID}`;
+        document.body.appendChild(node);
+        node.select();
+        document.execCommand('copy');
+        document.body.removeChild(node);
+        copyPost.style.display = 'inline-block';
+        setTimeout(() => {
+          copyPost.style.display = 'none';
+        }, 5000);
+      }
+    });
+  });
+});
 
 // Develope return values in post description
 descriptions.forEach((description) => {

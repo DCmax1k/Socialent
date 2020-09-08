@@ -20,19 +20,18 @@ file.addEventListener('change', () => {
 submit.addEventListener('click', async () => {
   if (file.value) {
     submit.innerText = 'Loading...';
-    const image = file.files[0];
+    const fileData = file.files[0];
     const data = new FormData();
-    data.append('file', image);
+    data.append('file', fileData);
     data.append('upload_preset', 'thepreset');
     data.append('cloud_name', 'thecloudname');
+    const uploadURL =
+      'https://api.cloudinary.com/v1_1/thecloudname/image/upload';
     try {
-      const response = await fetch(
-        'https://api.cloudinary.com/v1_1/thecloudname/image/upload',
-        {
-          method: 'POST',
-          body: data,
-        }
-      );
+      const response = await fetch(uploadURL, {
+        method: 'POST',
+        body: data,
+      });
       const resJSON = await response.json();
       const imgURL = resJSON.url;
       const newResponse = await fetch('/create/createpost', {
