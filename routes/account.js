@@ -132,6 +132,8 @@ router.post('/editprofile/verifyemail', async (req, res) => {
         subject: 'Verify Email',
         html: `
         <h1>Socialent: Verify Email</h1>
+        <hr />
+        <h2>${user.username}</h2>
         <br />
         Please click <a href="${process.env.DOMAIN}/account/editprofile/verifyemail/${user._id}?ec=${verifyEmailCode}" >here</a> to verify your email!
         <br />

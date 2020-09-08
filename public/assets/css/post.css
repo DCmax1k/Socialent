@@ -14,9 +14,9 @@
   height: 400px;
   width: 700px;
   position: absolute;
-  top: calc(50% - 30px);
+  top: 30px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   display: flex;
 }
 
@@ -205,8 +205,8 @@
     width: 300px;
     height: 700px;
     flex-direction: column;
-    margin-top: 20px;
-    margin-bottom: 50px;
+    margin-bottom: 100px;
+    margin-top: 50px;
   }
 
   #imgCont {
@@ -223,7 +223,6 @@
 @media screen and (max-width: 430px) {
   #postCont {
     top: 50px;
-    transform: translate(-50%, 0);
   }
 }
 
@@ -231,6 +230,6 @@
   #postCont {
     width: 100%;
     left: 0;
-    transform: translate(0, 0);
+    transform: translateX(0);
   }
 }

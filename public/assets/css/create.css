@@ -51,6 +51,11 @@
   outline: none;
   cursor: pointer;
   margin-bottom: 20px;
+  transition: background-color 0.3s ease;
+}
+
+#customBtn:hover {
+  background-color: rgb(143, 168, 185);
 }
 
 #description {
