@@ -43,7 +43,8 @@ submitCommentBtns.forEach((submitCommentBtn) => {
                   new Date().getMonth() +
                   1 +
                   '/' +
-                  new Date().getUTCDate() +
+                  new Date().getUTCDate() -
+                  1 +
                   '/' +
                   new Date().getFullYear(),
               }),
