@@ -19,7 +19,7 @@
     <!-- Start of posts -->
     <div class="all-posts">
       <% postsFollowing.reverse().forEach(post => { %>
-      <div class="post-cont">
+      <div data-post-id="<%= post._id %>" class="post-cont">
         <a
           href="/account/<%= post.author.username %>?k=<%= user._id %>"
           class="author"
@@ -35,6 +35,21 @@
           />
           <%= post.author.username %>
         </a>
+
+        <!-- prettier-ignore -->
+        <% if (JSON.stringify(post.author._id) === JSON.stringify(user._id)) { %>
+        <!-- Delete post menu -->
+        <div class="open-delete-post-menu" data-post-id="<%= post._id %>">
+          <i class="fas fa-ellipsis-h"></i>
+        </div>
+        <div data-post-id="<%= post._id %>" class="delete-post-menu">
+          <div data-post-id="<%= post._id %>" class="delete-post">
+            Delete post
+          </div>
+        </div>
+        <% } %>
+
+        <!-- Post img -->
         <div class="post-img">
           <img src="<%= post.img %> " alt="Post" />
         </div>

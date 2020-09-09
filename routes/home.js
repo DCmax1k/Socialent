@@ -32,6 +32,21 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Delet post
+router.post('/deletepost', async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userID);
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const post = await Post.deleteOne({ _id: req.body.postID });
+      res.json({
+        status: 'successful',
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // Add comment
 router.post('/addcomment', async (req, res) => {
   try {

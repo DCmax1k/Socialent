@@ -33,7 +33,7 @@ submit.addEventListener('click', async () => {
         body: data,
       });
       const resJSON = await response.json();
-      const imgURL = resJSON.url;
+      const imgURL = resJSON.secure_url;
       const newResponse = await fetch('/create/createpost', {
         method: 'POST',
         headers: {

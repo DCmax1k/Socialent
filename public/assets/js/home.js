@@ -1,3 +1,4 @@
+const posts = document.querySelectorAll('.post-cont');
 const likeBtns = document.querySelectorAll('.like-btn > i');
 const likeBtnsText = document.querySelectorAll('.like-btn > p');
 const logOutBt = document.getElementById('logOutBtn');
@@ -9,6 +10,49 @@ const submitCommentBtns = document.querySelectorAll('.submit-comment');
 const descriptions = document.querySelectorAll('.description');
 const shareBtns = document.querySelectorAll('.share-btn > i');
 const copyPosts = document.querySelectorAll('.copy-post');
+const openDeleteMenus = document.querySelectorAll('.open-delete-post-menu');
+const deletePostMenus = document.querySelectorAll('.delete-post-menu');
+const deletePosts = document.querySelectorAll('.delete-post');
+
+// Delete post
+openDeleteMenus.forEach((openDeleteMenu) => {
+  openDeleteMenu.addEventListener('click', () => {
+    const postID = openDeleteMenu.getAttribute('data-post-id');
+    deletePostMenus.forEach((deletePostMenu) => {
+      if (deletePostMenu.getAttribute('data-post-id') === postID) {
+        deletePostMenu.classList.toggle('active');
+      }
+    });
+  });
+});
+
+deletePosts.forEach((deletePost) => {
+  deletePost.addEventListener('click', async () => {
+    const postID = deletePost.getAttribute('data-post-id');
+    deletePost.innerText = 'Loading...';
+    const response = await fetch('/home/deletepost', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        postID,
+        userID,
+        device: window.navigator.userAgent,
+      }),
+    });
+    const resJSON = await response.json();
+    if (resJSON.status === 'successful') {
+      posts.forEach((post) => {
+        if (post.getAttribute('data-post-id') === postID) {
+          post.style.display = 'none';
+        }
+      });
+    } else {
+      window.location.href = '/login';
+    }
+  });
+});
 
 // Share post
 shareBtns.forEach((shareBtn) => {

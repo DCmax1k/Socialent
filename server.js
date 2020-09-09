@@ -20,11 +20,6 @@ app.get('/', (req, res) => {
   res.render('index');
 });
 
-// placeholder image
-app.get('/placeholderImg', (req, res) => {
-  res.sendFile(__dirname + '/public/images/profilePlaceholder.svg');
-});
-
 // Device verification
 app.post('/deviceverification', async (req, res) => {
   try {

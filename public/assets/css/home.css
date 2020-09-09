@@ -63,6 +63,39 @@
   background-color: #2e2e2e;
 }
 
+.open-delete-post-menu {
+  position: absolute;
+  height: 40px;
+  width: 40px;
+  top: 0px;
+  right: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.delete-post-menu {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+  background-color: white;
+  padding: 5px 10px;
+  border-radius: 10px;
+  border: 1px solid black;
+  display: none;
+}
+
+.delete-post-menu.active {
+  display: inline-block;
+}
+
+.delete-post {
+  color: rgb(206, 0, 0);
+  font-size: 13px;
+  cursor: pointer;
+}
+
 .post-img {
   width: 100%;
   max-height: 300px;
