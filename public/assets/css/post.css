@@ -18,7 +18,6 @@
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  margin-bottom: 150px;
 }
 
 #postCont hr {
@@ -212,6 +211,10 @@
     height: 700px;
     flex-direction: column;
     margin-top: 50px;
+  }
+
+  body {
+    min-height: 900px;
   }
 
   #imgCont {
