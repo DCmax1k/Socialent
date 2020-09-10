@@ -13,6 +13,26 @@ const copyPosts = document.querySelectorAll('.copy-post');
 const openDeleteMenus = document.querySelectorAll('.open-delete-post-menu');
 const deletePostMenus = document.querySelectorAll('.delete-post-menu');
 const deletePosts = document.querySelectorAll('.delete-post');
+const playBtns = document.querySelectorAll('.play-btn');
+const videos = document.querySelectorAll('.post-img > video');
+
+// Play a video
+playBtns.forEach((playBtn) => {
+  playBtn.addEventListener('click', () => {
+    const postID = playBtn.getAttribute('data-post-id');
+    videos.forEach((video) => {
+      if (video.getAttribute('data-post-id') === postID) {
+        if (video.paused) {
+          video.play();
+          playBtn.style.opacity = '0';
+        } else {
+          video.pause();
+          playBtn.style.opacity = '1';
+        }
+      }
+    });
+  });
+});
 
 // Delete post
 openDeleteMenus.forEach((openDeleteMenu) => {

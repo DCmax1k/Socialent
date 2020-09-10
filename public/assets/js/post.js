@@ -6,6 +6,23 @@ if (window.location.href.split('=').length !== 1) {
 const commentsCont = document.getElementById('commentsCont');
 const shareBtn = document.querySelector('#shareBtn > i');
 const postID = shareBtn.getAttribute('data-post-id');
+const playBtn = document.getElementById('playBtn');
+const video = document.getElementById('video');
+
+// Play video
+if (playBtn && video) {
+  playBtn.addEventListener('click', () => {
+    if (video.paused) {
+      video.play();
+      playBtn.style.opacity = '0';
+    } else {
+      video.pause();
+      playBtn.style.opacity = '1';
+    }
+  });
+}
+
+// Share Btn
 shareBtn.addEventListener('click', () => {
   const node = document.createElement('textarea');
   node.value = `${domain}/post/${postID}`;
@@ -25,6 +42,35 @@ if (loggedIn) {
   const likeBtnText = document.querySelector('#likeBtn > p');
   const commentInput = document.getElementById('commentInput');
   const submitComment = document.getElementById('submitComment');
+  const openDeleteMenu = document.querySelector('.open-delete-post-menu');
+  const deletePostMenu = document.querySelector('.delete-post-menu');
+  const deletePost = document.querySelector('.delete-post');
+
+  // Delete post
+  openDeleteMenu.addEventListener('click', () => {
+    deletePostMenu.classList.toggle('active');
+  });
+
+  deletePost.addEventListener('click', async () => {
+    deletePost.innerText = 'Loading...';
+    const response = await fetch('/home/deletepost', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        postID,
+        userID,
+        device: window.navigator.userAgent,
+      }),
+    });
+    const resJSON = await response.json();
+    if (resJSON.status === 'successful') {
+      window.location.href = `/account/${resJSON.username}?k=${resJSON._id}`;
+    } else {
+      window.location.href = '/login';
+    }
+  });
 
   // Post comment
   commentInput.addEventListener('keyup', (e) => {

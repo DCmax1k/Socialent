@@ -51,7 +51,17 @@
 
         <!-- Post img -->
         <div class="post-img">
-          <img src="<%= post.img %> " alt="Post" />
+          <% if (post.urlType === 'image') { %>
+          <img src="<%= post.url %> " alt="Post" />
+          <% } else if (post.urlType === 'video') {%>
+          <video data-post-id="<%= post._id %>">
+            <source src="<%= post.url %>" />
+          </video>
+          <div class="play-btn" data-post-id="<%= post._id %>">
+            <i class="fas fa-play"></i>
+          </div>
+
+          <% } %>
         </div>
         <div class="bottom-btns">
           <div class="like-btn">

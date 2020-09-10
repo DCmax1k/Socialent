@@ -131,11 +131,20 @@
       <div id="postsGrid">
         <% accountsPosts.reverse().forEach(post => { %>
         <div class="imgHolder" onclick="openPost('<%= post._id %>')">
+          <% if (post.urlType === 'image') { %>
           <img
-            src="<%= post.img %>"
+            src="<%= post.url %>"
             alt="Post Image"
             data-post-id="<%= post._id %>"
           />
+          <% } else if (post.urlType === 'video') { %>
+          <video>
+            <source src="<%= post.url %>" />
+          </video>
+          <div class="play-btn" data-post-id="<%= post._id %>">
+            <i class="fas fa-play"></i>
+          </div>
+          <% } %>
         </div>
 
         <% }) %>

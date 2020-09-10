@@ -20,7 +20,16 @@
     <!-- POST Content -->
     <div id="postCont">
       <div id="imgCont">
-        <img src="<%= post.img %>" alt="Post Image" />
+        <% if (post.urlType === 'image') { %>
+        <img src="<%= post.url %>" alt="Post Image" />
+        <% } else if (post.urlType === 'video') {%>
+        <video id="video">
+          <source src="<%= post.url %>" />
+        </video>
+        <div id="playBtn">
+          <i class="fas fa-play"></i>
+        </div>
+        <% } %>
       </div>
 
       <div id="postInfo">
@@ -38,6 +47,15 @@
           />
           <h1><%= post.author.username %></h1>
         </div>
+        <% if (loggedin) { %>
+        <!-- Delete post menu -->
+        <div class="open-delete-post-menu">
+          <i class="fas fa-ellipsis-h"></i>
+        </div>
+        <div class="delete-post-menu">
+          <div class="delete-post">Delete post</div>
+        </div>
+        <% } %>
 
         <!-- Comments -->
         <div id="commentsCont">

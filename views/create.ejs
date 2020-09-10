@@ -19,9 +19,14 @@
     <div id="formCont">
       <h1>Create a new post</h1>
       <div id="form">
-        <input type="file" id="file" style="display: none" />
+        <input
+          accept=".gif, .jpg, .jpeg, .png, .svg, .mp4, .mov, .wmv"
+          type="file"
+          id="file"
+          style="display: none"
+        />
+        <div class="row">* Photo (less than 10MB)/Video (less than 100MB)</div>
         <div class="row">
-          * Photo &nbsp;
           <button class="d-back" id="customBtn">Choose a file</button> &nbsp;
           <p id="customText">No file chosen</p>
         </div>

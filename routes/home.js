@@ -40,6 +40,8 @@ router.post('/deletepost', async (req, res) => {
       const post = await Post.deleteOne({ _id: req.body.postID });
       res.json({
         status: 'successful',
+        username: user.username,
+        _id: user._id,
       });
     }
   } catch (err) {

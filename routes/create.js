@@ -30,7 +30,8 @@ router.post('/createpost', async (req, res) => {
         username: user.username,
         profileImg: user.profileImg,
       },
-      img: req.body.url,
+      url: req.body.url,
+      urlType: req.body.urlType,
       description: req.body.description,
     });
     const savePost = await createPost.save();

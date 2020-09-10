@@ -19,14 +19,22 @@ file.addEventListener('change', () => {
 
 submit.addEventListener('click', async () => {
   if (file.value) {
-    submit.innerText = 'Loading...';
+    submit.innerText = 'Uploading...';
     const fileData = file.files[0];
     const data = new FormData();
     data.append('file', fileData);
     data.append('upload_preset', 'thepreset');
     data.append('cloud_name', 'thecloudname');
-    const uploadURL =
-      'https://api.cloudinary.com/v1_1/thecloudname/image/upload';
+    console.log(fileData.type.split('/')[0]);
+    let uploadURL = '';
+    let urlType = '';
+    if (fileData.type.split('/')[0] == 'video') {
+      uploadURL = 'https://api.cloudinary.com/v1_1/thecloudname/video/upload';
+      urlType = 'video';
+    } else if (fileData.type.split('/')[0] == 'image') {
+      uploadURL = 'https://api.cloudinary.com/v1_1/thecloudname/image/upload';
+      urlType = 'image';
+    }
     try {
       const response = await fetch(uploadURL, {
         method: 'POST',
@@ -41,6 +49,7 @@ submit.addEventListener('click', async () => {
         },
         body: JSON.stringify({
           url: imgURL,
+          urlType,
           description: description.value,
           userID,
         }),
