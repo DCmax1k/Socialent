@@ -17,6 +17,7 @@ const updateBio = document.getElementById('updateBio');
 const bio = document.getElementById('bio');
 const description = document.getElementById('description');
 
+// Set return values
 function fixDescription() {
   let descText = description.innerText;
   descText = descText.trim();
@@ -284,6 +285,8 @@ if (loginBtn) {
 
 if (editProfileBtn) {
   editProfileBtn.addEventListener('click', () => {
+    editProfileCont.style.transition =
+      'transform 0.5s cubic-bezier(0.75, -0.28, 0.26, 1.39)';
     editProfileCont.classList.add('active');
   });
 }
