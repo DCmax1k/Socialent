@@ -176,6 +176,7 @@
 }
 
 #editProfileCont {
+  transform: translateX(-120%);
   width: 90%;
   height: 85vh;
   position: fixed;
@@ -188,9 +189,6 @@
   z-index: 1;
   color: white;
   padding: 0 40px;
-
-  transform: translateX(-120%);
-  transition: transform 0.5s cubic-bezier(0.75, -0.28, 0.26, 1.39);
 }
 
 #editProfileCont::-webkit-scrollbar {
@@ -207,6 +205,7 @@
 }
 
 #editProfileCont.active {
+  transition: transform 0.5s cubic-bezier(0.75, -0.28, 0.26, 1.39);
   transform: translateX(0);
 }
 
