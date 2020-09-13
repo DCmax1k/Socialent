@@ -84,7 +84,7 @@
   border-radius: 10px;
   border: 1px solid black;
   display: none;
-  z-index: 2;
+  z-index: 6;
 }
 
 .delete-post-menu.active {
@@ -128,6 +128,7 @@
   background-color: rgba(0, 0, 0, 0.5);
   cursor: pointer;
   transition: opacity 0.3s ease;
+  z-index: 5;
 }
 
 .play-btn > i {

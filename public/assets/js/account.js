@@ -16,6 +16,7 @@ const followBtn = document.getElementById('followBtn');
 const updateBio = document.getElementById('updateBio');
 const bio = document.getElementById('bio');
 const description = document.getElementById('description');
+const deleteAccount = document.getElementById('deleteAccount');
 
 // Set return values
 function fixDescription() {
@@ -72,6 +73,31 @@ if (followBtn) {
 
 if (editProfileCont) {
   // Edit Profile
+
+  // Delete Account
+  deleteAccount.addEventListener('click', async () => {
+    const confirmation = confirm(
+      'Are you sure you would like to delete your account? All data and posts will be deleted!'
+    );
+    if (confirmation) {
+      const response = await fetch('/account/deleteaccount', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userID,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON = await response.json();
+      if (resJSON.status === 'successful') {
+        window.location.href = '/';
+      } else {
+        window.location.href = '/login';
+      }
+    }
+  });
 
   // Update Description
   updateBio.addEventListener('click', async () => {

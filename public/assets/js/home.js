@@ -35,6 +35,8 @@ playBtns.forEach((playBtn) => {
 });
 
 // Delete post
+
+// Open menu
 openDeleteMenus.forEach((openDeleteMenu) => {
   openDeleteMenu.addEventListener('click', () => {
     const postID = openDeleteMenu.getAttribute('data-post-id');
@@ -46,6 +48,7 @@ openDeleteMenus.forEach((openDeleteMenu) => {
   });
 });
 
+// Actual Delete post
 deletePosts.forEach((deletePost) => {
   deletePost.addEventListener('click', async () => {
     const postID = deletePost.getAttribute('data-post-id');
@@ -65,6 +68,13 @@ deletePosts.forEach((deletePost) => {
     if (resJSON.status === 'successful') {
       posts.forEach((post) => {
         if (post.getAttribute('data-post-id') === postID) {
+          videos.forEach((video) => {
+            if (video.getAttribute('data-post-id') === postID) {
+              if (!video.paused) {
+                video.pause();
+              }
+            }
+          });
           post.style.display = 'none';
         }
       });

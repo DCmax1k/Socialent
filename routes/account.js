@@ -55,6 +55,29 @@ router.get('/:username', async (req, res) => {
   }
 });
 
+// Delete Account
+router.post('/deleteaccount', async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userID);
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const deleteAllPosts = await Post.deleteMany({ 'author._id': user._id });
+      const deleteIdsFromFollowing = await User.updateMany({
+        $pull: { following: user._id },
+      });
+      const deleteUser = await User.deleteOne({ _id: user._id });
+      res.json({
+        status: 'successful',
+      });
+    } else {
+      res.json({
+        status: 'unseccessful',
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // Follow
 router.post('/followprofile', async (req, res) => {
   try {
