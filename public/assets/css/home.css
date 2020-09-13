@@ -245,6 +245,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
+  z-index: 7;
 }
 
 .all-comments.active {
