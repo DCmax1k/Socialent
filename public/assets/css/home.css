@@ -108,12 +108,10 @@
   position: relative;
 }
 
-.post-img > img {
-  width: 100%;
-}
-
+.post-img > img,
 .post-img > video {
   width: 100%;
+  z-index: 4;
 }
 
 .post-img > .play-btn {
