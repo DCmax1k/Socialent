@@ -146,6 +146,7 @@ submitCommentBtns.forEach((submitCommentBtn) => {
                   (new Date().getUTCDate() - 1) +
                   '/' +
                   new Date().getFullYear(),
+                device: window.navigator.userAgent,
               }),
             });
             const resJSON = await response.json();
@@ -172,6 +173,8 @@ submitCommentBtns.forEach((submitCommentBtn) => {
                   commentsArea.insertBefore(node, commentsArea.childNodes[0]);
                 }
               });
+            } else {
+              window.location.href = '/login';
             }
           }
         }
@@ -228,6 +231,7 @@ likeBtns.forEach((likeBtn) => {
           body: JSON.stringify({
             postID,
             userID,
+            device: window.navigator.userAgent,
           }),
         });
         const resJSON = await response.json();
@@ -244,6 +248,8 @@ likeBtns.forEach((likeBtn) => {
               }
             }
           });
+        } else {
+          window.location.href = '/login';
         }
       } else {
         // Unlike post
@@ -255,6 +261,7 @@ likeBtns.forEach((likeBtn) => {
           body: JSON.stringify({
             postID,
             userID,
+            device: window.navigator.userAgent,
           }),
         });
         const respJSON = await resp.json();
@@ -271,6 +278,8 @@ likeBtns.forEach((likeBtn) => {
               }
             }
           });
+        } else {
+          window.location.href = '/login';
         }
       }
     } catch (err) {

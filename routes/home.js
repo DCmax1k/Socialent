@@ -43,6 +43,10 @@ router.post('/deletepost', async (req, res) => {
         username: user.username,
         _id: user._id,
       });
+    } else {
+      res.json({
+        status: 'unseccesful',
+      });
     }
   } catch (err) {
     console.error(err);
@@ -54,19 +58,25 @@ router.post('/addcomment', async (req, res) => {
   try {
     const post = await Post.findById(req.body.postID);
     const user = await User.findById(req.body.userID);
-    const updatePost = await Post.findByIdAndUpdate(
-      post._id,
-      {
-        $push: { comments: [user.username, req.body.comment, req.body.date] },
-      },
-      { useFindAndModify: false }
-    );
-    const savePost = await updatePost.save();
-    res.json({
-      status: 'successful',
-      comment: [user.username, req.body.comment, req.body.date],
-      length: savePost.comments.length + 1,
-    });
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const updatePost = await Post.findByIdAndUpdate(
+        post._id,
+        {
+          $push: { comments: [user.username, req.body.comment, req.body.date] },
+        },
+        { useFindAndModify: false }
+      );
+      const savePost = await updatePost.save();
+      res.json({
+        status: 'successful',
+        comment: [user.username, req.body.comment, req.body.date],
+        length: savePost.comments.length + 1,
+      });
+    } else {
+      res.json({
+        status: 'unsuccessful',
+      });
+    }
   } catch (err) {
     console.error(err);
   }
@@ -98,23 +108,28 @@ router.post('/logout', async (req, res) => {
 router.post('/likepost', async (req, res) => {
   try {
     const user = await User.findById(req.body.userID);
-    const post = await Post.findById(req.body.postID);
-    if (!post.likes.includes(user._id)) {
-      const pushLike = await Post.findByIdAndUpdate(
-        post._id,
-        {
-          $push: { likes: user._id },
-        },
-        { useFindAndModify: false }
-      );
-      const save = await pushLike.save();
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const post = await Post.findById(req.body.postID);
+      if (!post.likes.includes(user._id)) {
+        const pushLike = await Post.findByIdAndUpdate(
+          post._id,
+          {
+            $push: { likes: user._id },
+          },
+          { useFindAndModify: false }
+        );
+        const save = await pushLike.save();
+        res.json({
+          status: 'liked',
+        });
+      }
+    } else {
       res.json({
-        status: 'liked',
+        status: 'unseccessful',
       });
     }
   } catch (err) {
     console.error(err);
-    res.send('error');
   }
 });
 
@@ -122,23 +137,29 @@ router.post('/likepost', async (req, res) => {
 router.post('/unlikepost', async (req, res) => {
   try {
     const user = await User.findById(req.body.userID);
-    const post = await Post.findById(req.body.postID);
-    if (post.likes.includes(user._id)) {
-      const likesArr = post.likes;
-      const newLikesArr = [];
-      likesArr.forEach((usersId) => {
-        if (usersId != user._id) {
-          newLikesArr.push(usersId);
-        }
-      });
-      const updateLikes = await Post.findByIdAndUpdate(
-        post._id,
-        { $set: { likes: newLikesArr } },
-        { useFindAndModify: false }
-      );
-      const save = await updateLikes.save();
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const post = await Post.findById(req.body.postID);
+      if (post.likes.includes(user._id)) {
+        const likesArr = post.likes;
+        const newLikesArr = [];
+        likesArr.forEach((usersId) => {
+          if (usersId != user._id) {
+            newLikesArr.push(usersId);
+          }
+        });
+        const updateLikes = await Post.findByIdAndUpdate(
+          post._id,
+          { $set: { likes: newLikesArr } },
+          { useFindAndModify: false }
+        );
+        const save = await updateLikes.save();
+        res.json({
+          status: 'unliked',
+        });
+      }
+    } else {
       res.json({
-        status: 'unliked',
+        status: 'unseccessful',
       });
     }
   } catch (err) {
