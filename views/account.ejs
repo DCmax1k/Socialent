@@ -141,7 +141,7 @@
             data-post-id="<%= post._id %>"
           />
           <% } else if (post.urlType === 'video') { %>
-          <video preload>
+          <video>
             <source src="<%= post.url %>" />
           </video>
           <div class="play-btn" data-post-id="<%= post._id %>">

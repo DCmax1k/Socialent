@@ -54,7 +54,7 @@
           <% if (post.urlType === 'image') { %>
           <img src="<%= post.url %> " alt="Post" />
           <% } else if (post.urlType === 'video') {%>
-          <video playsinline preload loop data-post-id="<%= post._id %>">
+          <video playsinline loop data-post-id="<%= post._id %>">
             <source src="<%= post.url %>" />
           </video>
           <div class="play-btn" data-post-id="<%= post._id %>">

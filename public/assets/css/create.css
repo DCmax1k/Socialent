@@ -14,11 +14,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 400px;
+  height: 500px;
   width: 600px;
   background-color: rgba(15, 76, 117, 0.9);
   position: absolute;
-  top: 70px;
+  top: 40px;
   left: 50%;
   transform: translateX(-50%);
   border-radius: 15px;
@@ -44,18 +44,27 @@
   width: 100%;
 }
 
-#customBtn {
-  border-radius: 5px;
-  padding: 5px;
-  border: none;
-  outline: none;
-  cursor: pointer;
+#dropbox {
+  height: 170px;
+  border: 2px dashed #bbe1fa;
+  border-radius: 20px;
+  background-color: #0f4c7593;
   margin-bottom: 20px;
-  transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: background-color 0.1s ease;
 }
 
-#customBtn:hover {
-  background-color: rgb(143, 168, 185);
+#dropbox.dragover {
+  background-color: #0f5d9193;
+}
+
+#dropbox span {
+  font-size: 12px;
 }
 
 #description {

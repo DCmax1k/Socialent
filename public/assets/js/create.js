@@ -1,26 +1,44 @@
 const file = document.getElementById('file');
-const customBtn = document.getElementById('customBtn');
-const customText = document.getElementById('customText');
 const submit = document.getElementById('submit');
+const dropbox = document.getElementById('dropbox');
+let airFile;
 
-customBtn.addEventListener('click', () => {
+// Drop box listeners
+dropbox.addEventListener('click', () => {
   file.click();
+});
+
+dropbox.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropbox.classList.add('dragover');
+});
+dropbox.addEventListener('dragleave', (e) => {
+  dropbox.classList.remove('dragover');
+});
+
+// Set air file
+dropbox.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropbox.classList.remove('dragover');
+  airFile = e.dataTransfer.files[0];
+  dropbox.innerText = airFile.name;
 });
 
 file.addEventListener('change', () => {
   if (file.value) {
-    customText.innerText = file.value.split('\\')[
+    airFile = file.files[0];
+    dropbox.innerText = file.value.split('\\')[
       file.value.split('\\').length - 1
     ];
   } else {
-    customText.innerText = 'No file chosen';
+    dropbox.innerText = 'Click to choose a file or drag it here.';
   }
 });
 
 submit.addEventListener('click', async () => {
-  if (file.value) {
+  if (airFile) {
     submit.innerText = 'Uploading...';
-    const fileData = file.files[0];
+    const fileData = airFile;
     const data = new FormData();
     data.append('file', fileData);
     data.append('upload_preset', 'thepreset');
