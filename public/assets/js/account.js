@@ -17,6 +17,9 @@ const updateBio = document.getElementById('updateBio');
 const bio = document.getElementById('bio');
 const description = document.getElementById('description');
 const deleteAccount = document.getElementById('deleteAccount');
+const changeImg = document.getElementById('changeImg');
+const changeImgFile = document.getElementById('changeImgFile');
+const profileImg = document.querySelector('#profile > #imgPlace > img');
 
 // Set return values
 function fixDescription() {
@@ -73,6 +76,52 @@ if (followBtn) {
 
 if (editProfileCont) {
   // Edit Profile
+
+  // Change profile pic
+  changeImg.addEventListener('click', () => {
+    changeImgFile.click();
+  });
+
+  changeImgFile.addEventListener('change', async () => {
+    if (changeImgFile.value) {
+      const fileData = changeImgFile.files[0];
+      const data = new FormData();
+      data.append('file', fileData);
+      data.append('upload_preset', 'thepreset');
+      data.append('cloud_name', 'thecloudname');
+
+      try {
+        const response = await fetch(
+          'https://api.cloudinary.com/v1_1/thecloudname/image/upload',
+          {
+            method: 'POST',
+            body: data,
+          }
+        );
+        const resJSON = await response.json();
+        const imgURL = resJSON.secure_url;
+
+        const newResponse = await fetch('/account/changeimg', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            imgURL,
+            userID,
+            device: window.navigator.userAgent,
+          }),
+        });
+
+        const newResJSON = await newResponse.json();
+        if (newResJSON.status === 'success') {
+          profileImg.src = imgURL;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+  });
 
   // Delete Account
   deleteAccount.addEventListener('click', async () => {

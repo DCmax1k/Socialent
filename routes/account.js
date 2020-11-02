@@ -55,6 +55,37 @@ router.get('/:username', async (req, res) => {
   }
 });
 
+// Change Profile Img
+router.post('/changeimg', async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userID);
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+
+      // Update profile pic
+      const updateProfileImg = await User.findByIdAndUpdate(
+        user._id,
+        {
+          profileImg: req.body.imgURL,
+        },
+        { useFindAndModify: false }
+      );
+      const saveUser = await updateProfileImg.save();
+
+      // Update posts with new pic
+      const updatePosts = await Post.updateMany( {'author._id': user._id}, {'author.profileImg': req.body.imgURL});
+      res.json({
+        status: 'success',
+      });
+    } else {
+      res.json({
+        status: 'error',
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // Delete Account
 router.post('/deleteaccount', async (req, res) => {
   try {

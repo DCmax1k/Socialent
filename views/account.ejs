@@ -77,11 +77,22 @@
 
     <div id="bodyCont">
       <div id="profile">
-        <% if (account.profileImg === 'none') { %>
-        <img src="/images/profilePlaceholder.svg" alt="Profile Image" />
-        <% } else { %>
-        <img src="<%= account.profileImg %> " alt="Profile Image" />
-        <% } %>
+        <div id="imgPlace">
+          <% if (account.profileImg === 'none') { %>
+          <img src="/images/profilePlaceholder.svg" alt="Profile Image" />
+          <% } else { %>
+          <img src="<%= account.profileImg %> " alt="Profile Image" />
+          <% } %> <% if (loggedin) { %> <% if (JSON.stringify(account._id) ===
+          JSON.stringify(user._id)) { %>
+          <div id="changeImg">Change image</div>
+          <input
+            accept=".gif, .jpg, .jpeg, .png, .svg"
+            id="changeImgFile"
+            type="file"
+          />
+          <% } %> <% } %>
+        </div>
+
         <div id="profileInfo">
           <div id="numbers">
             <div id="numberOfPosts">
