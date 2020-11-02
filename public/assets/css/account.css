@@ -135,11 +135,12 @@
 }
 
 #nameAndBio > h1 {
-  font-size: 25px;
+  font-size: 20px;
 }
 
 #description {
   word-wrap: break-word;
+  font-size: 12px;
 }
 
 #bodyCont > button {
