@@ -31,6 +31,33 @@
     const promoteBtns = document.querySelectorAll('.promote-btn');
     const deleteBtns = document.querySelectorAll('.delete-btn');
 
+    // Delete user
+    deleteBtns.forEach(deleteBtn => {
+        deleteBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you would like to DELETE this user! This cannot be undone!')) {
+                const userId = deleteBtn.getAttribute('data-user-id');
+                const response = await fetch(`/home/deleteuser`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        userID,
+                        device: window.navigator.userAgent,
+                    }),
+                });
+                const resJSON = await response.json();
+                if (resJSON.status == 'success') {
+                    alert(`Username: ${resJSON.username} has successfully been deleted!`);
+                } else {
+                    alert(`WARNING: Unseccessful`);
+                }
+            }
+        })
+    })
+
+    // Promote user
     promoteBtns.forEach(promoteBtn => {
         promoteBtn.addEventListener('click', async () => {
             if (confirm('Are you sure you would like to promote this user?')) {
@@ -89,7 +116,7 @@
         border-radius: 10px;
         border: 2px solid rgb(44, 44, 44);
         z-index: 20;
-        clip-path: circle(35px at 363px 560px);
+        clip-path: circle(7% at 91% 93%);
         transition: clip-path 0.3s ease;
         box-shadow: 2px 2px 5px black;
     }
@@ -119,17 +146,17 @@
     }
     #adminControlsKeyIcon {
         position: absolute;
-        bottom: 10px;
-        right: 10px;
-        height: 50px;
-        width: 50px;
-        transform: rotate(135deg);
+        bottom: 1.5%;
+        right: 1.5%;
+        height: 10%;
+        width: 15%;
         display: flex;
         justify-content: center;
         align-items: center;
         font-size: 30px;
         color: white;
         cursor: pointer;
+        transform: rotate(135deg);
     }
     .subUser {
         display: flex;
@@ -154,7 +181,7 @@
         height: 95%;
         display: flex;
         justify-content: space-between;
-        width: 75px;
+        width: 20%;
 
     }
     .subUser .manage-btns .promote-btn,
@@ -167,5 +194,45 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
+    }
+
+    @media screen and (max-width: 450px) {
+        #adminControls {
+            height: 450px;
+            width: 300px;
+        }
+        #adminControlsKeyIcon {
+            font-size: 20px;
+        }
+        #adminControlsTop {
+            height: 60px;
+        }       
+        #adminControlsTop h2 {
+            font-size: 15px;
+        }
+        #adminControlsTop input {
+            height: 30px;
+            width: 160px;
+            font-size: 12px;
+        }
+        
+    }
+
+    @media screen and (max-width: 340px) {
+        #adminControls {
+            height: 390px;
+            width: 260px;
+        }
+
+        #adminControlsTop {
+            height: 60px;
+        }       
+        #adminControlsTop h2 {
+            font-size: 15px;
+        }
+        #adminControlsTop input {
+            height: 20px;
+            width: 100px;
+        }
     }
 </style>

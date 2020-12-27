@@ -33,6 +33,37 @@ router.get('/', async (req, res) => {
   }
 });
 
+//Delete user
+router.post('/deleteuser', async (req, res) => {
+  try {
+    const admin = await User.findById(req.body.userID);
+    const user = await User.findById(req.body.userId);
+    if (admin.rank == 'owner' || admin.rank == 'admin') {
+      if (admin.status == 'online' || admin.devices.includes(req.body.device)) {
+        const deleteAllPosts = await Post.deleteMany({ 'author._id': user._id });
+        const deleteIdsFromFollowing = await User.updateMany({
+          $pull: { following: user._id },
+        });
+        const deleteUser = await User.deleteOne({ _id: user._id });
+        res.json({
+          status: 'success',
+          username: user.username,
+        })
+      } else {
+        res.json({
+          status: 'unseccessful',
+        });
+      }
+    } else {
+      res.json({
+        status: 'unseccessful',
+      });
+    }
+  } catch(err) {
+    console.error(err);
+  }
+})
+
 // Promote user
 router.post('/promote', async (req, res) => {
   try {
