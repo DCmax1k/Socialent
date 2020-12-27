@@ -2,15 +2,24 @@
     <!-- Icon -->
     <i id="adminControlsKeyIcon" class="fas fa-key"></i>
 
-    <!-- Text -->
+    <!-- Top -->
     <div id="adminControlsTop">
         <h2>All users:</h2> <input type="text" placeholder="Search...">
     </div>
     
+    <!-- Each user -->
     <% allUsers.forEach((subUser, i) => { %>
         <div class="subUser">
             <h3><%= i + 1 %>.</h3>
             <a href="https://socialent-app.herokuapp.com/account/<%= subUser.username %>?k=<%= user._id %>"><%= subUser.username %></a>
+            <% if(subUser.rank != 'owner') {%>
+            <div class="manage-btns">
+                <div data-user-id="<%= subUser._id %>" class="promote-btn"><i class="fas fa-arrows-alt-v"></i></div>
+                <div data-user-id="<%= subUser._id %>" class="delete-btn"><i class="far fa-trash-alt"></i></div>
+            </div>
+            <% } %>
+            
+
         </div>
     <% }) %>
 </div>
@@ -19,6 +28,39 @@
     const adminControlsKeyIcon = document.getElementById('adminControlsKeyIcon');
     const searchBar = document.querySelector('#adminControlsTop input');
     const allSubUsers = document.querySelectorAll('.subUser');
+    const promoteBtns = document.querySelectorAll('.promote-btn');
+    const deleteBtns = document.querySelectorAll('.delete-btn');
+
+    promoteBtns.forEach(promoteBtn => {
+        promoteBtn.addEventListener('click', async () => {
+            if (confirm('Are you sure you would like to promote this user?')) {
+                const userId = promoteBtn.getAttribute('data-user-id');
+                const response = await fetch(`/home/promote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId,
+                        userID,
+                        device: window.navigator.userAgent,
+                    }),
+                });
+                const resJSON = await response.json();
+                if (resJSON.status === 'success') {
+                    if (resJSON.promoteOrDemote == 'promote') {
+                        alert(`Username: ${resJSON.username} was successfully promoted!`);
+                    } else if (resJSON.promoteOrDemote == 'demote') {
+                        alert(`Username: ${resJSON.username} was successfully demoted!`);
+                    }
+                    
+                } else {
+                    alert('WARNING! Unseccessful!');
+                }
+            }
+        })
+    })
+
 
     searchBar.addEventListener('keyup', (e) => {
         allSubUsers.forEach(subUser => {
@@ -38,16 +80,18 @@
     #adminControls {
         color: white;
         position: fixed;
-        padding: 5px;
+        padding: 10px;
         bottom: 60px;
         right: 20px;
         height: 600px;
         width: 400px;
-        background-color: #3282B8;
+        background-color: #303030;
         border-radius: 10px;
+        border: 2px solid rgb(44, 44, 44);
         z-index: 20;
-        clip-path: circle(35px at 365px 560px);
+        clip-path: circle(35px at 363px 560px);
         transition: clip-path 0.3s ease;
+        box-shadow: 2px 2px 5px black;
     }
     #adminControls.active {
         clip-path: circle(75%);
@@ -71,6 +115,7 @@
         padding: 5px;
         color: rgb(129, 129, 129);
         font-size: 15px;
+        outline: none;
     }
     #adminControlsKeyIcon {
         position: absolute;
@@ -88,15 +133,39 @@
     }
     .subUser {
         display: flex;
-
+        width: 100%;
+        
+        position: relative;
     }
     .subUser h3 {
-        font-size: 25px;
+        font-size: 20px;
         margin-right: 8px;
 
     }
     .subUser a {
-        font-size: 25px;
+        font-size: 20px;
         color: white;
+    }
+    .subUser .manage-btns {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        height: 95%;
+        display: flex;
+        justify-content: space-between;
+        width: 75px;
+
+    }
+    .subUser .manage-btns .promote-btn,
+    .subUser .manage-btns .delete-btn {
+        height: 100%;
+        width: 45%;
+        border: 1px solid grey;
+        border-radius: 2px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
     }
 </style>

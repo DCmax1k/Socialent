@@ -16,10 +16,6 @@
   <body>
     <div id="background"></div>
     
-    <% if (user.rank == 'admin' || user.rank == 'owner') {%>
-      <%- include('partials/adminControls') %>
-    <% } %>
-    
 
     <!-- Start of posts -->
     <div class="all-posts">
@@ -138,5 +134,8 @@
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/deviceverification.js"></script>
     <script src="/assets/js/home.js"></script>
+    <% if (user.rank == 'admin' || user.rank == 'owner') {%>
+      <%- include('partials/adminControls') %>
+    <% } %>
   </body>
 </html>

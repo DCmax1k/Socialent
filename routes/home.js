@@ -33,6 +33,41 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Promote user
+router.post('/promote', async (req, res) => {
+  try {
+    const admin = await User.findById(req.body.userID);
+    const user = await User.findById(req.body.userId);
+    if (admin.rank == 'owner' || admin.rank == 'admin') {
+      if (admin.status == 'online' && admin.devices.includes(req.body.device)) {
+        if (user.rank == 'user') {
+          const promoteUser = await User.findByIdAndUpdate(user._id, { rank: 'admin' }, { useFindAndModify: false });
+          const saveUser = await promoteUser.save();
+          res.json({
+            status: 'success',
+            username: user.username,
+            promoteOrDemote: 'promote',
+          });
+        } else if (user.rank == 'admin') {
+          const demoteUser = await User.findByIdAndUpdate(user._id, { rank: 'user'}, { useFindAndModify: false });
+          const saveUser = await demoteUser.save();
+          res.json({
+            status: 'success',
+            username: user.username,
+            promoteOrDemote: 'demote',
+          });
+        }
+      } else {
+        res.json({
+          status: 'unseccessful',
+        });
+      }
+    }
+  } catch(err) {
+    console.error(err);
+  }
+})
+
 // Delet post
 router.post('/deletepost', async (req, res) => {
   try {
