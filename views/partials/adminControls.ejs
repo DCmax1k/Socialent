@@ -1,0 +1,102 @@
+<div id="adminControls">
+    <!-- Icon -->
+    <i id="adminControlsKeyIcon" class="fas fa-key"></i>
+
+    <!-- Text -->
+    <div id="adminControlsTop">
+        <h2>All users:</h2> <input type="text" placeholder="Search...">
+    </div>
+    
+    <% allUsers.forEach((subUser, i) => { %>
+        <div class="subUser">
+            <h3><%= i + 1 %>.</h3>
+            <a href="https://socialent-app.herokuapp.com/account/<%= subUser.username %>?k=<%= user._id %>"><%= subUser.username %></a>
+        </div>
+    <% }) %>
+</div>
+<script>
+    const adminControls = document.getElementById('adminControls');
+    const adminControlsKeyIcon = document.getElementById('adminControlsKeyIcon');
+    const searchBar = document.querySelector('#adminControlsTop input');
+    const allSubUsers = document.querySelectorAll('.subUser');
+
+    searchBar.addEventListener('keyup', (e) => {
+        allSubUsers.forEach(subUser => {
+            if (!subUser.innerText.toLowerCase().includes(e.target.value.toLowerCase())) {
+                subUser.style.display = 'none';
+            } else {
+                subUser.style.display = 'flex';
+            }
+        })
+    })
+
+    adminControlsKeyIcon.addEventListener('click', () => {
+        adminControls.classList.toggle('active');
+    })
+</script>
+<style>
+    #adminControls {
+        color: white;
+        position: fixed;
+        padding: 5px;
+        bottom: 60px;
+        right: 20px;
+        height: 600px;
+        width: 400px;
+        background-color: #3282B8;
+        border-radius: 10px;
+        z-index: 20;
+        clip-path: circle(35px at 365px 560px);
+        transition: clip-path 0.3s ease;
+    }
+    #adminControls.active {
+        clip-path: circle(75%);
+    }
+    #adminControlsTop {
+        display: flex;
+        height: 80px;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0 10px;;
+    }
+    #adminControlsTop h2 {
+        margin-right: 10px;
+    }
+    #adminControlsTop input {
+        background-color: rgba(61, 61, 61, 0.5);
+        border-radius: 5px;
+        height: 30px;
+        width: 200px;
+        border: none;
+        padding: 5px;
+        color: rgb(129, 129, 129);
+        font-size: 15px;
+    }
+    #adminControlsKeyIcon {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        height: 50px;
+        width: 50px;
+        transform: rotate(135deg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 30px;
+        color: white;
+        cursor: pointer;
+    }
+    .subUser {
+        display: flex;
+
+    }
+    .subUser h3 {
+        font-size: 25px;
+        margin-right: 8px;
+
+    }
+    .subUser a {
+        font-size: 25px;
+        color: white;
+    }
+</style>

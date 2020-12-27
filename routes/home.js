@@ -9,6 +9,7 @@ router.get('/', async (req, res) => {
   try {
     if (req.query.k) {
       const user = await User.findById(req.query.k);
+      const allUsers = await User.find();
       const posts = await Post.find();
       const postsFollowing = [];
       posts.forEach((post) => {
@@ -20,7 +21,7 @@ router.get('/', async (req, res) => {
         }
       });
       if (user.status === 'online') {
-        res.render('home', { user, postsFollowing });
+        res.render('home', { user, postsFollowing, allUsers });
       } else {
         res.redirect('/login');
       }
