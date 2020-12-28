@@ -189,7 +189,7 @@ router.post('/editprofile/verifyemail', async (req, res) => {
         <hr />
         <h2>${user.username}</h2>
         <br />
-        Please click <a href="${process.env.DOMAIN}/account/editprofile/verifyemail/${user._id}?ec=${verifyEmailCode}" >here</a> to verify your email!
+        Please click <a href="${process.env.DOMAIN}/account/editprofile/verifyemail/${user._id}?ec=${verifyEmailCode}" >here</a>, or copy this URL: ${process.env.DOMAIN}/account/editprofile/verifyemail/${user._id}?ec=${verifyEmailCode} : to verify your email!
         <br />
         <hr />
         <br />
