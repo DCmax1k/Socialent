@@ -2,20 +2,21 @@ const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
 
+const { google } = require('googleapis');
+const CLIENT_ID = '379935013349-r9o09e4972kqg9rea8t749q0frc6u4v6.apps.googleusercontent.com';
+const CLIENT_SECRET = 'jCkzawomV50MaUUf2l8nWFjC';
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = '1//04kHV0YmsNjQKCgYIARAAGAQSNwF-L9IrxdI-IuCZCByhRLZLNgsNlCVG2sfQ39jZAL-PYb5QG-EjR_O23OmfdW99emINKFB58sI';
+
+const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+
+
+
 const User = require('../models/User');
 const Post = require('../models/Post');
 
-// Email Transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'noreplydevapp@gmail.com',
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+
 
 // Get Route
 router.get('/:username', async (req, res) => {
@@ -180,6 +181,24 @@ router.post('/editprofile/verifyemail', async (req, res) => {
         { useFindAndModify: false }
       );
       const saveUser = await updateEmailCode.save();
+
+      // MAIL 
+      // Email Transporter
+      const accessToken = await oAuth2Client.getAccessToken();
+
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          type: 'OAuth2',
+          user: 'noreplydevapp@gmail.com',
+          clientId: CLIENT_ID,
+          clientSecret: CLIENT_SECRET,
+          refreshToken: REFRESH_TOKEN,
+          accessToken: accessToken,
+
+        },
+      });
+
       const mailOptions = {
         from: 'Socialent',
         to: user.emailData.email,
