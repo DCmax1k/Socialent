@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages - Socialent</title>
+    <link rel="stylesheet" href="/assets/css/main.css" />
+    <link rel="stylesheet" href="/assets/css/messages.css" />
+    <link
+      rel="stylesheet"
+      href="https://use.fontawesome.com/releases/v5.13.0/css/all.css"
+      integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V"
+      crossorigin="anonymous"
+    />
+</head>
+<body>
+    <div id="background"></div>
+
+    <!-- Messages Divider -->
+    <div id="messages">
+        <i id="addConversation" class="fas fa-plus"></i>
+        <div id="messagesList">
+
+            <!-- Each Conversation Here -->
+
+            <!-- <h1 id="noMessages">No messages here!</h1> -->
+
+        </div>
+        <div id="messaging">
+            
+            <div id="internalMessages">
+               <!-- EXAMPLE TEXTS -->
+                <!-- <div class="text-box sent-text">
+                    <div class="text">This is a sent text</div>
+                </div>
+                <div class="text-box received-text">
+                    <div class="text">This is a sent text</div>
+                </div>  -->
+            </div>
+            
+
+            <input placeholder="Message" type="text">
+            <i id="sendMessageBtn" class="fas fa-arrow-circle-up"></i>
+        </div>
+    </div>
+
+
+
+    <%- include('partials/sideNavBar') %> <%- include('partials/footer') %>
+    
+    <script src="/assets/js/main.js"></script>
+    <script src="/assets/js/deviceverification.js"></script>
+    <script src="/assets/js/messages.js"></script>
+    
+</body>
+</html>

@@ -60,6 +60,9 @@ app.use('/search', searchRoute);
 const postRoute = require('./routes/post');
 app.use('/post', postRoute);
 
+const messagesRoute = require('./routes/messages');
+app.use('/messages', messagesRoute);
+
 // DB connection
 mongoose.connect(
   process.env.DB_CONNECTION,
