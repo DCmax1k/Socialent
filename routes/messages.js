@@ -54,40 +54,43 @@ router.post('/addconversation', async (req, res) => {
     try {
         const user = await User.findById(req.body.userID);
         if (user.status === 'online') {
-            const receiver = await User.findOne({ username: req.body.receiver });
-            if (JSON.stringify(receiver._id) !== JSON.stringify(user._id)) {
-                // Check to see if they already have a conversation
-                const check1 = await Conversation.find({people: [user._id, receiver._id]});
-                const check2 = await Conversation.find({people: [receiver._id, user._id]});
-                if (check1.length == 0 && check2.length == 0) {
-                    if (receiver) {
-                        const createConversation = await new Conversation({
-                            people: [user._id, receiver._id],
-                            messages: [],
-                        });
-                        const saveConversation = await createConversation.save();
+            if (req.body.receiver) {
+                const receiver = await User.findOne({ username: req.body.receiver });
+                if (JSON.stringify(receiver._id) !== JSON.stringify(user._id)) {
+                    // Check to see if they already have a conversation
+                    const check1 = await Conversation.find({people: [user._id, receiver._id]});
+                    const check2 = await Conversation.find({people: [receiver._id, user._id]});
+                    if (check1.length == 0 && check2.length == 0) {
+                        if (receiver) {
+                            const createConversation = await new Conversation({
+                                people: [user._id, receiver._id],
+                                messages: [],
+                            });
+                            const saveConversation = await createConversation.save();
 
-                        const conversationID = createConversation._id;
-                        res.json({
-                            status: 'success',
-                            receiverUsername: receiver.username,
-                            conversationID,
-                        })    
+                            const conversationID = createConversation._id;
+                            res.json({
+                                status: 'success',
+                                receiverUsername: receiver.username,
+                                conversationID,
+                            })    
+                        } else {
+                            res.json({
+                                status: 'no-user',
+                            });
+                        }   
                     } else {
                         res.json({
-                            status: 'no-user',
+                            status: 'already-convo',
                         });
                     }   
                 } else {
                     res.json({
-                        status: 'already-convo',
+                        status: 'yourself',
                     });
-                }   
-            } else {
-                res.json({
-                    status: 'yourself',
-                });
-            } 
+                }     
+            }
+            
         } else {
             res.json({
                 status: 'unseccessful',
