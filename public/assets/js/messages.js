@@ -9,7 +9,7 @@ const sendMessageBtn = document.getElementById('sendMessageBtn');
 let conversationLoaded = '';
 
 // Load conversation takes a conversation ID and loads its messages & removes and adds appropriate html
-const loadConversation = async (conversationID) => {
+const loadConversation = async (conversationID, scroll) => {
     if (conversationID) {
         conversationLoaded = conversationID;
         const response = await fetch('/messages/loadconversation', {
@@ -46,6 +46,10 @@ const loadConversation = async (conversationID) => {
                 // Load html
                 internalMessages.appendChild(node);
             });
+            // Scroll to bottom
+            if (scroll) {
+                internalMessages.scrollTop = internalMessages.scrollHeight;
+            }
         } else {
             window.location.href = '/login';
         }   
@@ -78,6 +82,7 @@ setInterval(async () => {
         const resJSON = await response.json();
         if (resJSON.status === 'success') {
             // Removes previous html
+            let previousHTML = internalMessages.innerHTML;
             internalMessages.innerHTML = '';
             // Loops through messages generating html
             resJSON.messages.forEach(message => {
@@ -91,7 +96,10 @@ setInterval(async () => {
                 node.innerHTML = `<div class="text">${message[1]}</div>`;
                 // Load html
                 internalMessages.appendChild(node);
-            })
+            });
+            if (previousHTML != internalMessages.innerHTML) {
+                internalMessages.scrollTop = internalMessages.scrollHeight;
+            }
         } else {
             window.location.href = '/login';
         }   
@@ -181,9 +189,6 @@ const checkConversations = async () => {
     } else {
         window.location.href = '/login';
     }
-    // if (!messagesList.innerHTML) {
-    //     messagesList.innerHTML = '<h1 id="noMessages">No messages here!</h1>';
-    // }
 }
 checkConversations();
 setInterval(checkConversations, 3000);
@@ -212,7 +217,7 @@ const clickedConversation = (conversation) => {
     } else {
         const conversationID = conversation.getAttribute('data-conversation-id');
         // Load conversation by ID
-        loadConversation(conversationID);
+        loadConversation(conversationID, 'scroll-bottom');
     }
 }
 
@@ -243,6 +248,7 @@ const sendMessage = async (conversationID, senderID, message) => {
             message,
         })
     });
+    // justSentMessage = true;
     const resJSON = await response.json();
     if (resJSON.status === 'success') {
         messageInput.value = '';

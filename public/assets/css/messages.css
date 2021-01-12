@@ -39,6 +39,7 @@
     border-right: 2px solid white;
     padding-right: 10px;
     padding-top: 30px;
+    overflow-y: scroll;
 }
 
 .conversation {
@@ -92,7 +93,7 @@
 
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
     padding: 50px 10px;
 }
 
@@ -109,13 +110,13 @@
     position: relative;
     margin-top: 10px;
     display: flex;
-    height: fit-content;
+    height: 30px;
 }
 
 .text {
     width: fit-content;
     max-width: 60%;
-    height: fit-content;
+    height: 30px;
     padding: 5px 10px;
     color: white;
     border-radius: 20px;
