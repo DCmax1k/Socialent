@@ -16,6 +16,8 @@ oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
 const User = require('../models/User');
 const Post = require('../models/Post');
 
+const deleteUser = require('../globalFunctions/deleteAccount');
+
 
 
 // Get Route
@@ -88,27 +90,42 @@ router.post('/changeimg', async (req, res) => {
 });
 
 // Delete Account
+// router.post('/deleteaccount', async (req, res) => {
+//   try {
+//     const user = await User.findById(req.body.userID);
+//     if (user.status === 'online' && user.devices.includes(req.body.device)) {
+//       const deleteAllPosts = await Post.deleteMany({ 'author._id': user._id });
+//       const deleteIdsFromFollowing = await User.updateMany({
+//         $pull: { following: user._id },
+//       });
+//       const deleteUser = await User.deleteOne({ _id: user._id });
+//       res.json({
+//         status: 'success',
+//       });
+//     } else {
+//       res.json({
+//         status: 'unseccessful',
+//       });
+//     }
+//   } catch (err) {
+//     console.error(err);
+//   }
+// });
 router.post('/deleteaccount', async (req, res) => {
   try {
     const user = await User.findById(req.body.userID);
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
-      const deleteAllPosts = await Post.deleteMany({ 'author._id': user._id });
-      const deleteIdsFromFollowing = await User.updateMany({
-        $pull: { following: user._id },
-      });
-      const deleteUser = await User.deleteOne({ _id: user._id });
-      res.json({
-        status: 'successful',
-      });
-    } else {
-      res.json({
-        status: 'unseccessful',
-      });
+      const deleteTheUser = await deleteUser(user._id);
+      if (deleteTheUser === 'success') {
+        res.json({
+          status: 'success',
+        })
+      }
     }
-  } catch (err) {
+  } catch(err) {
     console.error(err);
   }
-});
+})
 
 // Follow
 router.post('/followprofile', async (req, res) => {

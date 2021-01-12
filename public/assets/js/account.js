@@ -140,7 +140,7 @@ if (editProfileCont) {
         }),
       });
       const resJSON = await response.json();
-      if (resJSON.status === 'successful') {
+      if (resJSON.status === 'success') {
         window.location.href = '/';
       } else {
         window.location.href = '/login';
