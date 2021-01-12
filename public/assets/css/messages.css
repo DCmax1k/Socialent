@@ -110,13 +110,13 @@
     position: relative;
     margin-top: 10px;
     display: flex;
-    height: 30px;
+    min-height: 30px;
 }
 
 .text {
     width: fit-content;
     max-width: 60%;
-    height: 30px;
+    min-height: 30px;
     padding: 5px 10px;
     color: white;
     border-radius: 20px;
