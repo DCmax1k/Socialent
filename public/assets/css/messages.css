@@ -29,7 +29,7 @@
     left: 15px;
     color: white;
     cursor: pointer;
-    z-index: 10;
+    z-index: 5;
 }
 
 #messagesList {
@@ -87,13 +87,9 @@
 
 #internalMessages {
     position: relative;
-    height: 100%;
+    max-height: calc(100%);
     width: 100%;
     overflow: scroll;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
     padding: 50px 10px;
 }
 
@@ -107,15 +103,16 @@
 }
 
 .text-box {
-    position: relative;
-    margin-top: 10px;
+    margin: 5px 0;
     display: flex;
+    height: fit-content;
     min-height: 30px;
 }
 
 .text {
     width: fit-content;
     max-width: 60%;
+    height: fit-content;
     min-height: 30px;
     padding: 5px 10px;
     color: white;
@@ -128,7 +125,7 @@
     justify-content: flex-end;
 }
 
-.sent-text .text {
+.sent-text > .text {
     background-color: rgb(45, 118, 226);
 }
 
@@ -136,7 +133,7 @@
     justify-content: flex-start;
 }
 
-.received-text .text {
+.received-text > .text {
     background-color: rgb(71, 71, 71);
 }
 
