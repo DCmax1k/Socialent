@@ -21,33 +21,6 @@ const changeImg = document.getElementById('changeImg');
 const changeImgFile = document.getElementById('changeImgFile');
 const profileImg = document.querySelector('#profile > #imgPlace > img');
 
-// Set return values
-function fixDescription() {
-  let descText = description.innerText;
-  descText = descText.trim();
-  descText = descText.split('');
-  descText.pop();
-  descText.shift();
-  descText = descText.join('');
-  descText = descText.replace(/\\n/gi, '<br />');
-  descText = descText.replace(/\\/gi, '');
-  description.innerHTML = descText;
-}
-fixDescription();
-
-// the textarea one
-function fixBio() {
-  let descText = bio.value;
-  descText = descText.trim();
-  descText = descText.split('');
-  descText.pop();
-  descText.shift();
-  descText = descText.join('');
-  descText = descText.replace(/\\n/gi, '&#10;');
-  descText = descText.replace(/\\/gi, '');
-  bio.innerHTML = descText;
-}
-fixBio();
 
 // Follow
 if (followBtn) {
@@ -74,8 +47,37 @@ if (followBtn) {
   });
 }
 
-if (editProfileCont) {
+if (editProfileBtn) {
   // Edit Profile
+
+  // Set return values
+  function fixDescription() {
+    let descText = description.innerText;
+    descText = descText.trim();
+    descText = descText.split('');
+    descText.pop();
+    descText.shift();
+    descText = descText.join('');
+    descText = descText.replace(/\\n/gi, '<br />');
+    descText = descText.replace(/\\/gi, '');
+    description.innerHTML = descText;
+  }
+  fixDescription();
+
+  // the textarea one
+  function fixBio() {
+    let descText = bio.value;
+    descText = descText.trim();
+    descText = descText.split('');
+    descText.pop();
+    descText.shift();
+    descText = descText.join('');
+    descText = descText.replace(/\\n/gi, '&#10;');
+    descText = descText.replace(/\\/gi, '');
+    bio.innerHTML = descText;
+  }
+  fixBio();
+
 
   // Change profile pic
   changeImg.addEventListener('click', () => {
