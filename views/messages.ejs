@@ -18,7 +18,15 @@
 
     <!-- Messages Divider -->
     <div id="messages">
-        <i id="addConversation" class="fas fa-plus"></i>
+        <div id="addConversationDiv" class="c-back">
+           <i id="addConversation" class="fas fa-plus"></i> 
+           <input placeholder="Username..." type="text" id="addConversationInput">
+           <div id="addConversationButtons">
+              <button id="addConversationCancel" class="d-back">Cancel</button> <button id="addConversationSubmit" class="d-back" >Add</button> 
+           </div>
+           
+        </div>
+        
         <div id="messagesList">
 
             <!-- Each Conversation Here -->

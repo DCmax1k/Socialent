@@ -1,6 +1,10 @@
 let conversations = document.querySelectorAll('.conversation');
 const messaging = document.getElementById('messaging');
 const addConversation = document.getElementById('addConversation');
+const addConversationDiv = document.getElementById('addConversationDiv');
+const addConversationSubmit = document.getElementById('addConversationSubmit');
+const addConversationCancel = document.getElementById('addConversationCancel');
+const addConversationInput = document.getElementById('addConversationInput');
 const messagesList = document.getElementById('messagesList');
 const internalMessages = document.getElementById('internalMessages');
 const messageInput = document.querySelector('#messaging > input');
@@ -107,8 +111,18 @@ setInterval(async () => {
 }, 3000)
 
 // Add conversation
-addConversation.addEventListener('click', async () => {
-    const receiver = prompt('Who would you like to message? USERNAME:');
+addConversation.addEventListener('click', () => {
+    addConversationDiv.classList.toggle('active');
+});
+addConversationCancel.addEventListener('click', () => {
+    addConversationDiv.classList.remove('active');
+    addConversationInput.value = '';
+});
+
+addConversationSubmit.addEventListener('click', async () => {
+    const receiver = addConversationInput.value;
+    addConversationSubmit.innerText = 'Loading...';
+    addConversationDiv.classList.remove('active');
     const response = await fetch('/messages/addconversation', {
         method: 'POST',
         headers: {
@@ -122,14 +136,17 @@ addConversation.addEventListener('click', async () => {
     const resJSON = await response.json();
     if (resJSON.status === 'no-user') {
         alert('No account with that username!');
+        addConversationSubmit.innerText = 'Add';
         return;
     }
     if (resJSON.status === 'already-convo') {
         alert('Already a conversation between you and that user!');
+        addConversationSubmit.innerText = 'Add';
         return;
     }
     if (resJSON.status === 'yourself') {
         alert('You cannot create a conversation with yourself!');
+        addConversationSubmit.innerText = 'Add';
         return;
     }
     if (resJSON.status === 'success') {
@@ -143,6 +160,8 @@ addConversation.addEventListener('click', async () => {
         <h2>${receiverUsername}</h2>
         <h4>Start Messaging!</h4>
         `;
+        addConversationSubmit.innerText = 'Add';
+        addConversationInput.value = '';
     } else {
         window.location.href = '/login';
     }   

@@ -23,13 +23,58 @@
     display: flex;
 }
 
+#addConversationDiv {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 5;
+    width: 300px;
+    border-radius: 10px;
+    clip-path: circle(14px at 14px 14px);
+    transition: clip-path 0.3s ease;
+}
+
+#addConversationDiv.active {
+    clip-path: circle(75%);
+}
+
+#addConversationInput {
+    float: right;
+    outline: none;
+    border-radius: 5px;
+    height: 30px;
+    width: 85%;
+    margin: 5px;
+    padding: 5px;
+    border: none;
+}
+
+#addConversationButtons {
+    float: right;
+    height: 20px;
+    width: 85%;
+    margin: 5px;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+#addConversationButtons > button {
+    height: 100%;
+    width: 48%;
+    outline: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
 #addConversation {
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 5px;
+    left: 5px;
     color: white;
     cursor: pointer;
-    z-index: 5;
+    font-size: 20px;
 }
 
 #messagesList {
@@ -38,7 +83,7 @@
     width: 20%;
     border-right: 2px solid white;
     padding-right: 10px;
-    padding-top: 30px;
+    padding-top: 50px;
     overflow-y: scroll;
 }
 
@@ -194,5 +239,14 @@
         height: calc(100% - 100px);
         left: 3px;
         top: 50px;
+    }
+}
+
+@media screen and (max-width: 350px) {
+    #addConversationDiv {
+        width: 200px;
+    }
+    #addConversationInput, #addConversationButtons {
+        width: 83%
     }
 }
