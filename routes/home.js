@@ -33,6 +33,71 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Warn a user
+router.post('/warn', async (req, res) => {
+  try {
+    const admin = await User.findById(req.body.adminID);
+    const user = await User.findById(req.body.userID);
+    if (admin.status === 'online' && admin.devices.includes(req.body.device)) {
+      if (admin.rank === 'admin' || admin.rank === 'owner') {
+        const updateUser = await User.findByIdAndUpdate(user._id, { $push: { warnings: [ req.body.warning, true ]}}, { useFindAndModify: false });
+        const saveUser = await updateUser.save();
+        res.json({
+          status: 'success',
+          username: user.username,
+        });
+      } else {
+        res.json({
+          status: 'unseccessful',
+        });
+      }
+    } else {
+      res.json({
+        status: 'unseccessful',
+      });
+    }
+  } catch(err) {
+    console.error(err);
+  }
+})
+
+// Check for warnings
+router.post('/checkwarnings', async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userID);
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      res.json({
+        status: 'success',
+        warnings: user.warnings,
+      });
+    } else {
+      res.json({
+        status: 'unseccessful',
+      });
+    }
+  } catch(err) {
+    console.error(err);
+  }
+});
+
+// Dismiss warning
+router.post('/dismisswarn', async (req, res) => {
+  try {
+    const user = await User.findById(req.body.userID);
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const warnings = user.warnings;
+      warnings[req.body.index][1] = false;
+      const updateUser = await User.findByIdAndUpdate(user._id, { $set: { warnings }}, { useFindAndModify: false });
+      const saveUser = await updateUser.save();
+      res.json({
+        status: 'success',
+      });
+    }
+  } catch(err) {
+    console.error(err);
+  }
+});
+
 const deleteUser = require('../globalFunctions/deleteAccount');
 
 //Delete user from admin

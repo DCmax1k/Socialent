@@ -38,6 +38,10 @@
     clip-path: circle(75%);
 }
 
+#addConversationDiv > input {
+    display: none;
+}
+
 #addConversationInput {
     float: right;
     outline: none;

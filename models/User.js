@@ -42,6 +42,10 @@ const UserSchema = mongoose.Schema({
   following: {
     type: [String],
   },
+  // Warnings
+  warnings: {
+    type: [Array],
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);

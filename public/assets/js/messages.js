@@ -113,6 +113,7 @@ setInterval(async () => {
 // Add conversation
 addConversation.addEventListener('click', () => {
     addConversationDiv.classList.toggle('active');
+    document.querySelector('#addConversationDiv > input').style.display = 'block';
 });
 addConversationCancel.addEventListener('click', () => {
     addConversationDiv.classList.remove('active');

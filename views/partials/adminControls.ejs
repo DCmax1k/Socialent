@@ -14,6 +14,7 @@
             <a href="https://socialent-app.herokuapp.com/account/<%= subUser.username %>?k=<%= user._id %>"><%= subUser.username %></a>
             <% if(subUser.rank != 'owner') {%>
             <div class="manage-btns">
+                <div data-user-id="<%= subUser._id %>" class="warn-btn"><i class="fas fa-exclamation"></i></div>
                 <div data-user-id="<%= subUser._id %>" class="promote-btn"><i class="fas fa-arrows-alt-v"></i></div>
                 <div data-user-id="<%= subUser._id %>" class="delete-btn"><i class="far fa-trash-alt"></i></div>
             </div>
@@ -30,6 +31,34 @@
     const allSubUsers = document.querySelectorAll('.subUser');
     const promoteBtns = document.querySelectorAll('.promote-btn');
     const deleteBtns = document.querySelectorAll('.delete-btn');
+    const warnBtns = document.querySelectorAll('.warn-btn');
+
+    // Warn user
+    warnBtns.forEach(warnBtn => {
+        warnBtn.addEventListener('click', async () => {
+            const warning = prompt('Warning...');
+            if (warning) {
+                const response = await fetch('/home/warn', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userID: warnBtn.getAttribute('data-user-id'),
+                        adminID: userID,
+                        warning,
+                        device: window.navigator.userAgent,
+                    }),
+                });
+                const resJSON = await response.json();
+                if (resJSON.status === 'success') {
+                    alert(`Successfully warned ${resJSON.username}!`);
+                } else if (resJSON.status === 'unseccessful') {
+                    window.location.href = '/login';
+                }
+            }
+        });
+    });
 
     // Delete user
     deleteBtns.forEach(deleteBtn => {
@@ -181,13 +210,14 @@
         height: 95%;
         display: flex;
         justify-content: space-between;
-        width: 20%;
+        width: 30%;
 
     }
     .subUser .manage-btns .promote-btn,
-    .subUser .manage-btns .delete-btn {
+    .subUser .manage-btns .delete-btn,
+    .subUser .manage-btns .warn-btn {
         height: 100%;
-        width: 45%;
+        width: 30%;
         border: 1px solid grey;
         border-radius: 2px;
         display: flex;
