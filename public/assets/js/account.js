@@ -60,7 +60,7 @@ if (editProfileBtn) {
     descText = descText.join('');
     descText = descText.replace(/\\n/gi, '<br />');
     descText = descText.replace(/\\/gi, '');
-    description.innerHTML = descText;
+    description.innerText = descText;
   }
   fixDescription();
 

@@ -12,7 +12,7 @@ const sendMessageBtn = document.getElementById('sendMessageBtn');
 
 let conversationLoaded = '';
 
-// Load conversation takes a conversation ID and loads its messages & removes and adds appropriate html
+// Load conversation takes a conversation ID and loads its messages & removes and adds new html
 const loadConversation = async (conversationID, scroll) => {
     if (conversationID) {
         conversationLoaded = conversationID;
@@ -70,7 +70,7 @@ const loadConversation = async (conversationID, scroll) => {
     }
     
 }
-// Periodic load conversation here, all code copied from aboce.
+// Periodic load conversation here, all code copied from above.
 setInterval(async () => {
     if (conversationLoaded) {
         const response = await fetch('/messages/loadconversation', {
@@ -268,10 +268,11 @@ const sendMessage = async (conversationID, senderID, message) => {
             message,
         })
     });
-    // justSentMessage = true;
     const resJSON = await response.json();
     if (resJSON.status === 'success') {
         messageInput.value = '';
+        loadConversation(conversationID, 'scroll-bottom');
+
     } else {
         window.location.href = '/login';
     }
