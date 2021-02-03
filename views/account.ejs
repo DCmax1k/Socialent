@@ -76,6 +76,9 @@
     <% } %>
 
     <div id="bodyCont">
+      <!-- Admin prefix -->
+      
+      <!-- Profile Info -->
       <div id="profile">
         <div id="imgPlace">
           <% if (account.profileImg === 'none') { %>
@@ -112,7 +115,10 @@
           </div>
           <div id="belowNumbers">
             <div id="nameAndBio">
-              <h1><%= account.name %></h1>
+              <h1>
+                <p><%= account.name %></p>
+                <p>@<%= account.username %></p>
+              </h1>
               <p id="description"><%= JSON.stringify(account.description) %></p>
             </div>
           </div>

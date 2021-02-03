@@ -14,6 +14,14 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  prefix: {
+    type: Object,
+    required: true,
+    default: {
+      name: '',
+      status: true,
+    }
+  },
   password: {
     type: String,
     required: true,

@@ -182,7 +182,7 @@ const checkConversations = async () => {
     const resJSON = await response.json();
     if (resJSON.status === 'success') {
         // Generate html for each conversation
-        resJSON.usersConversations.forEach(async conversation => {
+        resJSON.usersConversations.forEach(async (conversation, i) => {
             let receiverID = '';
             if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
                 receiverID = conversation.people[1];
@@ -199,12 +199,11 @@ const checkConversations = async () => {
             <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
             `;
             node.addEventListener('click', () => { clickedConversation(node) });
-            // Right before loading the html, remove previous html to eliminate flash
-            if (messagesList.innerHTML) {
-                messagesList.innerHTML = '';
-            }
+            
+            //Remove node that is about to be replaced
+            messagesList.removeChild(messagesList.childNodes[i]);
             // Load html here
-            messagesList.insertBefore(node, messagesList.childNodes[0]);
+            messagesList.insertBefore(node, messagesList.childNodes[i]);
         });
     } else {
         window.location.href = '/login';
@@ -231,14 +230,14 @@ const lookupUsername = async (receiverID) => {
 
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {
-    if (conversationLoaded) {
-        conversationLoaded = '';
-        loadConversation();
-    } else {
-        const conversationID = conversation.getAttribute('data-conversation-id');
-        // Load conversation by ID
-        loadConversation(conversationID, 'scroll-bottom');
-    }
+        if (conversationLoaded === conversation.getAttribute('data-conversation-id')) {
+            conversationLoaded = '';
+            loadConversation();
+        } else {
+            const conversationID = conversation.getAttribute('data-conversation-id');
+            // Load conversation by ID
+            loadConversation(conversationID, 'scroll-bottom');
+        }
 }
 
 // Send message

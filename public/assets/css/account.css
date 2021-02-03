@@ -137,6 +137,14 @@
   font-size: 20px;
 }
 
+#nameAndBio  > h1 > p:nth-child(2) {
+  color: grey;
+}
+
+#nameAndBio > h1 p {
+  display: inline;
+}
+
 #description {
   word-wrap: break-word;
   font-size: 12px;
