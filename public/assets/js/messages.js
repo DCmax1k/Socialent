@@ -136,17 +136,17 @@ addConversationSubmit.addEventListener('click', async () => {
     });
     const resJSON = await response.json();
     if (resJSON.status === 'no-user') {
-        alert('No account with that username!');
+        myAlert('No account with that username!');
         addConversationSubmit.innerText = 'Add';
         return;
     }
     if (resJSON.status === 'already-convo') {
-        alert('Already a conversation between you and that user!');
+        myAlert('Already a conversation between you and that user!');
         addConversationSubmit.innerText = 'Add';
         return;
     }
     if (resJSON.status === 'yourself') {
-        alert('You cannot create a conversation with yourself!');
+        myAlert('You cannot create a conversation with yourself!');
         addConversationSubmit.innerText = 'Add';
         return;
     }

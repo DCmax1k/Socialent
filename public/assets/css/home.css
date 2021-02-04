@@ -362,6 +362,21 @@
   margin-bottom: -3px;
 }
 
+@media screen and (max-width: 1000px) {
+  #warnAlerts {
+    width: 75%;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  #warnAlerts {
+    width: 90%;
+  }
+  .warning > h1 {
+    font-size: 20px;
+  }
+}
+
 @media screen and (max-width: 400px) {
   .all-posts {
     top: 40px;
