@@ -11,6 +11,15 @@
     <% allUsers.forEach((subUser, i) => { %>
         <div class="subUser">
             <h3><%= i + 1 %>.</h3>
+            <% if (subUser.prefix.active && subUser.prefix.title) { %>
+                <% if (subUser.rank === 'owner') { %>
+                  <p class="prefix owner">[<%= subUser.prefix.title.split('')[0] %>]&nbsp;</p>
+                <% } else if (subUser.rank === 'admin') { %>
+                  <p class="prefix admin">[<%= subUser.prefix.title.split('')[0] %>]&nbsp;</p>
+                <% } else { %>
+                  <p class="prefix">[<%= subUser.prefix.title.split('')[0] %>]&nbsp;</p>
+                <% } %>
+              <% } %>
             <a href="https://socialent-app.herokuapp.com/account/<%= subUser.username %>?k=<%= user._id %>"><%= subUser.username %></a>
             <% if(subUser.rank != 'owner') {%>
             <div class="manage-btns">
@@ -52,7 +61,7 @@
                 });
                 const resJSON = await response.json();
                 if (resJSON.status === 'success') {
-                    alert(`Successfully warned ${resJSON.username}!`);
+                    myAlert(`Successfully warned ${resJSON.username}!`);
                 } else if (resJSON.status === 'unseccessful') {
                     window.location.href = '/login';
                 }
@@ -78,9 +87,9 @@
                 });
                 const resJSON = await response.json();
                 if (resJSON.status == 'success') {
-                    alert(`Username: ${resJSON.username} has successfully been deleted!`);
+                    myAlert(`Username: ${resJSON.username} has successfully been deleted!`);
                 } else {
-                    alert(`WARNING: Unseccessful`);
+                    myAlert(`WARNING: Unseccessful`);
                 }
             }
         })
@@ -105,13 +114,13 @@
                 const resJSON = await response.json();
                 if (resJSON.status === 'success') {
                     if (resJSON.promoteOrDemote == 'promote') {
-                        alert(`Username: ${resJSON.username} was successfully promoted!`);
+                        myAlert(`Username: ${resJSON.username} was successfully promoted!`);
                     } else if (resJSON.promoteOrDemote == 'demote') {
-                        alert(`Username: ${resJSON.username} was successfully demoted!`);
+                        myAlert(`Username: ${resJSON.username} was successfully demoted!`);
                     }
                     
                 } else {
-                    alert('WARNING! Unseccessful!');
+                    myAlert('WARNING! Unseccessful!');
                 }
             }
         })

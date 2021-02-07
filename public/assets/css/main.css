@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Coda+Caption:wght@800&display=swap');
 
 * {
   margin: 0;
@@ -52,15 +53,14 @@ body::-webkit-scrollbar-track {
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(71, 71, 71, 0);
+  background-color: transparent;
   z-index: 1000;
-  transition: background-color 0.3s ease;
   pointer-events: none;
 }
 
 #customAlert.active {
   pointer-events: all;
-  background-color: rgba(71, 71, 71, 0.795);
+  background-color: rgba(53, 53, 53, 0.795);
 }
 
 .alert {
@@ -114,3 +114,17 @@ body::-webkit-scrollbar-track {
 .alert > button:hover {
   background-color: rgb(146, 146, 146);
 } 
+
+.prefix {
+  color: rgb(27, 116, 27);
+  font-family: 'Coda Caption', sans-serif !important;
+}
+
+.prefix.owner {
+  color: red !important;
+}
+
+.prefix.admin {
+  color: rgb(41, 97, 201) !important;
+}
+

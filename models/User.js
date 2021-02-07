@@ -14,12 +14,13 @@ const UserSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  // .title .active: true, false 
   prefix: {
     type: Object,
     required: true,
     default: {
-      name: '',
-      status: true,
+      title: '',
+      active: true,
     }
   },
   password: {

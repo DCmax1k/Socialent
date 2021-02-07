@@ -139,6 +139,10 @@ router.post('/promote', async (req, res) => {
         if (user.rank == 'user') {
           const promoteUser = await User.findByIdAndUpdate(user._id, { rank: 'admin' }, { useFindAndModify: false });
           const saveUser = await promoteUser.save();
+          const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': 'Admin' }, { useFindAndModify: false });
+          const savePrefix = await setPrefix.save();
+          const setPrefixActive = await User.findByIdAndUpdate(user._id, { 'prefix.active': true }, { useFindAndModify: false });
+          const saveActive = await setPrefixActive.save();
           res.json({
             status: 'success',
             username: user.username,
@@ -147,6 +151,10 @@ router.post('/promote', async (req, res) => {
         } else if (user.rank == 'admin') {
           const demoteUser = await User.findByIdAndUpdate(user._id, { rank: 'user'}, { useFindAndModify: false });
           const saveUser = await demoteUser.save();
+          const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': '' }, { useFindAndModify: false });
+          const savePrefix = await setPrefix.save();
+          const setPrefixActive = await User.findByIdAndUpdate(user._id, { 'prefix.active': false }, { useFindAndModify: false });
+          const saveActive = await setPrefixActive.save();
           res.json({
             status: 'success',
             username: user.username,

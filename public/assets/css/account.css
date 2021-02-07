@@ -137,7 +137,7 @@
   font-size: 20px;
 }
 
-#nameAndBio  > h1 > p:nth-child(2) {
+#nameAndBio  > h1 > p:last-child {
   color: grey;
 }
 
