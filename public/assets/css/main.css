@@ -75,11 +75,11 @@ body::-webkit-scrollbar-track {
   border: 2px solid rgb(168, 168, 168);
   color: rgb(168, 168, 168);
   transform: translate(-50%, -350px);
-  transition: transform 0.3s ease;
 }
 
 #customAlert.active .alert{
   transform: translate(-50%, 0);
+  transition: transform 0.3s ease;
 }
 
 .alert > i {

@@ -9,6 +9,31 @@ const postID = shareBtn.getAttribute('data-post-id');
 const playBtn = document.getElementById('playBtn');
 const video = document.getElementById('video');
 
+const authorSpace = document.getElementById('username');
+
+// Add prefix to username in author space at top of post
+const addPrefix = async () => {
+  const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
+  const node = document.createElement('p');
+  if (authorUser.prefix.title && authorUser.prefix.active) {
+    if (authorUser.rank === 'owner') {
+      node.classList.add('prefix', 'owner');
+      node.style.marginLeft = '5px';
+      node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
+    } else if (authorUser.rank === 'admin') {
+      node.classList.add('prefix', 'admin');
+      node.style.marginLeft = '5px';
+      node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
+    } else {
+      node.classList.add('prefix');
+      node.style.marginLeft = '5px';
+      node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
+    }
+  }
+  authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 2]);
+}
+addPrefix();
+
 // Play video
 if (playBtn && video) {
   playBtn.addEventListener('click', () => {

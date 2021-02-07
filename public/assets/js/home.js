@@ -17,7 +17,23 @@ const playBtns = document.querySelectorAll('.play-btn');
 const videos = document.querySelectorAll('.post-img > video');
 const warnAlerts = document.getElementById('warnAlerts');
 const dismissBtns = document.querySelectorAll('.dismiss-btn')
+const authorSpaces = document.querySelectorAll('.author');
 
+// Add prefix to username in author space at top of post
+authorSpaces.forEach(async authorSpace => {
+  const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
+  const node = document.createElement('span');
+  if (authorUser.prefix.title && authorUser.prefix.active) {
+    if (authorUser.rank === 'owner') {
+      node.innerHTML = `<p class="prefix owner">[${authorUser.prefix.title}]</p>&nbsp;`;
+    } else if (authorUser.rank === 'admin') {
+      node.innerHTML = `<p class="prefix admin">[${authorUser.prefix.title}]</p>&nbsp;`;
+    } else {
+      node.innerHTML = `<p class="prefix">[${authorUser.prefix.title}]</p>&nbsp;`;
+    }
+  }
+  authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 2]);
+});
 
 // Play a video
 playBtns.forEach((playBtn) => {

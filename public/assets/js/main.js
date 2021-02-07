@@ -21,3 +21,18 @@ const myAlert = (message) => {
         }
     })
 }
+
+// Lookup username from ID
+const lookupUsername = async (receiverID) => {
+    const response = await fetch('/messages/lookupusername', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            receiverID,
+        })
+    });
+    const resJSON = await response.json();
+    return resJSON;
+}

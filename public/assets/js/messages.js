@@ -225,22 +225,6 @@ const checkConversations = async () => {
 checkConversations();
 setInterval(checkConversations, 3000);
 
-
-// Lookup username from ID
-const lookupUsername = async (receiverID) => {
-    const response = await fetch('/messages/lookupusername', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            receiverID,
-        })
-    });
-    const resJSON = await response.json();
-    return resJSON;
-}
-
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {
         if (conversationLoaded === conversation.getAttribute('data-conversation-id')) {
