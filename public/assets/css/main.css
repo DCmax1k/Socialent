@@ -118,6 +118,7 @@ body::-webkit-scrollbar-track {
 .prefix {
   color: rgb(27, 116, 27);
   font-family: 'Coda Caption', sans-serif !important;
+  display: inline;
 }
 
 .prefix.owner {
@@ -126,5 +127,14 @@ body::-webkit-scrollbar-track {
 
 .prefix.admin {
   color: rgb(41, 97, 201) !important;
+}
+
+@media screen and (max-width: 430px) {
+  .alert {
+    width: 95%;
+  }
+  .alert > h1 {
+    font-size: 23px;
+  }
 }
 

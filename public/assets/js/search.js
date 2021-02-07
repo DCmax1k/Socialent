@@ -40,6 +40,16 @@ searchInput.addEventListener('input', async (e) => {
             'onclick',
             `openURL('/account/${account.username}?k=${userID}')`
           );
+          let prefixHTML = ``;
+            if (account.prefix.active && account.prefix.title) {
+                if (account.rank === 'owner') {
+                  prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
+                } else if (account.rank === 'admin') {
+                  prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
+                } else {
+                  prefixHTML = `<p class="prefix">[<${account.prefix.title}]</p>`;
+                }
+            }
           node.innerHTML = `
               <img src="${
                 account.profileImg === 'none'
@@ -47,7 +57,7 @@ searchInput.addEventListener('input', async (e) => {
                   : account.profileImg
               }" alt="Profile Image" />
             <div class="right-side">
-                <span class="username">${account.username}</span>
+                <span class="username">${prefixHTML} ${account.username}</span>
                 <span class="name">${account.name}</span>
             </div>
               `;

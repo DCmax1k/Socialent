@@ -189,13 +189,26 @@ const checkConversations = async () => {
             } else {
                 receiverID = conversation.people[0];
             }
-            const receiverUser = await lookupUsername(receiverID);   
+            const receiverUser = await lookupUsername(receiverID);  
+            
+            console.log(receiverUser);
+
             const node = document.createElement('div');
             node.classList.add('conversation');
             node.setAttribute('data-conversation-id', conversation._id);
+            let prefixHTML = ``;
+            if (receiverUser.prefix.active && receiverUser.prefix.title) {
+                if (receiverUser.rank === 'owner') {
+                  prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                } else if (receiverUser.rank === 'admin') {
+                  prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                } else {
+                  prefixHTML = `<p class="prefix">[<${receiverUser.prefix.title.split('')[0]}]</p>`;
+                }
+            }
             node.innerHTML = 
             `
-            <h2>${receiverUser}</h2>
+            <h2>${prefixHTML} ${receiverUser.username}</h2>
             <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
             `;
             node.addEventListener('click', () => { clickedConversation(node) });
@@ -225,7 +238,7 @@ const lookupUsername = async (receiverID) => {
         })
     });
     const resJSON = await response.json();
-    return resJSON.username;
+    return resJSON;
 }
 
 // Function for click on conversation - Listener added when the element is created

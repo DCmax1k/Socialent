@@ -138,6 +138,8 @@ router.post('/lookupusername', async (req, res) => {
       const receiver = await User.findById(req.body.receiverID);
       res.json({
         username: receiver.username,
+        prefix: receiver.prefix,
+        rank: receiver.rank,
       });
     } catch(err) {
       console.error(err);

@@ -15,4 +15,9 @@ const myAlert = (message) => {
         customAlert.classList.remove('active'); 
     }
     customAlertOk.addEventListener('click', removeAlert);
+    document.addEventListener('keyup', (e) => {
+        if (e.keyCode == 13) {
+            removeAlert();
+        }
+    })
 }
