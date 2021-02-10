@@ -32,7 +32,7 @@
         <% if (post.urlType === 'image') { %>
         <img src="<%= post.url %>" alt="Post Image" />
         <% } else if (post.urlType === 'video') {%>
-        <video playsinline loop id="video">
+        <video playsinline loop id="video"  preload="auto">
           <source src="<%= post.url %>" />
         </video>
         <div id="playBtn">
