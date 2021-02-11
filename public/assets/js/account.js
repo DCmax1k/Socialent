@@ -1,3 +1,4 @@
+const accountUsername = window.location.href.split('/')[4].split('?')[0];
 const loginBtn = document.getElementById('loginBtn');
 const changeNameInput = document.getElementById('changeNameInput');
 const changeEmailInput = document.getElementById('changeEmailInput');
@@ -20,6 +21,9 @@ const deleteAccount = document.getElementById('deleteAccount');
 const changeImg = document.getElementById('changeImg');
 const changeImgFile = document.getElementById('changeImgFile');
 const profileImg = document.querySelector('#profile > #imgPlace > img');
+const setUsersPrefix = document.getElementById('setUsersPrefix');
+const setUsersPrefixInput = document.getElementById('setUsersPrefixInput');
+const prefix = document.querySelector('.prefix');
 
 
 // Follow
@@ -47,6 +51,7 @@ if (followBtn) {
   });
 }
 
+// If account is the user
 if (editProfileBtn) {
   // Edit Profile
 
@@ -348,6 +353,9 @@ if (editProfileBtn) {
       submitEmail.style.color = 'red';
     }
   });
+
+  
+
 }
 
 const openPost = (postID) => {
@@ -372,4 +380,71 @@ if (closeEditProfileCont) {
   closeEditProfileCont.addEventListener('click', () => {
     editProfileCont.classList.remove('active');
   });
+}
+
+// If logged in
+if (editProfileBtn || followBtn) {
+ 
+// Set users prefix
+  if (setUsersPrefix) {
+    setUsersPrefixInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter' ) {
+        submitSetUsersPrefix();
+      }
+    });
+
+    const submitSetUsersPrefix = async () => {
+      const usersPrefix = setUsersPrefixInput.value;
+      const response = await fetch('/account/setusersprefix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userID,
+          accountUsername,
+          usersPrefix,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON = await response.json();
+      if (resJSON.status === 'not admin') {
+        window.location.href = '/login';
+      } else if (resJSON.status === 'fail') {
+        setUsersPrefixInput.blur();
+        myAlert('Failed setting prefix');
+      } else if (resJSON.status === 'success') {
+        setUsersPrefixInput.blur();
+        if (resJSON.prefixActive) {
+          if (prefix) {
+            if (resJSON.prefix) {
+              prefix.innerText = `[${resJSON.prefix}]`;
+            } else {
+              prefix.innerText = '';
+            }
+          } else {
+            // Create prefix div, then set prefix value
+            // <p class="prefix">[<%= account.prefix.title %>]</p>
+            const node = document.createElement('p');
+            node.classList.add('prefix');
+            if (resJSON.usersRank === 'owner') {
+              node.classList.add('owner');
+            } else if (resJSON.usersRank === 'admin') {
+              node.classList.add('admin');
+            }
+            if (resJSON.prefix) {
+              node.innerText = `[${resJSON.prefix}]`;
+            } else {
+              node.innerText = '';
+            }
+            document.querySelector('#nameAndBio > h1').insertBefore(node, document.querySelector('#nameAndBio > h1').childNodes[0]);
+          }
+          
+        }
+        myAlert('Successfully set')
+      }
+    }  
+  }
+  
+ 
 }

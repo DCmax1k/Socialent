@@ -32,7 +32,7 @@ authorSpaces.forEach(async authorSpace => {
       node.innerHTML = `<p class="prefix">[${authorUser.prefix.title}]</p>&nbsp;`;
     }
   }
-  authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 2]);
+  authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 1]);
 });
 
 // Play a video

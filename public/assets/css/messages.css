@@ -32,31 +32,33 @@
     border-radius: 10px;
     clip-path: circle(14px at 14px 14px);
     transition: clip-path 0.3s ease;
+    min-height: fit-content;
 }
 
 #addConversationDiv.active {
     clip-path: circle(75%);
 }
 
-#addConversationDiv > input {
-    display: none;
+#addConversationInputs {
+    margin-left: 30px;
+    height: fit-content;
+    width: 85%;
 }
 
 #addConversationInput {
-    float: right;
     outline: none;
     border-radius: 5px;
     height: 30px;
-    width: 85%;
+    width: 100%;
     margin: 5px;
     padding: 5px;
     border: none;
+    display: none;
 }
 
 #addConversationButtons {
-    float: right;
     height: 20px;
-    width: 85%;
+    width: 100%;
     margin: 5px;
     display: flex;
     justify-content: space-between;
@@ -79,6 +81,32 @@
     color: white;
     cursor: pointer;
     font-size: 20px;
+}
+
+#addConversationSuggestions {
+    width: 85%;
+    height: fit-content;
+    margin-top: 5px;
+    margin-left: 35px;
+}
+
+.suggestion {
+    width: 100%;
+    font-size: 15px;
+    color: white;
+    border-radius: 99999px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    overflow: hidden;
+    text-align: center;
+    padding: 5px;
+    background-color: rgba(182, 182, 182, 0.3);
+}
+
+.suggestion:hover {
+    background-color: rgba(182, 182, 182, 0.651);
 }
 
 #messagesList {

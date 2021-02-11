@@ -58,6 +58,30 @@ router.get('/:username', async (req, res) => {
   }
 });
 
+// Set users prefix
+router.post('/setusersprefix', async (req, res) => {
+  try {
+    const admin = await User.findById(req.body.userID);
+    const user = await User.findOne({username: req.body.accountUsername});
+    if ((admin.rank === 'owner' || admin.rank === 'admin') && admin.devices.includes(req.body.device)) {
+      const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
+      const saveUser = await updateUser.save();
+      res.json({
+        status: 'success',
+        prefix: req.body.usersPrefix,
+        prefixActive: user.prefix.active,
+        usersRank: user.rank,
+      });
+    } else {
+      res.json({
+        status: 'not admin',
+      });
+    }
+  } catch(err) {
+    console.error(err);
+  }
+})
+
 // Change Profile Img
 router.post('/changeimg', async (req, res) => {
   try {
@@ -111,6 +135,8 @@ router.post('/changeimg', async (req, res) => {
 //     console.error(err);
 //   }
 // });
+
+// Delete account using global funciton
 router.post('/deleteaccount', async (req, res) => {
   try {
     const user = await User.findById(req.body.userID);

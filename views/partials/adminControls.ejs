@@ -157,9 +157,11 @@
         clip-path: circle(7% at 91% 93%);
         transition: clip-path 0.3s ease;
         box-shadow: 2px 2px 5px black;
+        pointer-events: none;
     }
     #adminControls.active {
         clip-path: circle(75%);
+        pointer-events: all;
     }
     #adminControlsTop {
         display: flex;
@@ -195,6 +197,7 @@
         color: white;
         cursor: pointer;
         transform: rotate(135deg);
+        pointer-events: all !important;
     }
     .subUser {
         display: flex;

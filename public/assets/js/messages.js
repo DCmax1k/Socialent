@@ -9,6 +9,7 @@ const messagesList = document.getElementById('messagesList');
 const internalMessages = document.getElementById('internalMessages');
 const messageInput = document.querySelector('#messaging > input');
 const sendMessageBtn = document.getElementById('sendMessageBtn');
+const addConversationSuggestions = document.getElementById('addConversationSuggestions');
 
 let conversationLoaded = '';
 
@@ -113,7 +114,7 @@ setInterval(async () => {
 // Add conversation
 addConversation.addEventListener('click', () => {
     addConversationDiv.classList.toggle('active');
-    document.querySelector('#addConversationDiv > input').style.display = 'block';
+    addConversationInput.style.display = 'block';
 });
 addConversationCancel.addEventListener('click', () => {
     addConversationDiv.classList.remove('active');
@@ -121,52 +122,120 @@ addConversationCancel.addEventListener('click', () => {
 });
 
 addConversationSubmit.addEventListener('click', async () => {
-    const receiver = addConversationInput.value;
-    addConversationSubmit.innerText = 'Loading...';
-    addConversationDiv.classList.remove('active');
-    const response = await fetch('/messages/addconversation', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            userID,
-            receiver,
-        }),
-    });
-    const resJSON = await response.json();
-    if (resJSON.status === 'no-user') {
-        myAlert('No account with that username!');
-        addConversationSubmit.innerText = 'Add';
-        return;
-    }
-    if (resJSON.status === 'already-convo') {
-        myAlert('Already a conversation between you and that user!');
-        addConversationSubmit.innerText = 'Add';
-        return;
-    }
-    if (resJSON.status === 'yourself') {
-        myAlert('You cannot create a conversation with yourself!');
-        addConversationSubmit.innerText = 'Add';
-        return;
-    }
-    if (resJSON.status === 'success') {
-        // Generate conversation html
-        const receiverUsername = resJSON.username;
-        const node = document.createElement('div');
-        node.classList.add('conversation');
-        node.setAttribute('data-conversation-id', resJSON.conversationID);
-        node.innerHTML = 
-        `
-        <h2>${receiverUsername}</h2>
-        <h4>Start Messaging!</h4>
-        `;
-        addConversationSubmit.innerText = 'Add';
-        addConversationInput.value = '';
-    } else {
-        window.location.href = '/login';
-    }   
+    addConversationSubmitFunction(); 
 });
+
+addConversationInput.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') {
+        addConversationSubmitFunction();
+    }
+})
+
+const addConversationSubmitFunction = async () => {
+    if (addConversationInput.value) {
+        const receiver = addConversationInput.value;
+        addConversationSubmit.innerText = 'Loading...';
+        addConversationDiv.classList.remove('active');
+        const response = await fetch('/messages/addconversation', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userID,
+                receiver,
+            }),
+        });
+        const resJSON = await response.json();
+        if (resJSON.status === 'no-user') {
+            myAlert('No account with that username!');
+            addConversationSubmit.innerText = 'Add';
+            addConversationInput.value = '';
+            return;
+        }
+        if (resJSON.status === 'already-convo') {
+            myAlert('Already a conversation between you and that user!');
+            addConversationSubmit.innerText = 'Add';
+            addConversationInput.value = '';
+            return;
+        }
+        if (resJSON.status === 'yourself') {
+            myAlert('You cannot create a conversation with yourself!');
+            addConversationSubmit.innerText = 'Add';
+            addConversationInput.value = '';
+            return;
+        }
+        if (resJSON.status === 'success') {
+            // Generate conversation html
+            const receiverUsername = resJSON.username;
+            const node = document.createElement('div');
+            node.classList.add('conversation');
+            node.setAttribute('data-conversation-id', resJSON.conversationID);
+            node.innerHTML = 
+            `
+            <h2>${receiverUsername}</h2>
+            <h4>Start Messaging!</h4>
+            `;
+            addConversationSubmit.innerText = 'Add';
+            addConversationInput.value = '';
+        } else {
+            window.location.href = '/login';
+        }    
+    }
+       
+}
+
+// Add conversation search for user
+addConversationInput.addEventListener('input', async (e) => {
+    try {
+      if (e.target.value) {
+        const response = await fetch('/search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            value: e.target.value,
+            userID,
+            device: window.navigator.userAgent,
+          }),
+        });
+        const resJSON = await response.json();
+        if (resJSON.status === 'wrong user') {
+          window.location.href = '/login';
+        } else if (resJSON.status === 'success') {
+          const parsedAccounts = resJSON.searchedAccounts.map((account) =>
+            JSON.parse(account)
+          );
+          addConversationSuggestions.innerHTML = '';
+          parsedAccounts.forEach((account) => {
+            const node = document.createElement('div');
+            node.classList.add('suggestion');
+            let prefixHTML = ``;
+              if (account.prefix.active && account.prefix.title) {
+                  if (account.rank === 'owner') {
+                    prefixHTML = `<p class="prefix owner">[${account.prefix.title.split('')[0]}]</p>`
+                  } else if (account.rank === 'admin') {
+                    prefixHTML = `<p class="prefix admin">[${account.prefix.title.split('')[0]}]</p>`
+                  } else {
+                    prefixHTML = `<p class="prefix">[<${account.prefix.title.split('')[0]}]</p>`;
+                  }
+              }
+            node.innerHTML = 
+            `
+            ${prefixHTML} ${account.username} - ${account.name}
+            `;
+            addConversationSuggestions.insertBefore(node, addConversationSuggestions.childNodes[0]);
+          });
+        }
+      } else {
+        addConversationSuggestions.innerHTML = '';
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  });
+  
 
 // Check for Conversations *Right when page loads & periodically*
 const checkConversations = async () => {
@@ -190,8 +259,6 @@ const checkConversations = async () => {
                 receiverID = conversation.people[0];
             }
             const receiverUser = await lookupUsername(receiverID);  
-            
-            console.log(receiverUser);
 
             const node = document.createElement('div');
             node.classList.add('conversation');
@@ -203,7 +270,7 @@ const checkConversations = async () => {
                 } else if (receiverUser.rank === 'admin') {
                   prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
                 } else {
-                  prefixHTML = `<p class="prefix">[<${receiverUser.prefix.title.split('')[0]}]</p>`;
+                  prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
                 }
             }
             node.innerHTML = 

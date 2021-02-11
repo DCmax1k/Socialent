@@ -47,7 +47,7 @@ searchInput.addEventListener('input', async (e) => {
                 } else if (account.rank === 'admin') {
                   prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
                 } else {
-                  prefixHTML = `<p class="prefix">[<${account.prefix.title}]</p>`;
+                  prefixHTML = `<p class="prefix">[${account.prefix.title}]</p>`;
                 }
             }
           node.innerHTML = `

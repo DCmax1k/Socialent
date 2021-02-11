@@ -88,6 +88,10 @@
   font-family: 'Open Sans', sans-serif;
 }
 
+.all-posts .post-cont:last-child {
+  margin-bottom: 200px !important;
+}
+
 .post-cont {
   width: 300px;
   position: relative;
