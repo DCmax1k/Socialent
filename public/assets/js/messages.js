@@ -218,7 +218,7 @@ addConversationInput.addEventListener('input', async (e) => {
                   } else if (account.rank === 'admin') {
                     prefixHTML = `<p class="prefix admin">[${account.prefix.title.split('')[0]}]</p>`
                   } else {
-                    prefixHTML = `<p class="prefix">[<${account.prefix.title.split('')[0]}]</p>`;
+                    prefixHTML = `<p class="prefix">[${account.prefix.title.split('')[0]}]</p>`;
                   }
               }
             node.innerHTML = 
