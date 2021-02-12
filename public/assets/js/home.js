@@ -2,6 +2,7 @@ const posts = document.querySelectorAll('.post-cont');
 const likeBtns = document.querySelectorAll('.like-btn > i');
 const likeBtnsText = document.querySelectorAll('.like-btn > p');
 const postImgs = document.querySelectorAll('.post-img > img');
+const postVideos = document.querySelectorAll('.post-img > video');
 const logOutBt = document.getElementById('logOutBtn');
 const viewCommentsBtns = document.querySelectorAll('.view-comments-btn');
 const allCommentsConts = document.querySelectorAll('.all-comments');
@@ -407,5 +408,9 @@ const giveDisEventListener = dismissBtn => {
   });
 };
 
-  
+window.addEventListener('load', () => {
+  postVideos.forEach(postVideo => {
+    postVideo.load();
+  })
 
+})
