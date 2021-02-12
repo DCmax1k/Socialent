@@ -15,7 +15,7 @@ const authorSpace = document.getElementById('username');
 const addPrefix = async () => {
   const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
   const node = document.createElement('p');
-  if (authorUser.prefix.title && authorUser.prefix.active) {
+  if (authorUser.prefix.title) {
     if (authorUser.rank === 'owner') {
       node.classList.add('prefix', 'owner');
       node.style.marginLeft = '5px';

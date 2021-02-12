@@ -141,8 +141,6 @@ router.post('/promote', async (req, res) => {
           const saveUser = await promoteUser.save();
           const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': 'Admin' }, { useFindAndModify: false });
           const savePrefix = await setPrefix.save();
-          const setPrefixActive = await User.findByIdAndUpdate(user._id, { 'prefix.active': true }, { useFindAndModify: false });
-          const saveActive = await setPrefixActive.save();
           res.json({
             status: 'success',
             username: user.username,
@@ -153,8 +151,6 @@ router.post('/promote', async (req, res) => {
           const saveUser = await demoteUser.save();
           const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': '' }, { useFindAndModify: false });
           const savePrefix = await setPrefix.save();
-          const setPrefixActive = await User.findByIdAndUpdate(user._id, { 'prefix.active': false }, { useFindAndModify: false });
-          const saveActive = await setPrefixActive.save();
           res.json({
             status: 'success',
             username: user.username,

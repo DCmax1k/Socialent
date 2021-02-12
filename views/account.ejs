@@ -137,7 +137,7 @@
           <div id="belowNumbers">
             <div id="nameAndBio">
               <h1>
-                <% if (account.prefix.active && account.prefix.title) { %>
+                <% if (account.prefix.title) { %>
                   <% if (account.rank === 'owner') { %>
                     <p class="prefix owner">[<%= account.prefix.title %>]</p>
                   <% } else if (account.rank === 'admin') { %>

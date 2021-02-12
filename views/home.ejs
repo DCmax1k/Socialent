@@ -74,7 +74,7 @@
         <!-- Post img -->
         <div class="post-img">
           <% if (post.urlType === 'image') { %>
-          <img loading='lazy' src="<%= post.url %> " alt="Post" />
+          <img data-post-id="<%= post._id %>" loading='lazy' src="<%= post.url %> " alt="Post" />
           <% } else if (post.urlType === 'video') {%>
           <video loading='lazy'  preload="auto" playsinline loop data-post-id="<%= post._id %>">
             <source src="<%= post.url %>" />

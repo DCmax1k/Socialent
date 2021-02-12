@@ -211,8 +211,10 @@ addConversationInput.addEventListener('input', async (e) => {
           parsedAccounts.forEach((account) => {
             const node = document.createElement('div');
             node.classList.add('suggestion');
+            node.setAttribute('data-username', account.username)
+            node.addEventListener('click', () => { autofillSearchUsername(node.getAttribute('data-username')); });
             let prefixHTML = ``;
-              if (account.prefix.active && account.prefix.title) {
+              if (account.prefix.title) {
                   if (account.rank === 'owner') {
                     prefixHTML = `<p class="prefix owner">[${account.prefix.title.split('')[0]}]</p>`
                   } else if (account.rank === 'admin') {
@@ -234,7 +236,15 @@ addConversationInput.addEventListener('input', async (e) => {
     } catch (err) {
       console.error(err);
     }
-  });
+});
+
+const autofillSearchUsername = username => {
+    const inputArray = addConversationInput.value.split(' ');
+    inputArray[inputArray.length - 1] = username;
+    addConversationInput.value = inputArray.join();
+    addConversationInput.select();
+}
+  
   
 
 // Check for Conversations *Right when page loads & periodically*
@@ -251,7 +261,7 @@ const checkConversations = async () => {
     const resJSON = await response.json();
     if (resJSON.status === 'success') {
         // Generate html for each conversation
-        resJSON.usersConversations.forEach(async (conversation, i) => {
+        resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
             let receiverID = '';
             if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
                 receiverID = conversation.people[1];
@@ -264,7 +274,7 @@ const checkConversations = async () => {
             node.classList.add('conversation');
             node.setAttribute('data-conversation-id', conversation._id);
             let prefixHTML = ``;
-            if (receiverUser.prefix.active && receiverUser.prefix.title) {
+            if (receiverUser.prefix.title) {
                 if (receiverUser.rank === 'owner') {
                   prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
                 } else if (receiverUser.rank === 'admin') {

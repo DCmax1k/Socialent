@@ -20,7 +20,6 @@ const UserSchema = mongoose.Schema({
     required: true,
     default: {
       title: '',
-      active: true,
     }
   },
   password: {

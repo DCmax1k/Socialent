@@ -41,7 +41,7 @@ searchInput.addEventListener('input', async (e) => {
             `openURL('/account/${account.username}?k=${userID}')`
           );
           let prefixHTML = ``;
-            if (account.prefix.active && account.prefix.title) {
+            if (account.prefix.title) {
                 if (account.rank === 'owner') {
                   prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
                 } else if (account.rank === 'admin') {

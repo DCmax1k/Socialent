@@ -1,6 +1,7 @@
 const posts = document.querySelectorAll('.post-cont');
 const likeBtns = document.querySelectorAll('.like-btn > i');
 const likeBtnsText = document.querySelectorAll('.like-btn > p');
+const postImgs = document.querySelectorAll('.post-img > img');
 const logOutBt = document.getElementById('logOutBtn');
 const viewCommentsBtns = document.querySelectorAll('.view-comments-btn');
 const allCommentsConts = document.querySelectorAll('.all-comments');
@@ -23,7 +24,7 @@ const authorSpaces = document.querySelectorAll('.author');
 authorSpaces.forEach(async authorSpace => {
   const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
   const node = document.createElement('span');
-  if (authorUser.prefix.title && authorUser.prefix.active) {
+  if (authorUser.prefix.title) {
     if (authorUser.rank === 'owner') {
       node.innerHTML = `<p class="prefix owner">[${authorUser.prefix.title}]</p>&nbsp;`;
     } else if (authorUser.rank === 'admin') {
@@ -233,79 +234,106 @@ viewCommentsBtns.forEach((viewCommentsBtn) => {
 });
 
 // Like/unlike post
-likeBtns.forEach((likeBtn) => {
-  likeBtn.addEventListener('click', async () => {
-    try {
-      const postID = likeBtn.getAttribute('data-post-id');
-      if (
-        !likeBtn.getAttribute('data-post-liked') ||
-        likeBtn.getAttribute('data-post-liked') === 'false'
-      ) {
-        // Like post
-        const response = await fetch('/home/likepost', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            postID,
-            userID,
-            device: window.navigator.userAgent,
-          }),
-        });
-        const resJSON = await response.json();
-        if (resJSON.status === 'liked') {
-          likeBtn.style.color = 'red';
-          likeBtn.setAttribute('data-post-liked', 'true');
-          likeBtnsText.forEach((text) => {
-            if (text.getAttribute('data-post-id') === postID) {
-              const currentNumLikes = text.innerText.split(' ')[0];
-              if (currentNumLikes == 0) {
-                text.innerText = parseFloat(currentNumLikes) + 1 + ' Like';
-              } else {
-                text.innerText = parseFloat(currentNumLikes) + 1 + ' Likes';
-              }
+
+const likePost = async likeBtn => {
+  try {
+    const postID = likeBtn.getAttribute('data-post-id');
+    if (
+      !likeBtn.getAttribute('data-post-liked') ||
+      likeBtn.getAttribute('data-post-liked') === 'false'
+    ) {
+      // Like post
+      const response = await fetch('/home/likepost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postID,
+          userID,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON = await response.json();
+      if (resJSON.status === 'liked') {
+        likeBtn.style.color = 'red';
+        likeBtn.setAttribute('data-post-liked', 'true');
+        likeBtnsText.forEach((text) => {
+          if (text.getAttribute('data-post-id') === postID) {
+            const currentNumLikes = text.innerText.split(' ')[0];
+            if (currentNumLikes == 0) {
+              text.innerText = parseFloat(currentNumLikes) + 1 + ' Like';
+            } else {
+              text.innerText = parseFloat(currentNumLikes) + 1 + ' Likes';
             }
-          });
-        } else {
-          window.location.href = '/login';
-        }
+          }
+        });
       } else {
-        // Unlike post
-        const resp = await fetch('/home/unlikepost', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            postID,
-            userID,
-            device: window.navigator.userAgent,
-          }),
-        });
-        const respJSON = await resp.json();
-        if (respJSON.status === 'unliked') {
-          likeBtn.style.color = '#c4c4c4';
-          likeBtn.setAttribute('data-post-liked', 'false');
-          likeBtnsText.forEach((text) => {
-            if (text.getAttribute('data-post-id') === postID) {
-              const currentNumLikes = text.innerText.split(' ')[0];
-              if (currentNumLikes == 2) {
-                text.innerText = parseFloat(currentNumLikes) - 1 + ' Like';
-              } else {
-                text.innerText = parseFloat(currentNumLikes) - 1 + ' Likes';
-              }
-            }
-          });
-        } else {
-          window.location.href = '/login';
-        }
+        window.location.href = '/login';
       }
-    } catch (err) {
-      console.error(err);
+    } else {
+      // Unlike post
+      const resp = await fetch('/home/unlikepost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postID,
+          userID,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const respJSON = await resp.json();
+      if (respJSON.status === 'unliked') {
+        likeBtn.style.color = '#c4c4c4';
+        likeBtn.setAttribute('data-post-liked', 'false');
+        likeBtnsText.forEach((text) => {
+          if (text.getAttribute('data-post-id') === postID) {
+            const currentNumLikes = text.innerText.split(' ')[0];
+            if (currentNumLikes == 2) {
+              text.innerText = parseFloat(currentNumLikes) - 1 + ' Like';
+            } else {
+              text.innerText = parseFloat(currentNumLikes) - 1 + ' Likes';
+            }
+          }
+        });
+      } else {
+        window.location.href = '/login';
+      }
     }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+likeBtns.forEach((likeBtn) => {
+  likeBtn.addEventListener('click', () => {
+    likePost(likeBtn);
   });
 });
+
+playBtns.forEach(playBtn => {
+  playBtn.addEventListener('dblclick', () => {
+    const postID = playBtn.getAttribute('data-post-id');
+    likeBtns.forEach(likeBtn => {
+      if (likeBtn.getAttribute('data-post-id') === postID) {
+        likePost(likeBtn);
+      }
+    });
+  });
+});
+
+postImgs.forEach(postImg => {
+  postImg.addEventListener('dblclick', () => {
+    const postID = postImg.getAttribute('data-post-id');
+    likeBtns.forEach(likeBtn => {
+      if (likeBtn.getAttribute('data-post-id') === postID) {
+        likePost(likeBtn);
+      }
+    });
+  });
+})
 
 // Warnings
 let currentWarnings = [];

@@ -20,7 +20,7 @@
                   <p class="prefix">[<%= subUser.prefix.title.split('')[0] %>]&nbsp;</p>
                 <% } %>
               <% } %>
-            <a href="https://socialent-app.herokuapp.com/account/<%= subUser.username %>?k=<%= user._id %>"><%= subUser.username %></a>
+            <a href="/account/<%= subUser.username %>?k=<%= user._id %>"><%= subUser.username %></a>
             <% if(subUser.rank != 'owner') {%>
             <div class="manage-btns">
                 <div data-user-id="<%= subUser._id %>" class="warn-btn"><i class="fas fa-exclamation"></i></div>
@@ -213,6 +213,7 @@
     .subUser a {
         font-size: 20px;
         color: white;
+
     }
     .subUser .manage-btns {
         position: absolute;
@@ -236,6 +237,7 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        background-color: #303030;
     }
 
     @media screen and (max-width: 450px) {
