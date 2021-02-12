@@ -24,6 +24,7 @@ const profileImg = document.querySelector('#profile > #imgPlace > img');
 const setUsersPrefix = document.getElementById('setUsersPrefix');
 const setUsersPrefixInput = document.getElementById('setUsersPrefixInput');
 const prefix = document.querySelector('.prefix');
+const postVideos = document.querySelectorAll('.imgHolder > video');
 
 
 // Follow
@@ -448,3 +449,11 @@ if (editProfileBtn || followBtn) {
   
  
 }
+
+// Load videos
+window.addEventListener('load', () => {
+  postVideos.forEach(postVideo => {
+    postVideo.load();
+  });
+
+});

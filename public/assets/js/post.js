@@ -8,7 +8,6 @@ const shareBtn = document.querySelector('#shareBtn > i');
 const postID = shareBtn.getAttribute('data-post-id');
 const playBtn = document.getElementById('playBtn');
 const video = document.getElementById('video');
-
 const authorSpace = document.getElementById('username');
 
 // Add prefix to username in author space at top of post
@@ -44,6 +43,11 @@ if (playBtn && video) {
       video.pause();
       playBtn.style.opacity = '1';
     }
+  });
+
+  // Load videos
+  window.addEventListener('load', () => {
+    video.load();
   });
 }
 

@@ -45,7 +45,11 @@
         <!-- Username -->
         <div id="username" data-author-id="<%= post.author._id %>">
           <img
-            src="<%= post.author.profileImg %>"
+          src="<% if (post.author.profileImg === 'none') { %>
+            /images/profilePlaceholder.svg
+           <% } else {  %>
+             <%= post.author.profileImg %> 
+           <% } %> "
             alt="Profile Image"
             style="
               background-color: #2e2e2e;

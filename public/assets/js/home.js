@@ -408,9 +408,10 @@ const giveDisEventListener = dismissBtn => {
   });
 };
 
+// Load videos
 window.addEventListener('load', () => {
   postVideos.forEach(postVideo => {
     postVideo.load();
-  })
+  });
 
-})
+});
