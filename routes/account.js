@@ -63,7 +63,7 @@ router.post('/setusersprefix', async (req, res) => {
   try {
     const admin = await User.findById(req.body.userID);
     const user = await User.findOne({username: req.body.accountUsername});
-    if ((admin.rank === 'owner' || admin.rank === 'admin') && admin.devices.includes(req.body.device)) {
+    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
       const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
       const saveUser = await updateUser.save();
       res.json({

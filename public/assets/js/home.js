@@ -20,6 +20,7 @@ const videos = document.querySelectorAll('.post-img > video');
 const warnAlerts = document.getElementById('warnAlerts');
 const dismissBtns = document.querySelectorAll('.dismiss-btn')
 const authorSpaces = document.querySelectorAll('.author');
+const bottomBtns = document.querySelectorAll('.bottom-btns');
 
 // Add prefix to username in author space at top of post
 authorSpaces.forEach(async authorSpace => {
@@ -35,6 +36,82 @@ authorSpaces.forEach(async authorSpace => {
     }
   }
   authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 1]);
+});
+
+// Admin delete post
+
+// Function
+const adminDeletePost = async (postID, admin, user) => {
+  try {
+    const confirming = confirm('Are you sure you would like to delete this post?');
+    if (confirming) {
+      const response = await fetch('/home/admindeletepost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postID,
+          admin,
+          user,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON = await response.json();
+      if (resJSON.status === 'success') {
+        posts.forEach(post => {
+          if (post.getAttribute('data-post-id') === resJSON.postID) {
+            post.parentNode.removeChild(post);
+          }
+        })
+      } else {
+        window.location.href = '/login';
+      }  
+    }
+    
+  } catch(err) {
+    console.error(err);
+  }
+};
+
+// Check rank of user
+const checkUserRank = async authorID => {
+  try {
+    const response = await fetch('/home/checkuserrank', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        authorID,
+      }),
+    });
+    const resJSON = await response.json();
+    if (resJSON.status === 'success') {
+      return resJSON.rank;
+    }
+  } catch(err) {
+    console.error(err);
+  }
+};
+
+bottomBtns.forEach( async bottomBtn => {
+  const postID = bottomBtn.getAttribute('data-post-id');
+  const authorID = bottomBtn.getAttribute('data-author-id');
+  const userRank = await checkUserRank(userID);
+  const authorRank = await checkUserRank(authorID);
+  if ((authorRank === 'owner' && userRank === 'owner') || (userRank === 'owner' && authorRank === 'admin') || (userRank === 'admin' && authorRank !== 'owner') || (authorRank === 'user' && (userRank === 'owner' || userRank === 'admin'))) {
+    const node = document.createElement('div');
+    node.classList.add('admin-delete-btn');
+    node.innerHTML =
+    `
+    <i data-post-id="${postID}" class="fas fa-ban"></i>
+    `;
+    node.addEventListener('click', () => {
+      adminDeletePost(postID, userID, authorID);
+    });
+    bottomBtn.appendChild(node);
+  }
 });
 
 // Play a video

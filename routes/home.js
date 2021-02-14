@@ -33,6 +33,37 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Admin delete post
+router.post('/admindeletepost', async (req, res) => {
+  try {
+    const admin = await User.findById(req.body.admin);
+    const user = await User.findById(req.body.user);
+    const post = await Post.findById(req.body.postID);
+    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
+      const deletePost = await Post.findByIdAndDelete(post._id);
+      res.json({
+        status: 'success',
+        postID: post._id,
+      })
+    }
+  } catch(err) {
+    console.error(err);
+  }
+});
+
+// Check user rank
+router.post('/checkuserrank', async (req, res) => {
+  try {
+    const user = await User.findById(req.body.authorID);
+    res.json({
+      status: 'success',
+      rank: user.rank,
+    });
+  } catch(err) {
+    console.error(err);
+  }
+});
+
 // Warn a user
 router.post('/warn', async (req, res) => {
   try {

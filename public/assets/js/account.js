@@ -52,23 +52,24 @@ if (followBtn) {
   });
 }
 
+
+// Set return values
+function fixDescription() {
+  let descText = description.innerText;
+  descText = descText.trim();
+  descText = descText.split('');
+  descText.pop();
+  descText.shift();
+  descText = descText.join('');
+  descText = descText.replace(/\\n/gi, '<br />');
+  descText = descText.replace(/\\/gi, '');
+  description.innerHTML = descText;
+}
+fixDescription();
+
 // If account is the user
 if (editProfileBtn) {
   // Edit Profile
-
-  // Set return values
-  function fixDescription() {
-    let descText = description.innerText;
-    descText = descText.trim();
-    descText = descText.split('');
-    descText.pop();
-    descText.shift();
-    descText = descText.join('');
-    descText = descText.replace(/\\n/gi, '<br />');
-    descText = descText.replace(/\\/gi, '');
-    description.innerHTML = descText;
-  }
-  fixDescription();
 
   // the textarea one
   function fixBio() {
@@ -416,31 +417,28 @@ if (editProfileBtn || followBtn) {
         myAlert('Failed setting prefix');
       } else if (resJSON.status === 'success') {
         setUsersPrefixInput.blur();
-        if (resJSON.prefixActive) {
-          if (prefix) {
-            if (resJSON.prefix) {
-              prefix.innerText = `[${resJSON.prefix}]`;
-            } else {
-              prefix.innerText = '';
-            }
+        if (prefix) {
+          if (resJSON.prefix) {
+            prefix.innerText = `[${resJSON.prefix}]`;
           } else {
-            // Create prefix div, then set prefix value
-            // <p class="prefix">[<%= account.prefix.title %>]</p>
-            const node = document.createElement('p');
-            node.classList.add('prefix');
-            if (resJSON.usersRank === 'owner') {
-              node.classList.add('owner');
-            } else if (resJSON.usersRank === 'admin') {
-              node.classList.add('admin');
-            }
-            if (resJSON.prefix) {
-              node.innerText = `[${resJSON.prefix}]`;
-            } else {
-              node.innerText = '';
-            }
-            document.querySelector('#nameAndBio > h1').insertBefore(node, document.querySelector('#nameAndBio > h1').childNodes[0]);
+            prefix.innerText = '';
           }
-          
+        } else {
+          // Create prefix div, then set prefix value
+          // <p class="prefix">[<%= account.prefix.title %>]</p>
+          const node = document.createElement('p');
+          node.classList.add('prefix');
+          if (resJSON.usersRank === 'owner') {
+            node.classList.add('owner');
+          } else if (resJSON.usersRank === 'admin') {
+            node.classList.add('admin');
+          }
+          if (resJSON.prefix) {
+            node.innerText = `[${resJSON.prefix}]`;
+          } else {
+            node.innerText = '';
+          }
+          document.querySelector('#nameAndBio > h1').insertBefore(node, document.querySelector('#nameAndBio > h1').childNodes[0]);
         }
         myAlert('Successfully set')
       }

@@ -46,15 +46,18 @@
           class="author"
           data-author-id="<%= post.author._id %>"
         >
-          <img
-            class="author-img"
-            src="<% if (post.author.profileImg === 'none') { %>
-          /images/profilePlaceholder.svg
-         <% } else {  %>
-           <%= post.author.profileImg %> 
-         <% } %> "
-            alt="Profile Picture"
-          />
+          <div class="author-img-place">
+            <img
+              class="author-img"
+              src="<% if (post.author.profileImg === 'none') { %>
+            /images/profilePlaceholder.svg
+          <% } else {  %>
+            <%= post.author.profileImg %> 
+          <% } %> "
+              alt="Profile Picture"
+            />
+          </div>  
+            
           <%= post.author.username %>
         </a>
 
@@ -85,7 +88,7 @@
 
           <% } %>
         </div>
-        <div class="bottom-btns">
+        <div class="bottom-btns" data-post-id="<%= post._id %>" data-author-id="<%= post.author._id %>">
           <div class="like-btn">
             <!-- prettier-ignore -->
             <i
@@ -101,6 +104,12 @@
               Copied post link to clipboard!
             </p>
           </div>
+            
+          <!-- Admin Delete post example -->
+          <!-- <div class="admin-delete-btn">
+            <i data-post-id="<%= post._id %>" class="fas fa-ban"></i>
+          </div> -->
+
         </div>
         <div class="description">
           <b><%= post.author.username %></b> &nbsp; <%=

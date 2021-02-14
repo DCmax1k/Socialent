@@ -115,12 +115,23 @@
   color: black;
 }
 
-.author > img {
+.author-img-place {
   height: 23px;
   width: 23px;
   border-radius: 50%;
   margin-right: 10px;
   background-color: #2e2e2e;
+  overflow: hidden;
+  position: relative;
+}
+
+.author-img {
+  position: absolute;
+  width: 100%;
+  background-color: #2e2e2e;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
 }
 
 .open-delete-post-menu {
@@ -196,6 +207,7 @@
 
 .bottom-btns {
   display: flex;
+  position: relative;
 }
 
 .like-btn {
@@ -217,6 +229,16 @@
 .like-btn > i {
   color: #c4c4c4;
   cursor: pointer;
+}
+
+.admin-delete-btn {
+  color: red;
+  cursor: pointer;
+  margin-left: 20px;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .share-btn {
