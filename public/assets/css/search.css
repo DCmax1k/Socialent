@@ -75,12 +75,23 @@
   cursor: pointer;
 }
 
-.search-result > img {
+.profileImagePlace {
   height: 50px;
   width: 50px;
   border-radius: 50%;
-  background-color: #252525;
   margin-left: 10px;
+  background-color: #252525;
+  position: relative;
+  overflow: hidden;
+}
+
+.profileImagePlace > img {
+  width: 100%;
+  background-color: #252525;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
 }
 
 .search-result > .right-side {

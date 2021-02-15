@@ -51,11 +51,13 @@ searchInput.addEventListener('input', async (e) => {
                 }
             }
           node.innerHTML = `
-              <img src="${
+            <div class="profileImagePlace">
+                <img src="${
                 account.profileImg === 'none'
                   ? '/images/profilePlaceholder.svg'
                   : account.profileImg
               }" alt="Profile Image" />
+            </div>
             <div class="right-side">
                 <span class="username">${prefixHTML} ${account.username}</span>
                 <span class="name">${account.name}</span>

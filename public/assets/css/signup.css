@@ -28,7 +28,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 400px;
+  height: 450px;
   width: 600px;
   background-color: rgba(15, 76, 117, 0.9);
   position: absolute;
@@ -105,6 +105,17 @@ body {
   color: black;
   font-size: 10px;
   cursor: pointer;
+}
+
+#agreements {
+  color: rgb(190, 190, 190);
+  margin: 10px 0;
+  width: 100%;
+  text-align: center;
+}
+
+#agreements > a {
+  color: rgb(121, 121, 185);
 }
 
 #formCont > a {
