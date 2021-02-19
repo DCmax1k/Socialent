@@ -474,11 +474,11 @@ if (editProfileBtn || followBtn) {
         myAlert('Failed setting prefix');
       } else if (resJSON.status === 'success') {
         setUsersPrefixInput.blur();
-        if (prefix) {
+        if (document.querySelector('.prefix')) {
           if (resJSON.prefix) {
-            prefix.innerText = `[${resJSON.prefix}]`;
+            document.querySelector('.prefix').innerText = `[${resJSON.prefix}]`;
           } else {
-            prefix.innerText = '';
+            document.querySelector('.prefix').innerText = '';
           }
         } else {
           // Create prefix div, then set prefix value

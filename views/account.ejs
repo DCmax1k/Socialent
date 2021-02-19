@@ -91,7 +91,7 @@
     <% if ((account.rank === 'owner' && user.rank === 'owner') || (user.rank === 'owner' && account.rank === 'admin') || (user.rank === 'admin' && account.rank !== 'owner') || (account.rank === 'user' && (user.rank === 'owner' || user.rank === 'admin'))) {%>
       <div id="setUsersPrefix">
          <label for="setUsersPrefixInput">Set users prefix:</label>
-         <input type="text" name="setUsersPrefixInput" id="setUsersPrefixInput" placeholder="Title..." value="<%= account.prefix.title %>">
+         <input autocomplete="off" type="text" name="setUsersPrefixInput" id="setUsersPrefixInput" placeholder="Title..." value="<%= account.prefix.title %>">
       </div>
     <% } %>
 
