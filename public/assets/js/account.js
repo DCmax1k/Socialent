@@ -148,13 +148,25 @@ if (editProfileBtn) {
           image.src = e.target.result;
           image.onload = async (e) => {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 75;
-            const scaleSize = MAX_WIDTH / e.target.width;
-            canvas.width = MAX_WIDTH;
-            canvas.height = MAX_WIDTH;
-            const newHeight = e.target.height * scaleSize;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(e.target, 0, canvas.height/2 - newHeight/2, canvas.width, newHeight);
+            const MAX_SIDE_LENGTH = 75;
+            let scaleSize;
+            let ctx;
+            if (image.height - image.width >= 0) {
+              scaleSize = MAX_SIDE_LENGTH / e.target.width;
+              canvas.width = MAX_SIDE_LENGTH;
+              canvas.height = MAX_SIDE_LENGTH;
+              const newHeight = e.target.height * scaleSize;
+              ctx = canvas.getContext('2d');
+              ctx.drawImage(e.target, 0, canvas.height/2 - newHeight/2, canvas.width, newHeight);
+            } else {
+              scaleSize = MAX_SIDE_LENGTH / e.target.height;
+              canvas.width = MAX_SIDE_LENGTH;
+              canvas.height = MAX_SIDE_LENGTH;
+              const newWidth = e.target.width * scaleSize;
+              ctx = canvas.getContext('2d');
+              ctx.drawImage(e.target, canvas.width/2 - newWidth/2, 0, newWidth, canvas.height);  
+            }
+            
             const imgURL = ctx.canvas.toDataURL('image/jpeg', 0.75);
             profileImg.src = imgURL;
             navBarProfilePic.src = imgURL;
