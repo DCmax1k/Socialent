@@ -64,7 +64,7 @@ const messagesRoute = require('./routes/messages');
 app.use('/messages', messagesRoute);
 
 const agreementsRoute = require('./routes/agreements');
-app.use('/agreements', (agreementsRoute));
+app.use('/agreements', agreementsRoute);
 
 // DB connection
 mongoose.connect(

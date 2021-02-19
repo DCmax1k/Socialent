@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const PostSchema = mongoose.Schema({
+  active: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
   // ._id .username .profileImg
   author: {
     type: Object,
