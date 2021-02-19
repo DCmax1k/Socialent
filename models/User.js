@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const UserSchema = mongoose.Schema({
+  // Like a snapscore
+  score: {
+    type: Number,
+    default: 0,
+  },
   // .email .verified .emailCode
   emailData: {
     type: Object,

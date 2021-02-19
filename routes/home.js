@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
     if (req.query.k) {
       const user = await User.findById(req.query.k);
       const allUsers = await User.find();
-      const posts = await Post.find();
+      const posts = await Post.find({active: true});
       const postsFollowing = [];
       posts.forEach((post) => {
         if (
@@ -40,7 +40,10 @@ router.post('/admindeletepost', async (req, res) => {
     const user = await User.findById(req.body.user);
     const post = await Post.findById(req.body.postID);
     if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
-      const deletePost = await Post.findByIdAndDelete(post._id);
+      // Doesn't actually delete post, but rather disables it
+      // const deletePost = await Post.findByIdAndDelete(post._id);
+      const disablePost = await Post.findByIdAndUpdate(post._id, { active: false }, { useFindAndModify: false });
+      const savePost = await disablePost.save();
       res.json({
         status: 'success',
         postID: post._id,
@@ -205,7 +208,10 @@ router.post('/deletepost', async (req, res) => {
     const user = await User.findById(req.body.userID);
     const post = await Post.findById(req.body.postID);
     if (user.status === 'online' && user.devices.includes(req.body.device) && JSON.stringify(post.author._id) === JSON.stringify(user._id)) {
-      const post = await Post.deleteOne({ _id: req.body.postID });
+      // Doesn't actually delete post, but rather disables it
+      // const deletePost = await Post.deleteOne({ _id: req.body.postID });
+      const disablePost = await Post.findByIdAndUpdate(post._id, { active: false }, { useFindAndModify: false });
+      const savePost = await disablePost.save();
       res.json({
         status: 'successful',
         username: user.username,

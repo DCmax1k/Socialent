@@ -58,15 +58,32 @@ const adminDeletePost = async (postID, admin, user) => {
         }),
       });
       const resJSON = await response.json();
-      if (resJSON.status === 'success') {
-        posts.forEach(post => {
-          if (post.getAttribute('data-post-id') === resJSON.postID) {
-            post.parentNode.removeChild(post);
-          }
-        })
-      } else {
+      if (resJSON.status !== 'success') {
         window.location.href = '/login';
-      }  
+      }
+      const warning = "Unfortunatly, one of your recent posts have been deleted because it went against our Terms of Use or Privacy Policy!"
+      const response1 = await fetch('/home/warn', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            userID: user,
+            adminID: admin,
+            warning,
+            device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON1 = await response1.json();
+      if (resJSON1.status === 'success' && resJSON.status === 'success') {
+          posts.forEach(post => {
+            if (post.getAttribute('data-post-id') === resJSON.postID) {
+              post.parentNode.removeChild(post);
+            }
+          });
+      } else if (resJSON1.status === 'unseccessful') {
+          window.location.href = '/login';
+      }
     }
     
   } catch(err) {

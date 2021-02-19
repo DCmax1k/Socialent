@@ -24,7 +24,7 @@ const deleteUser = require('../globalFunctions/deleteAccount');
 router.get('/:username', async (req, res) => {
   try {
     const account = await User.findOne({ username: req.params.username });
-    const accountsPosts = await Post.find({ 'author._id': account._id });
+    const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
     const allUsers = await User.find();
     const accountsFollowers = [];
     allUsers.forEach((allUser) => {

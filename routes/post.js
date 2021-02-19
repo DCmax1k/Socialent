@@ -8,21 +8,26 @@ const User = require('../models/User');
 router.get('/:post', async (req, res) => {
   try {
     const post = await Post.findById(req.params.post);
-    const account = await Post.findById(post.author._id);
-    if (req.query.k) {
-      const user = await User.findById(req.query.k);
-      if (user.status === 'online') {
-        let likedpost = false;
-        post.likes.includes(user._id)
-          ? (likedpost = true)
-          : (likedpost = false);
-        res.render('post', { post, user, account, likedpost, loggedin: true });
+    if (post.active) {
+      const account = await Post.findById(post.author._id);
+      if (req.query.k) {
+        const user = await User.findById(req.query.k);
+        if (user.status === 'online') {
+          let likedpost = false;
+          post.likes.includes(user._id)
+            ? (likedpost = true)
+            : (likedpost = false);
+          res.render('post', { post, user, account, likedpost, loggedin: true });
+        } else {
+          res.redirect('/login');
+        }
       } else {
-        res.redirect('/login');
-      }
+        res.render('post', { post, account, loggedin: false });
+      }  
     } else {
-      res.render('post', { post, account, loggedin: false });
+      res.send('This post is no longer available!')
     }
+    
   } catch (err) {
     console.error(err);
   }
