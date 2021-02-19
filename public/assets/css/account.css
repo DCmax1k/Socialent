@@ -94,7 +94,7 @@
   display: none;
 }
 
-#imgPlace:hover > #changeImg {
+#imgPlace:hover > #changeImg, #imgPlace.active > #changeImg {
   opacity: 1;
 }
 

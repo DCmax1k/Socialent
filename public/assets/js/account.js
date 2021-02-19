@@ -1,4 +1,5 @@
 const accountUsername = window.location.href.split('/')[4].split('?')[0];
+const navBarProfilePic = document.querySelector('#profileBtn > img');
 const loginBtn = document.getElementById('loginBtn');
 const changeNameInput = document.getElementById('changeNameInput');
 const changeEmailInput = document.getElementById('changeEmailInput');
@@ -21,6 +22,8 @@ const deleteAccount = document.getElementById('deleteAccount');
 const changeImg = document.getElementById('changeImg');
 const changeImgFile = document.getElementById('changeImgFile');
 const profileImg = document.querySelector('#profile > #imgPlace > img');
+const imgPlace = document.getElementById('imgPlace');
+const changeImgText = document.getElementById('changeImg');
 const setUsersPrefix = document.getElementById('setUsersPrefix');
 const setUsersPrefixInput = document.getElementById('setUsersPrefixInput');
 const prefix = document.querySelector('.prefix');
@@ -91,46 +94,100 @@ if (editProfileBtn) {
     changeImgFile.click();
   });
 
-  changeImgFile.addEventListener('change', async () => {
-    if (changeImgFile.value) {
-      const fileData = changeImgFile.files[0];
-      const data = new FormData();
-      data.append('file', fileData);
-      data.append('upload_preset', 'thepreset');
-      data.append('cloud_name', 'thecloudname');
+  // Comment out so the optimized account profile pic is uploaded
+  // changeImgFile.addEventListener('change', async () => {
+  //   if (changeImgFile.value) {
+  //     const fileData = changeImgFile.files[0];
+  //     const data = new FormData();
+  //     data.append('file', fileData);
+  //     data.append('upload_preset', 'thepreset');
+  //     data.append('cloud_name', 'thecloudname');
 
-      try {
-        const response = await fetch(
-          'https://api.cloudinary.com/v1_1/thecloudname/image/upload',
-          {
-            method: 'POST',
-            body: data,
+  //     try {
+  //       const response = await fetch(
+  //         'https://api.cloudinary.com/v1_1/thecloudname/image/upload',
+  //         {
+  //           method: 'POST',
+  //           body: data,
+  //         }
+  //       );
+  //       const resJSON = await response.json();
+  //       const imgURL = resJSON.secure_url;
+
+  //       const newResponse = await fetch('/account/changeimg', {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({
+  //           imgURL,
+  //           userID,
+  //           device: window.navigator.userAgent,
+  //         }),
+  //       });
+
+  //       const newResJSON = await newResponse.json();
+  //       if (newResJSON.status === 'success') {
+  //         profileImg.src = imgURL;
+  //       }
+  //     } catch (err) {
+  //       console.error(err);
+  //     }
+  //   }
+  // });
+
+  changeImgFile.addEventListener('change', () => {
+    try {
+      if (changeImgFile.value) {
+        const file = changeImgFile.files[0];
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          // Lower size and qualtiy of image
+          const image = new Image();
+          image.src = e.target.result;
+          image.onload = async (e) => {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 75;
+            const scaleSize = MAX_WIDTH / e.target.width;
+            canvas.width = MAX_WIDTH;
+            canvas.height = MAX_WIDTH;
+            const newHeight = e.target.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(e.target, 0, canvas.height/2 - newHeight/2, canvas.width, newHeight);
+            const imgURL = ctx.canvas.toDataURL('image/jpeg', 0.75);
+            profileImg.src = imgURL;
+            navBarProfilePic.src = imgURL;
+            imgPlace.classList.add('active');
+            changeImgText.innerText = 'Loading...';
+
+            // Send url to DB
+            const newResponse = await fetch('/account/changeimg', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                imgURL,
+                userID,
+                device: window.navigator.userAgent,
+              }),
+            });
+    
+            const newResJSON = await newResponse.json();
+            if (newResJSON.status === 'success') {
+              imgPlace.classList.remove('active');
+              changeImgText.innerText = 'Change image';
+            }
           }
-        );
-        const resJSON = await response.json();
-        const imgURL = resJSON.secure_url;
-
-        const newResponse = await fetch('/account/changeimg', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            imgURL,
-            userID,
-            device: window.navigator.userAgent,
-          }),
-        });
-
-        const newResJSON = await newResponse.json();
-        if (newResJSON.status === 'success') {
-          profileImg.src = imgURL;
+          
         }
-      } catch (err) {
-        console.error(err);
       }
+    } catch(err) {
+      console.error(err);
     }
-  });
+    
+  })
 
   // Delete Account
   deleteAccount.addEventListener('click', async () => {
