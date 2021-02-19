@@ -57,7 +57,7 @@
             
           <h1><%= post.author.username %></h1>
         </div>
-        <% if (loggedin) { %>
+        <% if (loggedin && JSON.stringify(user._id) === JSON.stringify(post.author._id)) { %>
         <!-- Delete post menu -->
         <div class="open-delete-post-menu">
           <i class="fas fa-ellipsis-h"></i>

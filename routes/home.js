@@ -203,7 +203,8 @@ router.post('/promote', async (req, res) => {
 router.post('/deletepost', async (req, res) => {
   try {
     const user = await User.findById(req.body.userID);
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const post = await Post.findById(req.body.postID);
+    if (user.status === 'online' && user.devices.includes(req.body.device) && JSON.stringify(post.author._id) === JSON.stringify(user._id)) {
       const post = await Post.deleteOne({ _id: req.body.postID });
       res.json({
         status: 'successful',
