@@ -35,10 +35,22 @@ router.post('/loadconversation', async (req, res) => {
         const user = await User.findById(req.body.userID);
         if (user.status === 'online') {
             const conversation = await Conversation.findById(req.body.conversationID);
-            res.json({
-                status: 'success',
-                messages: conversation.messages,
-            })
+            const allMessages = conversation.messages;
+            if (allMessages.length > 55) {
+                const croppedMessages = [];
+                for (i=1; i<50; i++) {
+                    croppedMessages.unshift(allMessages[allMessages.length - i]);
+                }
+                res.json({
+                    status: 'success',
+                    messages: croppedMessages,
+                });
+            } else {
+                res.json({
+                    status: 'success',
+                    messages: allMessages,
+                });
+            }
         } else {
             res.json({
                 status: 'unseccessful',
