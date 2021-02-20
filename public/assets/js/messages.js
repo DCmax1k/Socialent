@@ -10,6 +10,7 @@ const internalMessages = document.getElementById('internalMessages');
 const messageInput = document.querySelector('#messaging > input');
 const sendMessageBtn = document.getElementById('sendMessageBtn');
 const addConversationSuggestions = document.getElementById('addConversationSuggestions');
+const conversationLoader = document.getElementById('conversationLoader');
 
 let conversationLoaded = '';
 
@@ -30,8 +31,12 @@ const loadConversation = async (conversationID, scroll) => {
         const resJSON = await response.json();
         if (resJSON.status === 'success') {
             // Make the conversation background darker to show it is selected
-            conversations = document.querySelectorAll('.conversation');
-            conversations.forEach(conversation1 => {
+            // First remove other conversation darkened backgrounds
+            let tempConversations = document.querySelectorAll('.conversation');
+            tempConversations.forEach(conversation => {
+                conversation.classList.remove('active');
+            });
+            tempConversations.forEach(conversation1 => {
                 if (conversation1.getAttribute('data-conversation-id') == conversationID) {
                     conversation1.classList.add('active');
                 }
@@ -64,9 +69,7 @@ const loadConversation = async (conversationID, scroll) => {
         // Make the conversation background light to show it is no longer selected
         conversations = document.querySelectorAll('.conversation');
         conversations.forEach(conversation => {
-            if (conversation.getAttribute('data-conversation-id') == conversationID) {
-                conversation.classList.remove('active');
-            }
+            conversation.classList.remove('active');
         });
     }
     
@@ -249,6 +252,7 @@ const autofillSearchUsername = username => {
 
 // Check for Conversations *Right when page loads & periodically*
 const checkConversations = async () => {
+    conversationLoader.classList.add('active');
     const response = await fetch('/messages/checkconversations', {
         method: 'POST',
         headers: {
@@ -272,6 +276,9 @@ const checkConversations = async () => {
 
             const node = document.createElement('div');
             node.classList.add('conversation');
+            if (conversation._id === conversationLoaded) {
+                node.classList.add('active');
+            }
             node.setAttribute('data-conversation-id', conversation._id);
             let prefixHTML = ``;
             if (receiverUser.prefix.title) {
@@ -294,6 +301,7 @@ const checkConversations = async () => {
             messagesList.removeChild(messagesList.childNodes[i]);
             // Load html here
             messagesList.insertBefore(node, messagesList.childNodes[i]);
+            conversationLoader.classList.remove('active');
         });
     } else {
         window.location.href = '/login';
