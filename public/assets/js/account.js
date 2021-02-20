@@ -148,7 +148,7 @@ if (editProfileBtn) {
           image.src = e.target.result;
           image.onload = async (e) => {
             const canvas = document.createElement('canvas');
-            const MAX_SIDE_LENGTH = 75;
+            const MAX_SIDE_LENGTH = 200;
             let scaleSize;
             let ctx;
             if (image.height - image.width >= 0) {
@@ -167,7 +167,7 @@ if (editProfileBtn) {
               ctx.drawImage(e.target, canvas.width/2 - newWidth/2, 0, newWidth, canvas.height);  
             }
             
-            const imgURL = ctx.canvas.toDataURL('image/jpeg', 0.75);
+            const imgURL = ctx.canvas.toDataURL('image/jpeg');
             profileImg.src = imgURL;
             navBarProfilePic.src = imgURL;
             imgPlace.classList.add('active');
