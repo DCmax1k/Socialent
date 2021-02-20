@@ -11,6 +11,9 @@ const messageInput = document.querySelector('#messaging > input');
 const sendMessageBtn = document.getElementById('sendMessageBtn');
 const addConversationSuggestions = document.getElementById('addConversationSuggestions');
 const conversationLoader = document.getElementById('conversationLoader');
+const sendImgBtn = document.getElementById('sendImgBtn');
+const sendImgIcon = document.getElementById('sendImgIcon');
+const sendImgFile = document.getElementById('sendImgFile');
 
 let conversationLoaded = '';
 
@@ -52,7 +55,12 @@ const loadConversation = async (conversationID, scroll) => {
                 } else {
                     node.classList.add('received-text');
                 }
-                node.innerHTML = `<div class="text">${message[1]}</div>`;
+                if (message[2] === 'img') {
+                    node.innerHTML = `<img src="${message[1]}" class="text img" />`;
+                } else {
+                    node.innerHTML = `<div class="text">${message[1]}</div>`;
+                }
+                
                 // Load html
                 internalMessages.appendChild(node);
             });
@@ -101,7 +109,11 @@ setInterval(async () => {
                 } else {
                     node.classList.add('received-text');
                 }
-                node.innerHTML = `<div class="text">${message[1]}</div>`;
+                if (message[2] === 'img') {
+                    node.innerHTML = `<img src="${message[1]}" class="text img" />`;
+                } else {
+                    node.innerHTML = `<div class="text">${message[1]}</div>`;
+                }
                 // Load html
                 internalMessages.appendChild(node);
             });
@@ -347,6 +359,66 @@ const sendMessage = async (conversationID, senderID, message) => {
             conversationID,
             senderID,
             message,
+            device: window.navigator.userAgent,
+        })
+    });
+    const resJSON = await response.json();
+    if (resJSON.status === 'success') {
+        messageInput.value = '';
+        loadConversation(conversationID, 'scroll-bottom');
+
+    } else {
+        window.location.href = '/login';
+    }
+}
+
+sendImgIcon.addEventListener('click', () => {
+    sendImgFile.click();
+})
+
+sendImgFile.addEventListener('change', (e) => {
+    if (conversationLoaded) {
+
+        // LOWER SIZE AND QUALITY OF IMG HERE
+        const reader = new FileReader();
+        reader.readAsDataURL(e.target.files[0]);
+        reader.onload = (event) => {
+            const image = new Image();
+            image.src = event.target.result;
+            image.onload = (ev) => {
+                const canvas = document.createElement('canvas');
+                const MAX_LENGTH = 200;
+                let scaleSize;
+                if (ev.target.height - ev.target.width >= 0) {
+                    canvas.height = MAX_LENGTH;
+                    scaleSize = canvas.height / ev.target.height;
+                    canvas.width = ev.target.width * scaleSize;
+                } else {
+                    canvas.width = MAX_LENGTH;
+                    scaleSize = canvas.width / ev.target.width;
+                    canvas.height = ev.target.height * scaleSize;
+                }
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(ev.target, 0, 0, canvas.width, canvas.height);
+                const encodedSrc = ctx.canvas.toDataURL('image/jpeg');
+                console.log(encodedSrc, encodedSrc.length);
+                sendImg(conversationLoaded, userID, encodedSrc);
+            }
+        }
+    }
+})
+
+const sendImg = async (conversationID, senderID, message) => {
+    const response = await fetch('/messages/sendimg', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            conversationID,
+            senderID,
+            message,
+            device: window.navigator.userAgent,
         })
     });
     const resJSON = await response.json();
@@ -364,8 +436,10 @@ setInterval(() => {
     if (conversationLoaded) {
         messageInput.style.visibility = 'visible';
         sendMessageBtn.style.visibility = 'visible';
+        sendImgBtn.style.visibility = 'visible';
     } else if (!conversationLoaded) {
         messageInput.style.visibility = 'hidden';
         sendMessageBtn.style.visibility = 'hidden';
+        sendImgBtn.style.visibility = 'hidden';
     }
 }, 1)

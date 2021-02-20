@@ -150,9 +150,26 @@ router.post('/lookupusername', async (req, res) => {
   router.post('/sendmessage', async (req, res) => {
     try {
       const user = await User.findById(req.body.senderID);
-      if (user.status === 'online') {
+      if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message] }}, { useFindAndModify: false });
+        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text'] }}, { useFindAndModify: false });
+        const saveConversation = await updateConversation.save();
+        res.json({
+            status: 'success',
+            message: req.body.message,
+        });
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  });
+
+  router.post('/sendimg', async (req, res) => {
+    try {
+      const user = await User.findById(req.body.senderID);
+      if (user.status === 'online' && user.devices.includes(req.body.device)) {
+        const conversation = await Conversation.findById(req.body.conversationID);
+        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'img'] }}, { useFindAndModify: false });
         const saveConversation = await updateConversation.save();
         res.json({
             status: 'success',
