@@ -66,6 +66,7 @@ const loadConversation = async (conversationID, scroll) => {
             });
             // Scroll to bottom
             if (scroll) {
+                internalMessages.scrollTop = internalMessages.scrollHeight;
                 document.querySelectorAll('.text.img').forEach( img => {
                     img.onload = () => {
                         internalMessages.scrollTop = internalMessages.scrollHeight;
@@ -309,7 +310,7 @@ const checkConversations = async () => {
             node.innerHTML = 
             `
             <h2>${prefixHTML} ${receiverUser.username}</h2>
-            <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
+            <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][2] === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
             `;
             node.addEventListener('click', () => { clickedConversation(node) });
             
@@ -405,7 +406,6 @@ sendImgFile.addEventListener('change', (e) => {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(ev.target, 0, 0, canvas.width, canvas.height);
                 const encodedSrc = ctx.canvas.toDataURL('image/jpeg');
-                console.log(encodedSrc, encodedSrc.length);
                 sendImg(conversationLoaded, userID, encodedSrc);
             }
         }
