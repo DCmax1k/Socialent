@@ -66,7 +66,11 @@ const loadConversation = async (conversationID, scroll) => {
             });
             // Scroll to bottom
             if (scroll) {
-                internalMessages.scrollTop = internalMessages.scrollHeight;
+                document.querySelectorAll('.text.img').forEach( img => {
+                    img.onload = () => {
+                        internalMessages.scrollTop = internalMessages.scrollHeight;
+                    };
+                })
             }
         } else {
             window.location.href = '/login';
@@ -409,26 +413,31 @@ sendImgFile.addEventListener('change', (e) => {
 })
 
 const sendImg = async (conversationID, senderID, message) => {
-    const response = await fetch('/messages/sendimg', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            conversationID,
-            senderID,
-            message,
-            device: window.navigator.userAgent,
-        })
-    });
-    const resJSON = await response.json();
-    if (resJSON.status === 'success') {
-        messageInput.value = '';
-        loadConversation(conversationID, 'scroll-bottom');
+    try {
+        const response = await fetch('/messages/sendimg', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                conversationID,
+                senderID,
+                message,
+                device: window.navigator.userAgent,
+            })
+        });
+        const resJSON = await response.json();
+        if (resJSON.status === 'success') {
+            messageInput.value = '';
+            loadConversation(conversationID, 'scroll-bottom');
 
-    } else {
-        window.location.href = '/login';
+        } else {
+            window.location.href = '/login';
+        }    
+    } catch(err) {
+        myAlert('Something went wrong.')
     }
+    
 }
 
 //Gets rid of input bar if nothing in conversationLoaded
