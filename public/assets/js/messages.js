@@ -22,7 +22,7 @@ let conversationLoaded = '';
 let editMode = false;
 
 // Load conversation takes a conversation ID and loads its messages & removes and adds new html
-const loadConversation = async (conversationID, scroll) => {
+const loadConversation = async (conversationID) => {
     if (conversationID) {
         conversationLoaded = conversationID;
         const response = await fetch('/messages/loadconversation', {
@@ -51,7 +51,7 @@ const loadConversation = async (conversationID, scroll) => {
                     messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                 }
             }); 
-
+            const previousHTML = internalMessages.innerHTML;
             // Removes previous html
             internalMessages.innerHTML = '';
             // Loops through messages generating html
@@ -79,8 +79,9 @@ const loadConversation = async (conversationID, scroll) => {
                 // Load html
                 internalMessages.appendChild(node);
             });
+            const newHTML = internalMessages.innerHTML;
             // Scroll to bottom
-            if (scroll) {
+            if (previousHTML !== newHTML) {
                 internalMessages.scrollTop = internalMessages.scrollHeight;
                 document.querySelectorAll('.text.img').forEach( img => {
                     img.onload = () => {
@@ -311,7 +312,7 @@ const clickedConversation = (conversation) => {
         } else {
             const conversationID = conversation.getAttribute('data-conversation-id');
             // Load conversation by ID
-            loadConversation(conversationID, 'scroll-bottom');
+            loadConversation(conversationID);
         }
 }
 
@@ -346,7 +347,7 @@ const sendMessage = async (conversationID, senderID, message) => {
     });
     const resJSON = await response.json();
     if (resJSON.status === 'success') {
-        loadConversation(conversationID, 'scroll-bottom');
+        loadConversation(conversationID);
 
     } else {
         window.location.href = '/login';
@@ -405,7 +406,7 @@ const sendImg = async (conversationID, senderID, message) => {
         const resJSON = await response.json();
         if (resJSON.status === 'success') {
             messageInput.value = '';
-            loadConversation(conversationID, 'scroll-bottom');
+            loadConversation(conversationID);
 
         } else {
             window.location.href = '/login';
@@ -417,10 +418,10 @@ const sendImg = async (conversationID, senderID, message) => {
 }
 
 editMessages.addEventListener('click', () => {
+    messaging.classList.toggle('delete-mode');
+    editMode ? editMode = false : editMode = true;
     document.querySelectorAll('.delete-btn').forEach(btn => {
-        editMode ? editMode = false : editMode = true;
         btn.classList.toggle('active');
-        messaging.classList.toggle('delete-mode')
     });
 });
 
