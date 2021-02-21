@@ -176,6 +176,7 @@ router.post('/lookupusername', async (req, res) => {
     }
   });
 
+  // Send img
   router.post('/sendimg', async (req, res) => {
     try {
       const user = await User.findById(req.body.senderID);
@@ -191,6 +192,36 @@ router.post('/lookupusername', async (req, res) => {
     } catch(err) {
       console.error(err);
     }
-  })
+  });
+
+  // Delete text 
+  router.post('/deletetext', async (req, res) => {
+      try {
+        const user = await User.findById(req.body.userID);
+        if (user.status === 'online' && user.devices.includes(req.body.device)) {
+            const conversation = await Conversation.findById(req.body.conversationLoaded);
+            const currentText = conversation.messages[conversation.messages.length - req.body.textIndex];
+            if (JSON.stringify(currentText[0]) === JSON.stringify(user._id)) {
+                const allMessages = conversation.messages;
+                allMessages.splice(allMessages.length - req.body.textIndex, 1);
+                const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $set: { messages: allMessages }}, { useFindAndModify: false });
+                const saveConversation = await updateConversation.save();
+                res.json({
+                    status: 'success',
+                });
+            } else {
+                res.json({
+                    status: 'wrong-user',
+                });
+            }
+        } else {
+            res.json({
+                status: 'unseccessful',
+            });
+        }
+      } catch(err) {
+          console.error(err);
+      }
+  });
 
 module.exports = router;

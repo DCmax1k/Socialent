@@ -14,8 +14,12 @@ const conversationLoader = document.getElementById('conversationLoader');
 const sendImgBtn = document.getElementById('sendImgBtn');
 const sendImgIcon = document.getElementById('sendImgIcon');
 const sendImgFile = document.getElementById('sendImgFile');
+const messagingHeader = document.getElementById('messagingHeader');
+const messagingHeaderUser = document.querySelector('#messagingHeader > h1');
+const editMessages = document.getElementById('editMessages');
 
 let conversationLoaded = '';
+let editMode = false;
 
 // Load conversation takes a conversation ID and loads its messages & removes and adds new html
 const loadConversation = async (conversationID, scroll) => {
@@ -42,25 +46,36 @@ const loadConversation = async (conversationID, scroll) => {
             tempConversations.forEach(conversation1 => {
                 if (conversation1.getAttribute('data-conversation-id') == conversationID) {
                     conversation1.classList.add('active');
+
+                    // Set header user
+                    messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                 }
-            });
+            }); 
+
             // Removes previous html
             internalMessages.innerHTML = '';
             // Loops through messages generating html
-            resJSON.messages.forEach(message => {
+            resJSON.messages.forEach((message, i) => {
                 const node = document.createElement('div');
                 node.classList.add('text-box');
+                node.setAttribute('data-text-index', resJSON.messages.length-i)
                 if (JSON.stringify(message[0]) === JSON.stringify(userID)) {
                     node.classList.add('sent-text');
                 } else {
                     node.classList.add('received-text');
                 }
                 if (message[2] === 'img') {
-                    node.innerHTML = `<img src="${message[1]}" class="text img" />`;
+                    node.innerHTML = `<img src="${message[1]}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i>`;
                 } else {
-                    node.innerHTML = `<div class="text">${message[1]}</div>`;
+                    node.innerHTML = `<div class="text">${message[1]}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i></div>`;
                 }
                 
+                // Add event listener to delete buttons
+                const deleteBtn = node.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', (e) => {
+                    deleteText(e.target.getAttribute('data-text-index'));
+                })
+
                 // Load html
                 internalMessages.appendChild(node);
             });
@@ -71,7 +86,7 @@ const loadConversation = async (conversationID, scroll) => {
                     img.onload = () => {
                         internalMessages.scrollTop = internalMessages.scrollHeight;
                     };
-                })
+                });    
             }
         } else {
             window.location.href = '/login';
@@ -87,48 +102,9 @@ const loadConversation = async (conversationID, scroll) => {
     }
     
 }
-// Periodic load conversation here, all code copied from above.
+// Periodic load conversation here, all code from above.
 setInterval(async () => {
-    if (conversationLoaded) {
-        const response = await fetch('/messages/loadconversation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userID,
-                conversationID: conversationLoaded,
-            }),
-        });
-        const resJSON = await response.json();
-        if (resJSON.status === 'success') {
-            // Removes previous html
-            let previousHTML = internalMessages.innerHTML;
-            internalMessages.innerHTML = '';
-            // Loops through messages generating html
-            resJSON.messages.forEach(message => {
-                const node = document.createElement('div');
-                node.classList.add('text-box');
-                if (JSON.stringify(message[0]) === JSON.stringify(userID)) {
-                    node.classList.add('sent-text');
-                } else {
-                    node.classList.add('received-text');
-                }
-                if (message[2] === 'img') {
-                    node.innerHTML = `<img src="${message[1]}" class="text img" />`;
-                } else {
-                    node.innerHTML = `<div class="text">${message[1]}</div>`;
-                }
-                // Load html
-                internalMessages.appendChild(node);
-            });
-            if (previousHTML != internalMessages.innerHTML) {
-                internalMessages.scrollTop = internalMessages.scrollHeight;
-            }
-        } else {
-            window.location.href = '/login';
-        }   
-    }
+    await loadConversation(conversationLoaded)
 }, 3000)
 
 // Add conversation
@@ -355,6 +331,7 @@ sendMessageBtn.addEventListener('click', () => {
 })
 
 const sendMessage = async (conversationID, senderID, message) => {
+    messageInput.value = '';
     const response = await fetch('/messages/sendmessage', {
         method: 'POST',
         headers: {
@@ -369,7 +346,6 @@ const sendMessage = async (conversationID, senderID, message) => {
     });
     const resJSON = await response.json();
     if (resJSON.status === 'success') {
-        messageInput.value = '';
         loadConversation(conversationID, 'scroll-bottom');
 
     } else {
@@ -440,15 +416,52 @@ const sendImg = async (conversationID, senderID, message) => {
     
 }
 
+editMessages.addEventListener('click', () => {
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        editMode ? editMode = false : editMode = true;
+        btn.classList.toggle('active');
+        messaging.classList.toggle('delete-mode')
+    });
+});
+
+const deleteText = async (textIndex) => {
+    try {
+        const response = await fetch('/messages/deletetext', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userID,
+                textIndex,
+                conversationLoaded,
+                device: window.navigator.userAgent,
+            }),
+        });
+        const resJSON = await response.json();
+        if (resJSON.status === 'unseccessful') {
+            window.location.href = '/login';
+        } else if (resJSON.status === 'wrong-user') {
+            myAlert('You can only delete messages YOU send!');
+        } else if (resJSON.status === 'success') {
+            await loadConversation(conversationLoaded);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 //Gets rid of input bar if nothing in conversationLoaded
 setInterval(() => {
     if (conversationLoaded) {
         messageInput.style.visibility = 'visible';
         sendMessageBtn.style.visibility = 'visible';
         sendImgBtn.style.visibility = 'visible';
+        messagingHeader.style.visibility = 'visible';
     } else if (!conversationLoaded) {
         messageInput.style.visibility = 'hidden';
         sendMessageBtn.style.visibility = 'hidden';
         sendImgBtn.style.visibility = 'hidden';
+        messagingHeader.style.visibility = 'hidden';
     }
 }, 1)

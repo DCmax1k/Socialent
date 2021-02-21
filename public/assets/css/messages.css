@@ -186,7 +186,39 @@
     background-color: rgba(255, 255, 255, 0.2);
     border-radius: 20px;
     margin-left: 10px;
+    transition: background-color 0.3s ease;
+}
+#messaging.delete-mode {
+    background-color: rgba(255, 112, 112, 0.2);
+}
 
+#messagingHeader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: rgba(48, 48, 48, 0.85);
+    border-radius: 20px 20px 0 0;
+    z-index: 1;
+    visibility: hidden;
+    box-shadow: rgba(255, 255, 255, 0.8) 0 2px 0px;
+}
+#messagingHeader > h1 {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    font-size: 20px;
+}
+#editMessages {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
 }
 
 #internalMessages {
@@ -197,6 +229,7 @@
     width: 100%;
     overflow: scroll;
     padding: 50px 10px;
+    border-radius: 20px;
 }
 
 #sendImgBtn {
@@ -233,6 +266,7 @@
     display: flex;
     height: fit-content;
     min-height: 30px;
+    position: relative;
 }
 
 .text {
@@ -245,11 +279,41 @@
     border-radius: 20px;
     word-wrap: break-word;
     font-size: 15px;
+    position: relative;
 }
 
 .text.img {
     max-height: 200px;
     max-width: 200px;
+    padding: 0;
+    border-radius: 10px;
+}
+.delete-btn {
+    display: none !important;
+}
+.delete-btn.active {
+    display: block !important;
+    color: rgb(255, 148, 148);
+    width: 15px;
+    height: 15px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.sent-text > .delete-btn.active { 
+    position: absolute;
+    top: -2px;
+    right: -5px;
+}
+
+.text .delete-btn.active {
+    position: absolute;
+    top: 0;
+    left: -5px;
+}
+
+.received-text .delete-btn {
+    display: none !important;
 }
 
 .sent-text {
@@ -274,7 +338,7 @@
     left: 10px;
     width: calc(100% - 20px);
     height: 30px;
-    padding: 5px 30px 5px 10px;
+    padding: 5px 65px 5px 10px;
     color: white;
     font-size: 15px;
     border: 1px solid grey;
@@ -314,6 +378,10 @@
         border-radius: 10px;
         padding: 5px;
     }
+
+    #messagingHeader > h1 {
+        font-size: 15px;
+    }
     
 }
 
@@ -326,6 +394,9 @@
     }
     #conversationLoader {
         left: 40px;
+    }
+    #messagingHeader > h1 {
+        font-size: 12px;
     }
 }
 
