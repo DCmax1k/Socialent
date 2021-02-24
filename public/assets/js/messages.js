@@ -51,7 +51,7 @@ const loadConversation = async (conversationID) => {
                     messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                 }
             }); 
-            const previousHTML = internalMessages.innerHTML;
+            const previousHTML = internalMessages.innerText;
             // Removes previous html
             internalMessages.innerHTML = '';
             // Loops through messages generating html
@@ -79,7 +79,7 @@ const loadConversation = async (conversationID) => {
                 // Load html
                 internalMessages.appendChild(node);
             });
-            const newHTML = internalMessages.innerHTML;
+            const newHTML = internalMessages.innerText;
             // Scroll to bottom
             if (previousHTML !== newHTML) {
                 internalMessages.scrollTop = internalMessages.scrollHeight;
