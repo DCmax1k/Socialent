@@ -129,6 +129,9 @@ router.post('/checkconversations', async (req, res) => {
                     usersConversations.push(conversation);
                 }
             });
+            usersConversations.sort((a,b) => {
+                return a.messages[a.messages.length - 1][3] - b.messages[b.messages.length - 1][3];
+            })
             res.json({
                 status: 'success',
                 usersConversations,
@@ -164,7 +167,7 @@ router.post('/lookupusername', async (req, res) => {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text'] }}, { useFindAndModify: false });
+        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text', req.body.date] }}, { useFindAndModify: false });
         const saveConversation = await updateConversation.save();
         res.json({
             status: 'success',
@@ -182,7 +185,7 @@ router.post('/lookupusername', async (req, res) => {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'img'] }}, { useFindAndModify: false });
+        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'img', req.body.date] }}, { useFindAndModify: false });
         const saveConversation = await updateConversation.save();
         res.json({
             status: 'success',

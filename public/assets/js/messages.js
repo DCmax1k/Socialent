@@ -342,6 +342,7 @@ const sendMessage = async (conversationID, senderID, message) => {
             conversationID,
             senderID,
             message,
+            date: Date.now(),
             device: window.navigator.userAgent,
         })
     });
@@ -400,6 +401,7 @@ const sendImg = async (conversationID, senderID, message) => {
                 conversationID,
                 senderID,
                 message,
+                date: Date.now(),
                 device: window.navigator.userAgent,
             })
         });
