@@ -5,6 +5,7 @@
   </div>
   <div id="conversationsBtn" class="d-back">
     <i class="fas fa-comment b"></i>
+    <i id="messageNotiIcon" class="fas fa-circle"></i>
   </div>
   <div id="searchBtn" class="d-back">
     <i class="fas fa-search b"></i>
@@ -59,6 +60,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
+    position: relative;
   }
 
   .fill-space  {
@@ -103,6 +105,17 @@
     display: none;
   }
 
+  #messageNotiIcon {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+    font-size: 10px;
+    color: rgb(0, 153, 255);
+    text-shadow: rgb(0, 39, 65) 0 0 3px;
+  }
+
   @media screen and (max-width: 500px) {
     #sideNavBar {
       transform: translateX(-100%);
@@ -141,6 +154,16 @@
   const profileBtn = document.getElementById('profileBtn');
   const openMenu = document.getElementById('openMenu');
   const sideNavBar = document.getElementById('sideNavBar');
+  const messageNotiIcon = document.getElementById('messageNotiIcon');
+
+  // setInterval(() => {
+  //   if (messageNotifications) {
+  //     messageNotiIcon.style.display = 'block';
+  //   }  else {
+  //     messageNotiIcon.style.display = 'none';
+  //   }
+  // }, 100);
+  
 
   openMenu.addEventListener('click', () => {
     sideNavBar.classList.toggle('active');
