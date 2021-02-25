@@ -288,6 +288,7 @@ const checkConversations = async () => {
             `
             <h2>${prefixHTML} ${receiverUser.username}</h2>
             <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][2] === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
+            <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''}"></i>
             `;
             node.addEventListener('click', () => { clickedConversation(node) });
             

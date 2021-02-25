@@ -6,7 +6,7 @@ const ConversationSchema = mongoose.Schema({
         type: [String],
         required: true,
     },
-    // [[_id of sender, value of text, type: (text, img), time: Date.now()]]
+    // [[_id of sender, value of text, (text, img), Date.now(), 'unread' ], [Another message]]
     messages: {
         type: [Array],
         required: false,

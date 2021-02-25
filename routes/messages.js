@@ -1,4 +1,5 @@
 const express = require('express');
+const { update } = require('../models/Conversation');
 const router = express.Router();
 
 const Conversation = require('../models/Conversation');
@@ -36,6 +37,14 @@ router.post('/loadconversation', async (req, res) => {
         if (user.status === 'online') {
             const conversation = await Conversation.findById(req.body.conversationID);
             const allMessages = conversation.messages;
+            // Set messages to read if unread
+            if (JSON.stringify(allMessages[allMessages.length - 1][0]) !== JSON.stringify(user._id)) {
+                allMessages[allMessages.length - 1][4] = 'read';
+                const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
+                const saveMessage = await updateMessage.save();
+            }
+
+            // Crop messages
             if (allMessages.length > 55) {
                 const croppedMessages = [];
                 for (i=1; i<50; i++) {
@@ -167,7 +176,7 @@ router.post('/lookupusername', async (req, res) => {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text', req.body.date] }}, { useFindAndModify: false });
+        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text', req.body.date, 'unread' ] }}, { useFindAndModify: false });
         const saveMessage = await updateMessage.save();
         const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
         const saveConversation = await updateConversation.save();
@@ -187,7 +196,7 @@ router.post('/lookupusername', async (req, res) => {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'img', req.body.date] }}, { useFindAndModify: false });
+        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'img', req.body.date, 'unread' ] }}, { useFindAndModify: false });
         const saveMessage = await updateMessage.save();
         const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
         const saveConversation = await updateConversation.save();
