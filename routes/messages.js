@@ -169,7 +169,7 @@ router.post('/lookupusername', async (req, res) => {
         const conversation = await Conversation.findById(req.body.conversationID);
         const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text', req.body.date] }}, { useFindAndModify: false });
         const saveMessage = await updateMessage.save();
-        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date });
+        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
         const saveConversation = await updateConversation.save();
         res.json({
             status: 'success',

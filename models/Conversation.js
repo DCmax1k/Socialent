@@ -14,7 +14,7 @@ const ConversationSchema = mongoose.Schema({
     dateActive: {
         type: Number,
         required: true,
-        default: 1614216311084,
+        default: Date.now,
     }
 });
 
