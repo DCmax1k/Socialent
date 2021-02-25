@@ -81,7 +81,7 @@ const loadConversation = async (conversationID) => {
             });
             const newHTML = internalMessages.innerText;
             // Scroll to bottom
-            if (previousHTML !== newHTML) {
+            if (previousHTML !== newHTML && !editMode) {
                 internalMessages.scrollTop = internalMessages.scrollHeight;
                 document.querySelectorAll('.text.img').forEach( img => {
                     img.onload = () => {

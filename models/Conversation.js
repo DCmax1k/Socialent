@@ -10,6 +10,11 @@ const ConversationSchema = mongoose.Schema({
     messages: {
         type: [Array],
         required: false,
+    },
+    dateActive: {
+        type: Number,
+        required: true,
+        default: 1614216311084,
     }
 });
 

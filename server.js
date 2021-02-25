@@ -6,6 +6,7 @@ require('dotenv').config();
 // Models
 const User = require('./models/User');
 const Post = require('./models/Post');
+const Conversation = require('./models/Conversation');
 
 // Middlewares
 app.use(express.urlencoded({ extended: false }));
