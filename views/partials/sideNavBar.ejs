@@ -155,42 +155,41 @@
   const sideNavBar = document.getElementById('sideNavBar');
   const messageNotiIcon = document.getElementById('messageNotiIcon');
 
-  const checkMessageNotis = async () => {
-    try {
-      const response = await fetch('/messages/checkconversations', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-              userID,
-          }),
-      });
-      const resJSON = await response.json();  
-      if (resJSON.status === 'success') {
-        resJSON.usersConversations.forEach(conversation => {
-          conversationNoits = [];
-          if (conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID) {
-            conversationNoits.push(true);
-          } else {
-            conversationNoits.push(false);
-          }
-        });
-        if (conversationNoits.includes(true)) {
-          messageNotiIcon.style.display = 'block';
-        } else {
-          messageNotiIcon.style.display = 'none';
-        }
-      } else {
-        window.location.href = '/login';
-      }
-    } catch(err) {
-      console.error(err);
-    }
-  }
-  setInterval(checkMessageNotis, 100);
+  // const checkMessageNotis = async () => {
+  //   try {
+  //     const response = await fetch('/messages/checkconversations', {
+  //         method: 'POST',
+  //         headers: {
+  //             'Content-Type': 'application/json',
+  //         },
+  //         body: JSON.stringify({
+  //             userID,
+  //         }),
+  //     });
+  //     const resJSON = await response.json();  
+  //     if (resJSON.status === 'success') {
+  //       resJSON.usersConversations.forEach(conversation => {
+  //         conversationNoits = [];
+  //         if (conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID) {
+  //           conversationNoits.push(true);
+  //         } else {
+  //           conversationNoits.push(false);
+  //         }
+  //       });
+  //       if (conversationNoits.includes(true)) {
+  //         messageNotiIcon.style.display = 'block';
+  //       } else {
+  //         messageNotiIcon.style.display = 'none';
+  //       }
+  //     } else {
+  //       window.location.href = '/login';
+  //     }
+  //   } catch(err) {
+  //     console.error(err);
+  //   }
+  // }
+  // setInterval(checkMessageNotis, 3000);
   
-  // conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''
 
   openMenu.addEventListener('click', () => {
     sideNavBar.classList.toggle('active');

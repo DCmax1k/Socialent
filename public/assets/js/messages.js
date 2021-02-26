@@ -305,7 +305,9 @@ const checkConversations = async () => {
     }
 }
 checkConversations();
-setInterval(checkConversations, 3000);
+setInterval(async () => {
+    await checkConversations();
+}, 3000);
 
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {

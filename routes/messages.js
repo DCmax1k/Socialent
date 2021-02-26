@@ -38,13 +38,19 @@ router.post('/loadconversation', async (req, res) => {
             const conversation = await Conversation.findById(req.body.conversationID);
             const allMessages = conversation.messages;
             // Set messages from other person to read if unread
-            allMessages.forEach((message, i) => {
-                if (JSON.stringify(message[0]) !== JSON.stringify(user._id)) {
-                    message[4] = 'read';
-                }
-            })
-            const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
-            const saveMessage = await updateMessages.save();
+            // Set messages to read if unread
+            if (JSON.stringify(allMessages[allMessages.length - 1][0]) !== JSON.stringify(user._id)) {
+                allMessages[allMessages.length - 1][4] = 'read';
+                const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
+                const saveMessage = await updateMessage.save();
+            }
+            // allMessages.forEach((message, i) => {
+            //     if (message[4] === 'unread' && JSON.stringify(message[0]) !== JSON.stringify(user._id)) {
+            //         message[4] = 'read';
+            //     }
+            // })
+            // const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
+            // const saveMessage = await updateMessages.save();
 
             // Crop messages
             if (allMessages.length > 55) {
