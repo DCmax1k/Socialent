@@ -35,6 +35,11 @@ router.post('/createpost', async (req, res) => {
       description: req.body.description,
     });
     const savePost = await createPost.save();
+    // Add 5 points to score
+    let usersScore = user.score;
+    usersScore += 5;
+    const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
+    const saveScore = await updateScore;
     res.json({
       status: 'successful',
     });

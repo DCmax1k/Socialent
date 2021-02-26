@@ -40,6 +40,9 @@ router.post('/', async (req, res) => {
       });
 
       const usersFound = [...searchUsername, ...searchName];
+      usersFound.sort((a, b) => {
+        return a.score - b.score;
+      });
       const deletedDupes = [];
       usersFound.forEach((account) => {
         if (!deletedDupes.includes(JSON.stringify(account))) {

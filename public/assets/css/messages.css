@@ -170,9 +170,9 @@
     top: 10px;
     right: 10px;
     font-size: 10px;
-    text-shadow: rgb(0, 39, 65) 0 0 5px;;
+    text-shadow: rgb(0, 184, 31) 0 0 5px;
     z-index: 1;
-    color: rgb(0, 153, 255);
+    color: rgb(62, 255, 95);;
 }
 
 .notification.active {

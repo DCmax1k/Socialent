@@ -20,7 +20,6 @@ const editMessages = document.getElementById('editMessages');
 
 let conversationLoaded = '';
 let editMode = false;
-// let messageNotifications = false;
 
 // Load conversation takes a conversation ID and loads its messages & removes and adds new html
 const loadConversation = async (conversationID) => {
@@ -292,9 +291,7 @@ const checkConversations = async () => {
             <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][2] === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
             <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''}"></i>
             `;
-            // if (conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID) {
-            //     messageNotifications = true;
-            // }
+
             node.addEventListener('click', () => { clickedConversation(node) });
             
             //Remove node that is about to be replaced

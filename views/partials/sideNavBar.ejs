@@ -108,12 +108,11 @@
   #messageNotiIcon {
     display: none;
     position: absolute;
-    top: 0;
-    right: 0;
-    transform: translate(50%, -50%);
+    top: 24%;
+    right: 24%;
     font-size: 10px;
-    color: rgb(0, 153, 255);
-    text-shadow: rgb(0, 39, 65) 0 0 3px;
+    color: rgb(62, 255, 95);
+    text-shadow: rgb(0, 184, 31) 0 0 5px;
   }
 
   @media screen and (max-width: 500px) {
@@ -156,14 +155,42 @@
   const sideNavBar = document.getElementById('sideNavBar');
   const messageNotiIcon = document.getElementById('messageNotiIcon');
 
-  // setInterval(() => {
-  //   if (messageNotifications) {
-  //     messageNotiIcon.style.display = 'block';
-  //   }  else {
-  //     messageNotiIcon.style.display = 'none';
-  //   }
-  // }, 100);
+  const checkMessageNotis = async () => {
+    try {
+      const response = await fetch('/messages/checkconversations', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              userID,
+          }),
+      });
+      const resJSON = await response.json();  
+      if (resJSON.status === 'success') {
+        resJSON.usersConversations.forEach(conversation => {
+          conversationNoits = [];
+          if (conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID) {
+            conversationNoits.push(true);
+          } else {
+            conversationNoits.push(false);
+          }
+        });
+        if (conversationNoits.includes(true)) {
+          messageNotiIcon.style.display = 'block';
+        } else {
+          messageNotiIcon.style.display = 'none';
+        }
+      } else {
+        window.location.href = '/login';
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  }
+  setInterval(checkMessageNotis, 100);
   
+  // conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''
 
   openMenu.addEventListener('click', () => {
     sideNavBar.classList.toggle('active');

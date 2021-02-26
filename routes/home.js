@@ -209,9 +209,9 @@ router.post('/deletepost', async (req, res) => {
     const post = await Post.findById(req.body.postID);
     if (user.status === 'online' && user.devices.includes(req.body.device) && JSON.stringify(post.author._id) === JSON.stringify(user._id)) {
       // Doesn't actually delete post, but rather disables it
-      // const deletePost = await Post.deleteOne({ _id: req.body.postID });
-      const disablePost = await Post.findByIdAndUpdate(post._id, { active: false }, { useFindAndModify: false });
-      const savePost = await disablePost.save();
+      const deletePost = await Post.deleteOne({ _id: req.body.postID });
+      // const disablePost = await Post.findByIdAndUpdate(post._id, { active: false }, { useFindAndModify: false });
+      // const savePost = await disablePost.save();
       res.json({
         status: 'successful',
         username: user.username,
