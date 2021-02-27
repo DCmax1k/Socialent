@@ -26,6 +26,20 @@ const loadConversation = async (conversationID) => {
     try {
         if (conversationID) {
             conversationLoaded = conversationID;
+            // Make the conversation background darker to show it is selected
+            // First remove other conversation darkened backgrounds
+            let tempConversations = document.querySelectorAll('.conversation');
+            tempConversations.forEach(conversation => {
+                conversation.classList.remove('active');
+            });
+            tempConversations.forEach(conversation1 => {
+                if (conversation1.getAttribute('data-conversation-id') == conversationID) {
+                    conversation1.classList.add('active');
+
+                    // Set header user
+                    messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
+                }
+            }); 
             const response = await fetch('/messages/loadconversation', {
                 method: 'POST',
                 headers: {
@@ -38,20 +52,6 @@ const loadConversation = async (conversationID) => {
             });
             const resJSON = await response.json();
             if (resJSON.status === 'success') {
-                // Make the conversation background darker to show it is selected
-                // First remove other conversation darkened backgrounds
-                let tempConversations = document.querySelectorAll('.conversation');
-                tempConversations.forEach(conversation => {
-                    conversation.classList.remove('active');
-                });
-                tempConversations.forEach(conversation1 => {
-                    if (conversation1.getAttribute('data-conversation-id') == conversationID) {
-                        conversation1.classList.add('active');
-
-                        // Set header user
-                        messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
-                    }
-                }); 
                 const previousHTML = internalMessages.innerText;
                 // Removes previous html
                 internalMessages.innerHTML = '';
@@ -252,62 +252,67 @@ const autofillSearchUsername = username => {
 
 // Check for Conversations *Right when page loads & periodically*
 const checkConversations = async () => {
-    conversationLoader.classList.add('active');
-    const response = await fetch('/messages/checkconversations', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            userID,
-        }),
-    });
-    const resJSON = await response.json();
-    if (resJSON.status === 'success') {
-        // Generate html for each conversation
-        resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
-            let receiverID = '';
-            if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
-                receiverID = conversation.people[1];
-            } else {
-                receiverID = conversation.people[0];
-            }
-            const receiverUser = await lookupUsername(receiverID);  
-
-            const node = document.createElement('div');
-            node.classList.add('conversation');
-            if (conversation._id === conversationLoaded) {
-                node.classList.add('active');
-            }
-            node.setAttribute('data-conversation-id', conversation._id);
-            let prefixHTML = ``;
-            if (receiverUser.prefix.title) {
-                if (receiverUser.rank === 'owner') {
-                  prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                } else if (receiverUser.rank === 'admin') {
-                  prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                } else {
-                  prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
-                }
-            }
-            node.innerHTML = 
-            `
-            <h2>${prefixHTML} ${receiverUser.username}</h2>
-            <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][2] === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
-            <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''}"></i>
-            `;
-
-            node.addEventListener('click', () => { clickedConversation(node) });
-            
-            //Remove node that is about to be replaced
-            messagesList.removeChild(messagesList.childNodes[i]);
-            // Load html here
-            messagesList.insertBefore(node, messagesList.childNodes[i]);
-            conversationLoader.classList.remove('active');
+    try {
+        conversationLoader.classList.add('active');
+        const response = await fetch('/messages/checkconversations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userID,
+            }),
         });
-    } else {
-        window.location.href = '/login';
+        const resJSON = await response.json();
+        if (resJSON.status === 'success') {
+            // Generate html for each conversation
+            resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
+                let receiverID = '';
+                if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
+                    receiverID = conversation.people[1];
+                } else {
+                    receiverID = conversation.people[0];
+                }
+                const receiverUser = await lookupUsername(receiverID);  
+
+                const node = document.createElement('div');
+                node.classList.add('conversation');
+                if (conversation._id === conversationLoaded) {
+                    node.classList.add('active');
+                }
+                node.setAttribute('data-conversation-id', conversation._id);
+                let prefixHTML = ``;
+                if (receiverUser.prefix.title) {
+                    if (receiverUser.rank === 'owner') {
+                    prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                    } else if (receiverUser.rank === 'admin') {
+                    prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                    } else {
+                    prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
+                    }
+                }
+                node.innerHTML = 
+                `
+                <h2>${prefixHTML} ${receiverUser.username}</h2>
+                <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][2] === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
+                <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''}"></i>
+                `;
+
+                node.addEventListener('click', () => { clickedConversation(node) });
+                
+                //Remove node that is about to be replaced
+                messagesList.removeChild(messagesList.childNodes[i]);
+                // Load html here
+                messagesList.insertBefore(node, messagesList.childNodes[i]);
+            });
+        } else {
+            window.location.href = '/login';
+        }
+        conversationLoader.classList.remove('active');
+    } catch(err) {
+        console.error(err);
     }
+    
 }
 checkConversations();
 setInterval(async () => {

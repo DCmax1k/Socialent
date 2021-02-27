@@ -183,8 +183,7 @@ router.post('/lookupusername', async (req, res) => {
     try {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
-        const conversation = await Conversation.findById(req.body.conversationID);
-        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, {dateActive: req.body.date,  $push: { messages: [user._id, req.body.message, 'text', req.body.date, 'unread' ] }}, { useFindAndModify: false });
+        const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, {dateActive: req.body.date,  $push: { messages: [user._id, req.body.message, 'text', req.body.date, 'unread' ] }}, { useFindAndModify: false });
         // const saveMessage = await updateMessage.save();
         // Conversation date active, commented out to include above
         // const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
@@ -209,8 +208,7 @@ router.post('/lookupusername', async (req, res) => {
     try {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
-        const conversation = await Conversation.findById(req.body.conversationID);
-        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date, $push: { messages: [user._id, req.body.message, 'img', req.body.date, 'unread' ] }}, { useFindAndModify: false });
+        const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, { dateActive: req.body.date, $push: { messages: [user._id, req.body.message, 'img', req.body.date, 'unread' ] }}, { useFindAndModify: false });
         // const saveMessage = await updateMessage.save();
         // Add 1 point to score
         let usersScore = user.score;
