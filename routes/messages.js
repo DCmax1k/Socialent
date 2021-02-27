@@ -42,7 +42,7 @@ router.post('/loadconversation', async (req, res) => {
             if (JSON.stringify(allMessages[allMessages.length - 1][0]) !== JSON.stringify(user._id)) {
                 allMessages[allMessages.length - 1][4] = 'read';
                 const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
-                const saveMessage = await updateMessage.save();
+                // const saveMessage = await updateMessage.save();
             }
             // allMessages.forEach((message, i) => {
             //     if (message[4] === 'unread' && JSON.stringify(message[0]) !== JSON.stringify(user._id)) {
@@ -184,15 +184,16 @@ router.post('/lookupusername', async (req, res) => {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'text', req.body.date, 'unread' ] }}, { useFindAndModify: false });
-        const saveMessage = await updateMessage.save();
-        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
-        const saveConversation = await updateConversation.save();
+        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, {dateActive: req.body.date,  $push: { messages: [user._id, req.body.message, 'text', req.body.date, 'unread' ] }}, { useFindAndModify: false });
+        // const saveMessage = await updateMessage.save();
+        // Conversation date active, commented out to include above
+        // const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
+        // const saveConversation = await updateConversation.save();
         // Add 1 point to score
         let usersScore = user.score;
         usersScore += 1;
         const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
-        const saveScore = await updateScore;
+        // const saveScore = await updateScore.save();
         res.json({
             status: 'success',
             message: req.body.message,
@@ -209,15 +210,13 @@ router.post('/lookupusername', async (req, res) => {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
-        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { $push: { messages: [user._id, req.body.message, 'img', req.body.date, 'unread' ] }}, { useFindAndModify: false });
-        const saveMessage = await updateMessage.save();
-        const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });
-        const saveConversation = await updateConversation.save();
+        const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date, $push: { messages: [user._id, req.body.message, 'img', req.body.date, 'unread' ] }}, { useFindAndModify: false });
+        // const saveMessage = await updateMessage.save();
         // Add 1 point to score
         let usersScore = user.score;
         usersScore += 1;
         const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
-        const saveScore = await updateScore;
+        // const saveScore = await updateScore.save();
         res.json({
             status: 'success',
             message: req.body.message,
@@ -239,7 +238,7 @@ router.post('/lookupusername', async (req, res) => {
                 const allMessages = conversation.messages;
                 allMessages.splice(allMessages.length - req.body.textIndex, 1);
                 const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { $set: { messages: allMessages }}, { useFindAndModify: false });
-                const saveConversation = await updateConversation.save();
+                // const saveConversation = await updateConversation.save();
                 res.json({
                     status: 'success',
                 });

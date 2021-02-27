@@ -23,85 +23,90 @@ let editMode = false;
 
 // Load conversation takes a conversation ID and loads its messages & removes and adds new html
 const loadConversation = async (conversationID) => {
-    if (conversationID) {
-        conversationLoaded = conversationID;
-        const response = await fetch('/messages/loadconversation', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userID,
-                conversationID,
-            }),
-        });
-        const resJSON = await response.json();
-        if (resJSON.status === 'success') {
-            // Make the conversation background darker to show it is selected
-            // First remove other conversation darkened backgrounds
-            let tempConversations = document.querySelectorAll('.conversation');
-            tempConversations.forEach(conversation => {
+    try {
+        if (conversationID) {
+            conversationLoaded = conversationID;
+            const response = await fetch('/messages/loadconversation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    userID,
+                    conversationID,
+                }),
+            });
+            const resJSON = await response.json();
+            if (resJSON.status === 'success') {
+                // Make the conversation background darker to show it is selected
+                // First remove other conversation darkened backgrounds
+                let tempConversations = document.querySelectorAll('.conversation');
+                tempConversations.forEach(conversation => {
+                    conversation.classList.remove('active');
+                });
+                tempConversations.forEach(conversation1 => {
+                    if (conversation1.getAttribute('data-conversation-id') == conversationID) {
+                        conversation1.classList.add('active');
+
+                        // Set header user
+                        messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
+                    }
+                }); 
+                const previousHTML = internalMessages.innerText;
+                // Removes previous html
+                internalMessages.innerHTML = '';
+                // Loops through messages generating html
+                resJSON.messages.forEach((message, i) => {
+                    const node = document.createElement('div');
+                    node.classList.add('text-box');
+                    node.setAttribute('data-text-index', resJSON.messages.length-i)
+                    node.setAttribute('data-text-read', message[4]);
+                    if (JSON.stringify(message[0]) === JSON.stringify(userID)) {
+                        node.classList.add('sent-text');
+                    } else {
+                        node.classList.add('received-text');
+                    }
+                    if (message[2] === 'img') {
+                        node.innerHTML = `<img src="${message[1]}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i>`;
+                    } else {
+                        node.innerHTML = `<div class="text">${message[1]}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i></div>`;
+                    }
+                    
+                    // Add event listener to delete buttons
+                    const deleteBtn = node.querySelector('.delete-btn');
+                    deleteBtn.addEventListener('click', (e) => {
+                        deleteText(e.target.getAttribute('data-text-index'));
+                    })
+
+                    // Load html
+                    internalMessages.appendChild(node);
+                });
+                const newHTML = internalMessages.innerText;
+                // Scroll to bottom
+                if (previousHTML !== newHTML && !editMode) {
+                    internalMessages.scrollTop = internalMessages.scrollHeight;
+                    document.querySelectorAll('.text.img').forEach( img => {
+                        img.onload = () => {
+                            internalMessages.scrollTop = internalMessages.scrollHeight;
+                        };
+                    });    
+                }
+            } else {
+                window.location.href = '/login';
+            }   
+        } else {
+            internalMessages.innerHTML = '';
+            conversationLoaded = '';
+            // Make the conversation background light to show it is no longer selected
+            conversations = document.querySelectorAll('.conversation');
+            conversations.forEach(conversation => {
                 conversation.classList.remove('active');
             });
-            tempConversations.forEach(conversation1 => {
-                if (conversation1.getAttribute('data-conversation-id') == conversationID) {
-                    conversation1.classList.add('active');
-
-                    // Set header user
-                    messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
-                }
-            }); 
-            const previousHTML = internalMessages.innerText;
-            // Removes previous html
-            internalMessages.innerHTML = '';
-            // Loops through messages generating html
-            resJSON.messages.forEach((message, i) => {
-                const node = document.createElement('div');
-                node.classList.add('text-box');
-                node.setAttribute('data-text-index', resJSON.messages.length-i)
-                node.setAttribute('data-text-read', message[4]);
-                if (JSON.stringify(message[0]) === JSON.stringify(userID)) {
-                    node.classList.add('sent-text');
-                } else {
-                    node.classList.add('received-text');
-                }
-                if (message[2] === 'img') {
-                    node.innerHTML = `<img src="${message[1]}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i>`;
-                } else {
-                    node.innerHTML = `<div class="text">${message[1]}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i></div>`;
-                }
-                
-                // Add event listener to delete buttons
-                const deleteBtn = node.querySelector('.delete-btn');
-                deleteBtn.addEventListener('click', (e) => {
-                    deleteText(e.target.getAttribute('data-text-index'));
-                })
-
-                // Load html
-                internalMessages.appendChild(node);
-            });
-            const newHTML = internalMessages.innerText;
-            // Scroll to bottom
-            if (previousHTML !== newHTML && !editMode) {
-                internalMessages.scrollTop = internalMessages.scrollHeight;
-                document.querySelectorAll('.text.img').forEach( img => {
-                    img.onload = () => {
-                        internalMessages.scrollTop = internalMessages.scrollHeight;
-                    };
-                });    
-            }
-        } else {
-            window.location.href = '/login';
-        }   
-    } else {
-        internalMessages.innerHTML = '';
-        conversationLoaded = '';
-        // Make the conversation background light to show it is no longer selected
-        conversations = document.querySelectorAll('.conversation');
-        conversations.forEach(conversation => {
-            conversation.classList.remove('active');
-        });
+        }
+    } catch(err) {
+        console.error(err);
     }
+    
     
 }
 // Periodic load conversation here, all code from above.
