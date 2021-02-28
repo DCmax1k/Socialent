@@ -9,7 +9,6 @@ router.get('/', async (req, res) => {
   try {
     if (req.query.k) {
       const user = await User.findById(req.query.k);
-      const allUsers = await User.find();
       const posts = await Post.find({active: true});
       const postsFollowing = [];
       posts.forEach((post) => {
@@ -20,8 +19,11 @@ router.get('/', async (req, res) => {
           postsFollowing.push(post);
         }
       });
-      if (user.status === 'online') {
+      if (user.status === 'online' && (user.rank === 'admin' || user.rank === 'owner')) {
+        const allUsers = await User.find();
         res.render('home', { user, postsFollowing, allUsers });
+      } else if (user.status === 'online') {
+        res.render('home', { user, postsFollowing });
       } else {
         res.redirect('/login');
       }

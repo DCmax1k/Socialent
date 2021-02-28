@@ -10,12 +10,12 @@ router.get('/', async (req, res) => {
     try {
         if (req.query.k) {
             const user = await User.findById(req.query.k);
-            const usersConversations = [];
-            (await Conversation.find()).forEach(conversation => {
-                if (conversation.people.includes(user._id)) {
-                    usersConversations.push(conversation);
-                }
-            });
+            // const usersConversations = [];
+            // (await Conversation.find({})).forEach(conversation => {
+            //     if (conversation.people.includes(user._id)) {
+            //         usersConversations.push(conversation);
+            //     }
+            // });
             if (user.status == 'online') {
                 res.render('messages', { user })
             } else {
@@ -37,27 +37,16 @@ router.post('/loadconversation', async (req, res) => {
         if (user.status === 'online') {
             const conversation = await Conversation.findById(req.body.conversationID);
             const allMessages = conversation.messages;
-            // Set messages from other person to read if unread
-            // Set messages to read if unread
-            if (JSON.stringify(allMessages[allMessages.length - 1][0]) !== JSON.stringify(user._id)) {
-                allMessages[allMessages.length - 1][4] = 'read';
-                const updateMessage = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
-                // const saveMessage = await updateMessage.save();
-            }
-            // allMessages.forEach((message, i) => {
-            //     if (message[4] === 'unread' && JSON.stringify(message[0]) !== JSON.stringify(user._id)) {
-            //         message[4] = 'read';
-            //     }
-            // })
-            // const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
-            // const saveMessage = await updateMessages.save();
-
+            allMessages.forEach((message, i) => {
+                if (message[4] === 'unread' && JSON.stringify(message[0]) !== JSON.stringify(user._id)) {
+                    message[4] = 'read';
+                }
+            });
+            const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
+            
             // Crop messages
             if (allMessages.length > 55) {
-                const croppedMessages = [];
-                for (i=1; i<50; i++) {
-                    croppedMessages.unshift(allMessages[allMessages.length - i]);
-                }
+                const croppedMessages = allMessages.splice(allMessages.length - 50, 50)
                 res.json({
                     status: 'success',
                     messages: croppedMessages,
@@ -140,12 +129,13 @@ router.post('/checkconversations', async (req, res) => {
     try {
         const user = await User.findById(req.body.userID);
         if (user.status === 'online') {
-            const usersConversations = [];
-            (await Conversation.find()).forEach(conversation => {
-                if (conversation.people.includes(user._id)) {
-                    usersConversations.push(conversation);
-                }
-            });
+            // const usersConversations = [];
+            // (await Conversation.find()).forEach(conversation => {
+            //     if (conversation.people.includes(user._id)) {
+            //         usersConversations.push(conversation);
+            //     }
+            // });
+            const usersConversations = await Conversation.find({people: user._id});
             usersConversations.sort((a,b) => {
                 return a.dateActive - b.dateActive;
             })
@@ -183,7 +173,10 @@ router.post('/lookupusername', async (req, res) => {
     try {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
-        const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, {dateActive: req.body.date,  $push: { messages: [user._id, req.body.message, 'text', req.body.date, 'unread' ] }}, { useFindAndModify: false });
+        const conversation = await Conversation.findById(req.body.conversationID);
+        currentMessages = conversation.messages;
+        currentMessages.push([user._id, req.body.message, 'text', req.body.date, 'unread' ]);
+        const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, {dateActive: req.body.date,  messages: currentMessages }, { useFindAndModify: false });
         // const saveMessage = await updateMessage.save();
         // Conversation date active, commented out to include above
         // const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { dateActive: req.body.date }, { useFindAndModify: false });

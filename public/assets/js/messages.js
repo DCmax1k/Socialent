@@ -26,24 +26,24 @@ let checkConversationsLoading = false;
 // Load conversation takes a conversation ID and loads its messages & removes and adds new html
 const loadConversation = async (conversationID) => {
     try {
+        // Make the conversation background darker to show it is selected
+        // First remove other conversation darkened backgrounds
+        let tempConversations = document.querySelectorAll('.conversation');
+        tempConversations.forEach(conversation => {
+            conversation.classList.remove('active');
+        });
+        tempConversations.forEach(conversation1 => {
+            if (conversation1.getAttribute('data-conversation-id') == conversationID) {
+                conversation1.classList.add('active');
+
+                // Set header user
+                messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
+            }
+        }); 
         if (!conversationLoading) {
             conversationLoading = true;
             if (conversationID) {
                 conversationLoaded = conversationID;
-                // Make the conversation background darker to show it is selected
-                // First remove other conversation darkened backgrounds
-                let tempConversations = document.querySelectorAll('.conversation');
-                tempConversations.forEach(conversation => {
-                    conversation.classList.remove('active');
-                });
-                tempConversations.forEach(conversation1 => {
-                    if (conversation1.getAttribute('data-conversation-id') == conversationID) {
-                        conversation1.classList.add('active');
-
-                        // Set header user
-                        messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
-                    }
-                }); 
                 const response = await fetch('/messages/loadconversation', {
                     method: 'POST',
                     headers: {
@@ -128,7 +128,7 @@ setInterval(async () => {
         conversationLoading = false;  
     }
       
-}, 3000)
+}, 500)
 
 // Add conversation
 addConversation.addEventListener('click', () => {
@@ -347,7 +347,7 @@ setInterval(async () => {
         checkConversationsLoading = false;
     }
     
-}, 3000);
+}, 500);
 
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {

@@ -25,13 +25,13 @@ router.get('/:username', async (req, res) => {
   try {
     const account = await User.findOne({ username: req.params.username });
     const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
-    const allUsers = await User.find();
-    const accountsFollowers = [];
-    allUsers.forEach((allUser) => {
-      if (allUser.following.includes(account._id)) {
-        accountsFollowers.push(allUser._id);
-      }
-    });
+    const accountsFollowers = await User.find({following: account._id});
+    // const accountsFollowers = [];
+    // allUsers.forEach((allUser) => {
+    //   if (allUser.following.includes(account._id)) {
+    //     accountsFollowers.push(allUser._id);
+    //   }
+    // });
     if (req.query.k) {
       const user = await User.findById(req.query.k);
       if (user.status === 'online') {
