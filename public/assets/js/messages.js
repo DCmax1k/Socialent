@@ -64,16 +64,16 @@ const loadConversation = async (conversationID) => {
                         const node = document.createElement('div');
                         node.classList.add('text-box');
                         node.setAttribute('data-text-index', resJSON.messages.length-i)
-                        node.setAttribute('data-text-read', message[4]);
-                        if (JSON.stringify(message[0]) === JSON.stringify(userID)) {
+                        node.setAttribute('data-text-read', message.seen);
+                        if (JSON.stringify(message.sender) === JSON.stringify(userID)) {
                             node.classList.add('sent-text');
                         } else {
                             node.classList.add('received-text');
                         }
-                        if (message[2] === 'img') {
-                            node.innerHTML = `<img src="${message[1]}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i>`;
+                        if (message.type === 'img') {
+                            node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i>`;
                         } else {
-                            node.innerHTML = `<div class="text">${message[1]}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i></div>`;
+                            node.innerHTML = `<div class="text">${message.value}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i></div>`;
                         }
                         
                         // Add event listener to delete buttons
@@ -312,8 +312,8 @@ const checkConversations = async () => {
                     node.innerHTML = 
                     `
                     <h2>${prefixHTML} ${receiverUser.username}</h2>
-                    <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1][2] === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1][1] : 'Start Messaging!'}</h4>
-                    <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1][4] === 'unread' && conversation.messages[conversation.messages.length - 1][0] !== userID ? 'active' : ''}"></i>
+                    <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value : 'Start Messaging!'}</h4>
+                    <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1].seen === 'unread' && conversation.messages[conversation.messages.length - 1].sender !== userID ? 'active' : ''}"></i>
                     `;
 
                     node.addEventListener('click', () => { clickedConversation(node) });

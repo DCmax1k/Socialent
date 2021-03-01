@@ -3,6 +3,17 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+var db = admin.firestore();
+
+
 // Models
 const User = require('./models/User');
 const Post = require('./models/Post');
@@ -65,7 +76,56 @@ const messagesRoute = require('./routes/messages');
 app.use('/messages', messagesRoute);
 
 const agreementsRoute = require('./routes/agreements');
+const JSONTransport = require('nodemailer/lib/json-transport');
 app.use('/agreements', agreementsRoute);
+
+// Testing purposes
+// app.get('/test', async (req, res) => {
+//   try {
+//     const users = await User.find();
+//     users.forEach(async user => {
+//       try {
+//         const jsonData = {
+//           _id: JSON.stringify(user._id),
+//         };
+
+//         const refDoc = await db.collection('users').doc(user.username).set(jsonData, { merge: true });
+//       } catch(err) {
+//         console.error(err);
+//       }
+      
+//     })
+//     // const refDoc = await (await db.collection('users').doc('DCmax1k').get()).data();
+//     res.send('DONE');
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
+
+// app.get('/testing', async (req, res) => {
+//   try {
+//     const conversations = await Conversation.find();
+//     conversations.forEach(async conversation => {
+//       const currentMessages = conversation.messages;
+//       const newMessages = [];
+//       currentMessages.forEach((message, i) => {
+//         const jsonData = {
+//           sender: message[0],
+//           value: message[1],
+//           type: message[2],
+//           date: message[3],
+//           seen: message[4],
+//         };
+//         newMessages.push(jsonData);
+//       });
+//       const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { messages: newMessages }, { useFindAndModify: false });
+//     });
+//     res.send('donedone');
+//   } catch(err) {
+//     console.error(err);
+//   }
+// })  
+
 
 // DB connection
 mongoose.connect(
@@ -75,6 +135,7 @@ mongoose.connect(
     console.log('Connected to DB');
   }
 );
+
 
 
 // PORT

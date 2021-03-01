@@ -38,8 +38,8 @@ router.post('/loadconversation', async (req, res) => {
             const conversation = await Conversation.findById(req.body.conversationID);
             const allMessages = conversation.messages;
             allMessages.forEach((message, i) => {
-                if (message[4] === 'unread' && JSON.stringify(message[0]) !== JSON.stringify(user._id)) {
-                    message[4] = 'read';
+                if (message.seen === 'unread' && JSON.stringify(message.sender) !== JSON.stringify(user._id)) {
+                    message.seen = 'read';
                 }
             });
             const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
@@ -175,7 +175,7 @@ router.post('/lookupusername', async (req, res) => {
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         const conversation = await Conversation.findById(req.body.conversationID);
         currentMessages = conversation.messages;
-        currentMessages.push([user._id, req.body.message, 'text', req.body.date, 'unread' ]);
+        currentMessages.push({ sender: user._id, value: req.body.message, type: 'text', date: req.body.date, seen: 'unread'});
         const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, {dateActive: req.body.date,  messages: currentMessages }, { useFindAndModify: false });
         // const saveMessage = await updateMessage.save();
         // Conversation date active, commented out to include above
@@ -201,7 +201,7 @@ router.post('/lookupusername', async (req, res) => {
     try {
       const user = await User.findById(req.body.senderID);
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
-        const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, { dateActive: req.body.date, $push: { messages: [user._id, req.body.message, 'img', req.body.date, 'unread' ] }}, { useFindAndModify: false });
+        const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, { dateActive: req.body.date, $push: { messages: {sender: user._id, value: req.body.message, type: 'img', date: req.body.date, seen: 'unread'} }}, { useFindAndModify: false });
         // const saveMessage = await updateMessage.save();
         // Add 1 point to score
         let usersScore = user.score;
