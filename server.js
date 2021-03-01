@@ -3,15 +3,27 @@ const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-var admin = require("firebase-admin");
+const admin = require("firebase-admin");
 
-var serviceAccount = require("./serviceAccountKey.json");
+// const serviceAccount = require("./serviceAccountKey.json");
+const serviceAccount = {
+  type: process.env.FB_TYPE,
+  project_id: process.env.FB_PROJECT_ID,
+  private_key_id: process.env.FB_PRIVATE_KEY_ID,
+  private_key: process.env.FB_PRIVATE_KEY.replace(/\\n/g, '\n'),
+  client_email: process.env.FB_CLIENT_EMAIL,
+  client_id: process.env.FB_CLIENT_ID,
+  auth_uri: process.env.FB_AUTH_URI,
+  token_uri: process.env.FB_TOEKN_URI,
+  auth_provider_x509_cert_url: process.env.FB_AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: process.env.FB_CLIENT_X509_CERT_URL
+}
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
 
-var db = admin.firestore();
+const db = admin.firestore();
 
 
 // Models
@@ -82,21 +94,9 @@ app.use('/agreements', agreementsRoute);
 // Testing purposes
 // app.get('/test', async (req, res) => {
 //   try {
-//     const users = await User.find();
-//     users.forEach(async user => {
-//       try {
-//         const jsonData = {
-//           _id: JSON.stringify(user._id),
-//         };
 
-//         const refDoc = await db.collection('users').doc(user.username).set(jsonData, { merge: true });
-//       } catch(err) {
-//         console.error(err);
-//       }
-      
-//     })
-//     // const refDoc = await (await db.collection('users').doc('DCmax1k').get()).data();
-//     res.send('DONE');
+//     const refDoc = await (await db.collection('users').doc('DCmax1k').get()).data();
+//     res.send(refDoc.profileImg);
 //   } catch(err) {
 //     console.error(err);
 //   }
