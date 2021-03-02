@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const nodemailer = require('nodemailer');
+const firebase_admin = require('firebase-admin');
+const db = firebase_admin.firestore();
 
 const { google } = require('googleapis');
 const CLIENT_ID = process.env.CLIENT_ID;
@@ -18,14 +20,17 @@ const Post = require('../models/Post');
 
 const deleteUser = require('../globalFunctions/deleteAccount');
 
-
-
 // Get Route
 router.get('/:username', async (req, res) => {
   try {
-    const account = await User.findOne({ username: req.params.username });
-    const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
-    const accountsFollowers = await User.find({following: account._id});
+
+    const account = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0].data();
+    const accountsPosts = (await db.collection('posts').where('author._id', '==', account._id).get()).docs.map(doc => doc.data());
+    const accountsFollowers = (await db.collection('users').where('following', 'array-contains', account._id).get()).docs.map(doc => doc.data());
+    // const account = await User.findOne({ username: req.params.username });
+    // const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
+    // const accountsFollowers = await User.find({following: account._id});
+
     // const accountsFollowers = [];
     // allUsers.forEach((allUser) => {
     //   if (allUser.following.includes(account._id)) {
@@ -61,11 +66,14 @@ router.get('/:username', async (req, res) => {
 // Set users prefix
 router.post('/setusersprefix', async (req, res) => {
   try {
-    const admin = await User.findById(req.body.userID);
-    const user = await User.findOne({username: req.body.accountUsername});
+    // const admin = await User.findById(req.body.userID);
+    // const user = await User.findOne({username: req.body.accountUsername});
+    const admin = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const user = (await db.collection('users').where('username', '==', req.body.accountUsername).get()).docs[0].data();
     if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
-      const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
-      const saveUser = await updateUser.save();
+      // const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
+      // const saveUser = await updateUser.save();
+      const updateUser = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
       res.json({
         status: 'success',
         prefix: req.body.usersPrefix,
@@ -85,21 +93,26 @@ router.post('/setusersprefix', async (req, res) => {
 // Change Profile Img
 router.post('/changeimg', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
 
       // Update profile pic
-      const updateProfileImg = await User.findByIdAndUpdate(
-        user._id,
-        {
-          profileImg: req.body.imgURL,
-        },
-        { useFindAndModify: false }
-      );
-      const saveUser = await updateProfileImg.save();
+      // const updateProfileImg = await User.findByIdAndUpdate( user._id, { profileImg: req.body.imgURL, }, { useFindAndModify: false });
+      // const saveUser = await updateProfileImg.save();
+      const updateProfileImg = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('profileImg', req.body.imgURL);
 
       // Update posts with new pic
-      const updatePosts = await Post.updateMany( {'author._id': user._id}, {'author.profileImg': req.body.imgURL});
+      // const updatePosts = await Post.updateMany( {'author._id': user._id}, {'author.profileImg': req.body.imgURL});
+      const updatePosts = (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+        try {
+          const updateDoc = await doc.ref.update('author.profileImg', req.body.imgURL);
+        } catch(err) {
+          console.error(err);
+        }
+      });
+
       res.json({
         status: 'success',
       });
@@ -139,7 +152,8 @@ router.post('/changeimg', async (req, res) => {
 // Delete account using global funciton
 router.post('/deleteaccount', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       const deleteTheUser = await deleteUser(user._id);
       if (deleteTheUser === 'success') {
@@ -156,17 +170,22 @@ router.post('/deleteaccount', async (req, res) => {
 // Follow
 router.post('/followprofile', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
-      const account = await User.findById(req.body.accountID);
+      // const account = await User.findById(req.body.accountID);
+      const account = (await db.collection('users').where('_id', '==', req.body.accountID).get()).docs[0].data();
       if (!user.following.includes(account._id)) {
         // Follow
-        const updateFollowing = await User.findByIdAndUpdate(
-          user._id,
-          { $push: { following: account._id } },
-          { useFindAndModify: false }
-        );
-        const saveFollowing = await updateFollowing.save();
+        // const updateFollowing = await User.findByIdAndUpdate(
+        //   user._id,
+        //   { $push: { following: account._id } },
+        //   { useFindAndModify: false }
+        // );
+        // const saveFollowing = await updateFollowing.save();
+        const followingArray = user.following;
+        followingArray.push(account._id);
+        const updateFollowing = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('following', followingArray);
         res.json({
           status: 'success',
           which: 'now following',
@@ -176,12 +195,13 @@ router.post('/followprofile', async (req, res) => {
         const followingArr = user.following;
         const index = followingArr.indexOf(account._id);
         followingArr.splice(index, 1);
-        const updateFollowing = await User.findByIdAndUpdate(
-          user._id,
-          { following: followingArr },
-          { useFindAndModify: false }
-        );
-        const saveFollowing = await updateFollowing.save();
+        // const updateFollowing = await User.findByIdAndUpdate(
+        //   user._id,
+        //   { following: followingArr },
+        //   { useFindAndModify: false }
+        // );
+        // const saveFollowing = await updateFollowing.save();
+        const updateFollowing = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('following', followingArr);
         res.json({
           status: 'success',
           which: 'not following',
@@ -198,7 +218,8 @@ router.post('/followprofile', async (req, res) => {
 // Check email verification
 router.post('/editprofile/verifyemail/checkverification', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    //const user = await User.findById(req.body.userID);
     res.json({
       verified: user.emailData.verified,
     });
@@ -210,21 +231,16 @@ router.post('/editprofile/verifyemail/checkverification', async (req, res) => {
 // Verify Email - send email
 router.post('/editprofile/verifyemail', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       let verifyEmailCode = JSON.stringify(Math.random())
         .split('')
         .slice(2)
         .join('');
-      const updateEmailCode = await User.findByIdAndUpdate(
-        user._id,
-        {
-          'emailData.emailCode': verifyEmailCode,
-        },
-        { useFindAndModify: false }
-      );
-      const saveUser = await updateEmailCode.save();
-
+      // const updateEmailCode = await User.findByIdAndUpdate(user._id,{'emailData.emailCode': verifyEmailCode,},{ useFindAndModify: false });
+      // const saveUser = await updateEmailCode.save();
+      const updateEmailCode = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.emailCode', verifyEmailCode);
       // MAIL 
       // Email Transporter
       const accessToken = await oAuth2Client.getAccessToken();
@@ -274,14 +290,12 @@ router.post('/editprofile/verifyemail', async (req, res) => {
 // Verify Email - from email
 router.get('/editprofile/verifyemail/:userId', async (req, res) => {
   try {
-    const user = await User.findById(req.params.userId);
+    // const user = await User.findById(req.params.userId);
+    const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
     if (user.emailData.emailCode === req.query.ec) {
-      const updateUser = await User.findByIdAndUpdate(
-        user._id,
-        { 'emailData.verified': true },
-        { useFindAndModify: false }
-      );
-      const saveUser = await updateUser.save();
+      // const updateUser = await User.findByIdAndUpdate(user._id,{ 'emailData.verified': true },{ useFindAndModify: false });
+      // const saveUser = await updateUser.save();
+      const updateUser = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.verified', true);
       res.send(`Successfully verified the email ${user.emailData.email}!`);
     }
   } catch (err) {
@@ -292,17 +306,13 @@ router.get('/editprofile/verifyemail/:userId', async (req, res) => {
 // Change Password
 router.post('/editprofile/changepassword', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       if (req.body.currentPassword === user.password) {
-        const updatePassword = await User.findByIdAndUpdate(
-          user._id,
-          {
-            password: req.body.newPassword,
-          },
-          { useFindAndModify: false }
-        );
-        const saveUser = await updatePassword.save();
+        // const updatePassword = await User.findByIdAndUpdate(user._id,{password: req.body.newPassword,},{ useFindAndModify: false });
+        // const saveUser = await updatePassword.save();
+        const updatePassword = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('password', req.body.newPassword);
         res.json({
           status: 'success',
         });
@@ -320,16 +330,12 @@ router.post('/editprofile/changepassword', async (req, res) => {
 // Change name
 router.post('/editprofile/changename', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
-      const updateName = await User.findByIdAndUpdate(
-        user._id,
-        {
-          name: req.body.name,
-        },
-        { useFindAndModify: false }
-      );
-      const saveUser = await updateName.save();
+      // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
+      // const saveUser = await updateName.save();
+      const updateName = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('name', req.body.name);
       res.json({
         status: 'success',
       });
@@ -342,22 +348,15 @@ router.post('/editprofile/changename', async (req, res) => {
 // Change email
 router.post('/editprofile/changeemail', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
-      const updateEmail = await User.findByIdAndUpdate(
-        user._id,
-        {
-          'emailData.email': req.body.email,
-        },
-        { useFindAndModify: false }
-      );
-      const saveUser = await updateEmail.save();
-      const updateVerified = await User.findByIdAndUpdate(
-        user._id,
-        { 'emailData.verified': false },
-        { useFindAndModify: false }
-      );
-      const saveVerified = await updateVerified.save();
+      // const updateEmail = await User.findByIdAndUpdate(user._id,{'emailData.email': req.body.email,},{ useFindAndModify: false });
+      // const saveUser = await updateEmail.save();
+      const updateEmail = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.email', req.body.email);
+      // const updateVerified = await User.findByIdAndUpdate(user._id,{ 'emailData.verified': false },{ useFindAndModify: false });
+      // const saveVerified = await updateVerified.save();
+      const updateVerified = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.verified', false);
       res.json({
         status: 'success',
       });
@@ -370,18 +369,15 @@ router.post('/editprofile/changeemail', async (req, res) => {
 // Update Bio
 router.post('/editprofile/updatebio', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
-      const update = await User.findByIdAndUpdate(
-        user._id,
-        { description: req.body.bio },
-        { useFindAndModify: false }
-      );
-      const save = await update.save();
-      const newUser = await User.findById(user._id);
+      // const update = await User.findByIdAndUpdate(user._id,{ description: req.body.bio },{ useFindAndModify: false });
+      // const save = await update.save();
+      const updateBio = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('description', req.body.bio);
       res.json({
         status: 'successful',
-        bio: newUser.description,
+        bio: req.body.bio,
       });
     }
   } catch (err) {
