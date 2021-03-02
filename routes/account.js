@@ -25,8 +25,13 @@ router.get('/:username', async (req, res) => {
   try {
 
     const account = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0].data();
-    const accountsPosts = (await db.collection('posts').where('author._id', '==', account._id).get()).docs.map(doc => doc.data());
+    const oriAccountsPosts = (await db.collection('posts').where('author._id', '==', account._id).get()).docs.map(doc => doc.data());
     const accountsFollowers = (await db.collection('users').where('following', 'array-contains', account._id).get()).docs.map(doc => doc.data());
+    const accountsPosts = oriAccountsPosts.filter(post => {
+      if (post.active) {
+        return post;
+      }
+    })
     // const account = await User.findOne({ username: req.params.username });
     // const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
     // const accountsFollowers = await User.find({following: account._id});
@@ -38,7 +43,9 @@ router.get('/:username', async (req, res) => {
     //   }
     // });
     if (req.query.k) {
-      const user = await User.findById(req.query.k);
+      // const user = await User.findById(req.query.k);
+      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
+      console.log(accountsFollowers);
       if (user.status === 'online') {
         res.render('account', {
           user,
