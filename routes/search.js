@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
   try {
     if (req.query.k) {
       // const user = await User.findById(req.query.k);
-      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].ref.data();
+      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
       if (user.status === 'online') {
         res.render('search', { user });
       } else {
@@ -26,19 +26,21 @@ router.get('/', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].ref.data();
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       // Search for account by username
-      const searchUsername = (await db.collection('users').get()).map(userDoc => userDoc.ref.data()).filter((account) => {
+      const dupeDataUsernames = [];
+      const searchUsername = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).filter((account) => {
         if (
           account.username.toLowerCase().includes(req.body.value.toLowerCase())
         ) {
+          dupeDataUsernames.push(account.username);
           return account;
         }
       });
       // Search for account by name
-      const searchName = (await db.collection('users').get()).map(userDoc => userDoc.ref.data()).filter((account) => {
-        if (account.name.toLowerCase().includes(req.body.value.toLowerCase())) {
+      const searchName = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).filter((account) => {
+        if (account.name.toLowerCase().includes(req.body.value.toLowerCase()) && !dupeDataUsernames.includes(account.username)) {
           return account;
         }
       });
@@ -47,14 +49,9 @@ router.post('/', async (req, res) => {
       usersFound.sort((a, b) => {
         return a.score - b.score;
       });
-      const deletedDupes = [];
-      usersFound.forEach((account) => {
-        if (!deletedDupes.includes(JSON.stringify(account))) {
-          deletedDupes.push(JSON.stringify(account));
-        }
-      });
+      
       res.json({
-        searchedAccounts: deletedDupes,
+        searchedAccounts: usersFound,
         status: 'success',
       });
     } else {

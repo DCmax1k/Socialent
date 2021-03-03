@@ -47,7 +47,8 @@ app.get('/', (req, res) => {
 // Device verification
 app.post('/deviceverification', async (req, res) => {
   try {
-    const user = await User.findById(req.query.k);
+    // const user = await User.findById(req.query.k);
+    const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
     if (!user.devices.includes(req.body.device)) {
       res.json({
         verified: false,
@@ -92,25 +93,25 @@ const JSONTransport = require('nodemailer/lib/json-transport');
 app.use('/agreements', agreementsRoute);
 
 // Testing purposes
-app.get('/test', async (req, res) => {
-  try {
+// app.get('/test', async (req, res) => {
+//   try {
 
-    // const refDoc = (await db.collection('users').doc('DCmax1k').get()).data();
+//     // const refDoc = (await db.collection('users').doc('DCmax1k').get()).data();
 
-    // const account = (await db.collection('users').where('emailData.email', '==', 'dylan.caldwell35@gmail.com').get()).docs[0].ref.update('username', 'DCmax1k');
-    // const updateAccount = await (await account.get()).update('username', 'lololol');
+//     // const account = (await db.collection('users').where('emailData.email', '==', 'dylan.caldwell35@gmail.com').get()).docs[0].ref.update('username', 'DCmax1k');
+//     // const updateAccount = await (await account.get()).update('username', 'lololol');
 
-    // const accountsFollowers = (await db.collection('users').where('following', 'array-contains', '5f3cb80565f16405540c6de3').get()).docs.map(doc => doc.data());
+//     // const accountsFollowers = (await db.collection('users').where('following', 'array-contains', '5f3cb80565f16405540c6de3').get()).docs.map(doc => doc.data());
 
-    const createAccount = (await db.collection('users').add({
-      username: 'testing', 
-      date: 'hithere sir',
-    }));
-    res.send('done');
-  } catch(err) {
-    console.error(err);
-  }
-});
+//     const createAccount = (await db.collection('users').add({
+//       username: 'testing', 
+//       date: 'hithere sir',
+//     }));
+//     res.send('done');
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
 
 // app.get('/testing', async (req, res) => {
 //   try {

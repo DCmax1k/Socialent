@@ -59,6 +59,7 @@ submit.addEventListener('click', async () => {
         }),
       });
       const resJSON = await response.json();
+      console.log(resJSON)
       submit.innerText = 'Submit';
       if (resJSON.response === 'wrong username') {
         alertMsg.innerHTML =

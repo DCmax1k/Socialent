@@ -29,9 +29,7 @@ searchInput.addEventListener('input', async (e) => {
       if (resJSON.status === 'wrong user') {
         window.location.href = '/login';
       } else if (resJSON.status === 'success') {
-        const parsedAccounts = resJSON.searchedAccounts.map((account) =>
-          JSON.parse(account)
-        );
+        const parsedAccounts = resJSON.searchedAccounts;
         searchResults.innerHTML = '';
         parsedAccounts.forEach((account) => {
           const node = document.createElement('div');
