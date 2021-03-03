@@ -97,12 +97,16 @@ app.get('/test', async (req, res) => {
 
     // const refDoc = (await db.collection('users').doc('DCmax1k').get()).data();
 
-    const account = (await db.collection('users').where('emailData.email', '==', 'dylan.caldwell35@gmail.com').get()).docs[0].ref.update('username', 'DCmax1k');
+    // const account = (await db.collection('users').where('emailData.email', '==', 'dylan.caldwell35@gmail.com').get()).docs[0].ref.update('username', 'DCmax1k');
     // const updateAccount = await (await account.get()).update('username', 'lololol');
 
     // const accountsFollowers = (await db.collection('users').where('following', 'array-contains', '5f3cb80565f16405540c6de3').get()).docs.map(doc => doc.data());
 
-    res.send(account);
+    const createAccount = (await db.collection('users').add({
+      username: 'testing', 
+      date: 'hithere sir',
+    }));
+    res.send('done');
   } catch(err) {
     console.error(err);
   }

@@ -80,7 +80,7 @@ router.post('/setusersprefix', async (req, res) => {
     if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
       // const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
       // const saveUser = await updateUser.save();
-      const updateUser = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
+      const updateUser = await (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
       res.json({
         status: 'success',
         prefix: req.body.usersPrefix,
@@ -108,7 +108,7 @@ router.post('/changeimg', async (req, res) => {
       // Update profile pic
       // const updateProfileImg = await User.findByIdAndUpdate( user._id, { profileImg: req.body.imgURL, }, { useFindAndModify: false });
       // const saveUser = await updateProfileImg.save();
-      const updateProfileImg = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('profileImg', req.body.imgURL);
+      const updateProfileImg = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('profileImg', req.body.imgURL);
 
       // Update posts with new pic
       // const updatePosts = await Post.updateMany( {'author._id': user._id}, {'author.profileImg': req.body.imgURL});
@@ -192,7 +192,7 @@ router.post('/followprofile', async (req, res) => {
         // const saveFollowing = await updateFollowing.save();
         const followingArray = user.following;
         followingArray.push(account._id);
-        const updateFollowing = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('following', followingArray);
+        const updateFollowing = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('following', followingArray);
         res.json({
           status: 'success',
           which: 'now following',
@@ -208,7 +208,7 @@ router.post('/followprofile', async (req, res) => {
         //   { useFindAndModify: false }
         // );
         // const saveFollowing = await updateFollowing.save();
-        const updateFollowing = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('following', followingArr);
+        const updateFollowing = await  (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('following', followingArr);
         res.json({
           status: 'success',
           which: 'not following',
@@ -247,7 +247,7 @@ router.post('/editprofile/verifyemail', async (req, res) => {
         .join('');
       // const updateEmailCode = await User.findByIdAndUpdate(user._id,{'emailData.emailCode': verifyEmailCode,},{ useFindAndModify: false });
       // const saveUser = await updateEmailCode.save();
-      const updateEmailCode = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.emailCode', verifyEmailCode);
+      const updateEmailCode = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.emailCode', verifyEmailCode);
       // MAIL 
       // Email Transporter
       const accessToken = await oAuth2Client.getAccessToken();
@@ -302,7 +302,7 @@ router.get('/editprofile/verifyemail/:userId', async (req, res) => {
     if (user.emailData.emailCode === req.query.ec) {
       // const updateUser = await User.findByIdAndUpdate(user._id,{ 'emailData.verified': true },{ useFindAndModify: false });
       // const saveUser = await updateUser.save();
-      const updateUser = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.verified', true);
+      const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.verified', true);
       res.send(`Successfully verified the email ${user.emailData.email}!`);
     }
   } catch (err) {
@@ -319,7 +319,7 @@ router.post('/editprofile/changepassword', async (req, res) => {
       if (req.body.currentPassword === user.password) {
         // const updatePassword = await User.findByIdAndUpdate(user._id,{password: req.body.newPassword,},{ useFindAndModify: false });
         // const saveUser = await updatePassword.save();
-        const updatePassword = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('password', req.body.newPassword);
+        const updatePassword = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('password', req.body.newPassword);
         res.json({
           status: 'success',
         });
@@ -342,7 +342,7 @@ router.post('/editprofile/changename', async (req, res) => {
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
       // const saveUser = await updateName.save();
-      const updateName = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('name', req.body.name);
+      const updateName = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('name', req.body.name);
       res.json({
         status: 'success',
       });
@@ -360,10 +360,10 @@ router.post('/editprofile/changeemail', async (req, res) => {
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       // const updateEmail = await User.findByIdAndUpdate(user._id,{'emailData.email': req.body.email,},{ useFindAndModify: false });
       // const saveUser = await updateEmail.save();
-      const updateEmail = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.email', req.body.email);
+      const updateEmail = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.email', req.body.email);
       // const updateVerified = await User.findByIdAndUpdate(user._id,{ 'emailData.verified': false },{ useFindAndModify: false });
       // const saveVerified = await updateVerified.save();
-      const updateVerified = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.verified', false);
+      const updateVerified = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.verified', false);
       res.json({
         status: 'success',
       });
@@ -381,7 +381,7 @@ router.post('/editprofile/updatebio', async (req, res) => {
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       // const update = await User.findByIdAndUpdate(user._id,{ description: req.body.bio },{ useFindAndModify: false });
       // const save = await update.save();
-      const updateBio = (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('description', req.body.bio);
+      const updateBio = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('description', req.body.bio);
       res.json({
         status: 'successful',
         bio: req.body.bio,
