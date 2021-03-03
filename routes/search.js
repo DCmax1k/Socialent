@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const firebase_admin = require('firebase-admin');
+const db = firebase_admin.firestore();
 
 const User = require('../models/User');
 
@@ -7,7 +9,8 @@ const User = require('../models/User');
 router.get('/', async (req, res) => {
   try {
     if (req.query.k) {
-      const user = await User.findById(req.query.k);
+      // const user = await User.findById(req.query.k);
+      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].ref.data();
       if (user.status === 'online') {
         res.render('search', { user });
       } else {
@@ -22,10 +25,11 @@ router.get('/', async (req, res) => {
 // Searching for account route
 router.post('/', async (req, res) => {
   try {
-    const user = await User.findById(req.body.userID);
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].ref.data();
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       // Search for account by username
-      const searchUsername = await (await User.find()).filter((account) => {
+      const searchUsername = (await db.collection('users').get()).map(userDoc => userDoc.ref.data()).filter((account) => {
         if (
           account.username.toLowerCase().includes(req.body.value.toLowerCase())
         ) {
@@ -33,7 +37,7 @@ router.post('/', async (req, res) => {
         }
       });
       // Search for account by name
-      const searchName = await (await User.find()).filter((account) => {
+      const searchName = (await db.collection('users').get()).map(userDoc => userDoc.ref.data()).filter((account) => {
         if (account.name.toLowerCase().includes(req.body.value.toLowerCase())) {
           return account;
         }
