@@ -103,39 +103,136 @@ app.use('/agreements', agreementsRoute);
 
 //     // const accountsFollowers = (await db.collection('users').where('following', 'array-contains', '5f3cb80565f16405540c6de3').get()).docs.map(doc => doc.data());
 
-//     const createAccount = (await db.collection('users').add({
-//       username: 'testing', 
-//       date: 'hithere sir',
-//     }));
-//     res.send('done');
+//     // const createAccount = (await db.collection('users').add({
+//     //   username: 'testing', 
+//     //   date: 'hithere sir',
+//     // }));
+
+//     // const lastMessage = (await db.collection('conversations').where('_id', '==', '602680d2d63c190017bf2be1').get()).docs[0].data().messages[730];
+//     // const lastMessage = (await Conversation.findById('602680d2d63c190017bf2be1')).messages[730];
+
+//     res.send('ok');
 //   } catch(err) {
 //     console.error(err);
 //   }
 // });
 
-// app.get('/testing', async (req, res) => {
+// app.get('/copyusers', async (req, res) => {
 //   try {
-//     const conversations = await Conversation.find();
-//     conversations.forEach(async conversation => {
-//       const currentMessages = conversation.messages;
-//       const newMessages = [];
-//       currentMessages.forEach((message, i) => {
-//         const jsonData = {
-//           sender: message[0],
-//           value: message[1],
-//           type: message[2],
-//           date: message[3],
-//           seen: message[4],
+//     const users = await User.find();
+//     users.forEach(async user => {
+//       try {
+//         const userid1 = JSON.stringify(user._id).split('');
+//         userid1.pop();
+//         userid1.shift();
+//         userid1.join('');
+//         const userid = userid1.join('');
+//         const usersWarnings = user.warnings.map(warning => { return { text: warning[0], active: warning[1] }})
+//         const userData = {
+//           _id: userid,
+//           score: user.score,
+//           emailData: {
+//             email: user.emailData.email,
+//             verified: user.emailData.verified || false,
+//             emailCode: user.emailData.emailCode || 0000,
+//           },
+//           name: user.name,
+//           username: user.username,
+//           prefix: user.prefix || '',
+//           password: user.password,
+//           devices: user.devices || [],
+//           status: user.status || 'online',
+//           rank: user.rank,
+//           profileImg: user.profileImg,
+//           description: user.description || '',
+//           following: user.following,
+//           warnings: usersWarnings,
 //         };
-//         newMessages.push(jsonData);
-//       });
-//       const updateConversation = await Conversation.findByIdAndUpdate(conversation._id, { messages: newMessages }, { useFindAndModify: false });
-//     });
+//         const setUser = await db.collection('users').doc(userData.username).set(userData);
+//       } catch(err) {    
+//         console.error(err);
+//       }
+//     })
 //     res.send('donedone');
 //   } catch(err) {
 //     console.error(err);
 //   }
-// })  
+// });
+
+// app.get('/copyposts', async (req, res) => {
+//   try {
+//     const posts = await Post.find();
+//     posts.forEach(async post => {
+//       try {
+//         const postid1 = JSON.stringify(post._id).split('');
+//         postid1.pop();
+//         postid1.shift();
+//         const postid = postid1.join('');
+//         const authorid1 = JSON.stringify(post.author._id).split('');
+//         authorid1.pop();
+//         authorid1.shift();
+//         const authorid = authorid1.join('');
+//         const postsComments = post.comments.map(comment => {return {username: comment[0], value: comment[1], date: comment[2]}});
+//         const postData = {
+//           _id: postid,
+//           active: post.active,
+//           author: {
+//             _id: authorid,
+//             profileImg: post.author.profileImg,
+//             username: post.author.username,
+//           },
+//           url: post.url,
+//           urlType: post.urlType,
+//           description: post.description,
+//           likes: post.likes,
+//           comments: postsComments,
+//           date: post.date,
+//         };
+//         const setPost = await db.collection('posts').doc(postData._id).set(postData);
+//       } catch(err) {    
+//         console.error(err);
+//       }
+//     })
+//     res.send('donedone');
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
+
+// app.get('/copyconvos', async (req, res) => {
+//   try {
+//     const conversations = await Conversation.find();
+//     conversations.forEach(async conversation => {
+//       try {
+//         const conversationid1 = JSON.stringify(conversation._id).split('');
+//         conversationid1.pop();
+//         conversationid1.shift();
+//         const conversationid = conversationid1.join('');
+//         const conversationsMessages = conversation.messages.map(message => { 
+//           const senderID = JSON.stringify(message.sender).split('');
+//           senderID.pop();
+//           senderID.shift();
+//           const newSender = senderID.join('');
+//           return { sender: newSender, value: message.value, type: message.type, date: message.date}
+//         });
+//         const userData = {
+//           _id: conversationid,
+//           people: conversation.people,
+//           messages: conversationsMessages,
+//         };
+//         const person1 = (await db.collection('users').where('_id', '==', userData.people[0]).get()).docs[0].data().username;
+//         const person2 = (await db.collection('users').where('_id', '==', userData.people[1]).get()).docs[0].data().username;
+//         const setUser = await db.collection('conversations').doc(`${person1}, ${person2}`).set(userData);
+//       } catch(err) {    
+//         console.error(err);
+//       }
+//     })
+//     res.send('donedone');
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
+
 
 
 // DB connection
@@ -150,4 +247,6 @@ mongoose.connect(
 
 
 // PORT
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Listening...');
+});
