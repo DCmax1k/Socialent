@@ -43,6 +43,7 @@ router.post('/', async (req, res) => {
         description: '',
         following: [],
         warnings: [],
+        dateJoined: Date.now(),
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
       res.json({
