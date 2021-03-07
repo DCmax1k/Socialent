@@ -218,6 +218,7 @@ router.post('/lookupusername', async (req, res) => {
       const user = (await db.collection('users').where('_id', '==', req.body.senderID).get()).docs[0].data();
       if (user.status === 'online' && user.devices.includes(req.body.device)) {
         // const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, { dateActive: req.body.date, $push: { messages: {sender: user._id, value: req.body.message, type: 'img', date: req.body.date, seen: 'unread'} }}, { useFindAndModify: false });
+        const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationID).get()).docs[0].data();
         const messageData = { sender: user._id, value: req.body.message, type: 'img', date: req.body.date };
         const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: req.body.date, seen: 'unread', seenFor: conversation.people[0] === user._id ? conversation.people[1] : conversation.people[0] });
 
