@@ -123,7 +123,7 @@
           </p>
         </div>
         <div class="date-created">
-          <p><%= post.date %></p>
+          <p><%= (new Date(post.date).toLocaleDateString()) %></p>
         </div>
         <div class="add-comment">
           <input
