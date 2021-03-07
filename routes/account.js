@@ -1,17 +1,19 @@
 const express = require('express');
 const router = express.Router();
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer');
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 
-const { google } = require('googleapis');
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const REDIRECT_URI = process.env.REDIRECT_URI;
-const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
+const sgMail = require('@sendgrid/mail')
+sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+// const { google } = require('googleapis');
+// const CLIENT_ID = process.env.CLIENT_ID;
+// const CLIENT_SECRET = process.env.CLIENT_SECRET;
+// const REDIRECT_URI = process.env.REDIRECT_URI;
+// const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 
-const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
-oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
+// const oAuth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
+// oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
 
 
 
@@ -247,28 +249,47 @@ router.post('/editprofile/verifyemail', async (req, res) => {
       // const updateEmailCode = await User.findByIdAndUpdate(user._id,{'emailData.emailCode': verifyEmailCode,},{ useFindAndModify: false });
       // const saveUser = await updateEmailCode.save();
       const updateEmailCode = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.emailCode', verifyEmailCode);
+
       // MAIL 
       // Email Transporter
-      const accessToken = await oAuth2Client.getAccessToken();
+      // const accessToken = await oAuth2Client.getAccessToken();
+      // const transporter = nodemailer.createTransport({
+      //   service: 'gmail',
+      //   auth: {
+      //     type: 'OAuth2',
+      //     user: 'noreplydevapp@gmail.com',
+      //     clientId: CLIENT_ID,
+      //     clientSecret: CLIENT_SECRET,
+      //     refreshToken: REFRESH_TOKEN,
+      //     accessToken: accessToken,
 
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          type: 'OAuth2',
-          user: 'noreplydevapp@gmail.com',
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
-          refreshToken: REFRESH_TOKEN,
-          accessToken: accessToken,
-
-        },
-      });
-
-      const mailOptions = {
-        from: 'Socialent',
+      //   },
+      // });
+      // const mailOptions = {
+      //   from: 'Socialent',
+      //   to: user.emailData.email,
+      //   subject: 'Verify Email',
+      //   html: `
+      //   <h1>Socialent: Verify Email</h1>
+      //   <hr />
+      //   <h2>${user.username}</h2>
+      //   <br />
+      //   Please click <a href="${process.env.DOMAIN}/account/editprofile/verifyemail/${user._id}?ec=${verifyEmailCode}" >here</a>, or copy this URL: ${process.env.DOMAIN}/account/editprofile/verifyemail/${user._id}?ec=${verifyEmailCode} : to verify your email!
+      //   <br />
+      //   <hr />
+      //   <br />
+      //   If you do not know why you reveived this email, please ignore it.
+      //   `,
+      // };
+      // transporter.sendMail(mailOptions, (err, data) => {
+      //   if (err) console.error(err);
+      // });
+      const msg = {
         to: user.emailData.email,
+        from: 'noreplydevapp@gmail.com',
         subject: 'Verify Email',
-        html: `
+        html: 
+        `
         <h1>Socialent: Verify Email</h1>
         <hr />
         <h2>${user.username}</h2>
@@ -279,10 +300,9 @@ router.post('/editprofile/verifyemail', async (req, res) => {
         <br />
         If you do not know why you reveived this email, please ignore it.
         `,
-      };
-      transporter.sendMail(mailOptions, (err, data) => {
-        if (err) console.error(err);
-      });
+      }
+      const sendMail = await sgMail.send(msg);
+
       res.json({
         status: 'sent email',
         email: user.emailData.email,
@@ -297,7 +317,7 @@ router.post('/editprofile/verifyemail', async (req, res) => {
 router.get('/editprofile/verifyemail/:userId', async (req, res) => {
   try {
     // const user = await User.findById(req.params.userId);
-    const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
+    const user = (await db.collection('users').where('_id', '==', req.params.userId).get()).docs[0].data();
     if (user.emailData.emailCode === req.query.ec) {
       // const updateUser = await User.findByIdAndUpdate(user._id,{ 'emailData.verified': true },{ useFindAndModify: false });
       // const saveUser = await updateUser.save();
