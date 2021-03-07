@@ -23,6 +23,7 @@ router.get('/', async (req, res) => {
           postsFollowing.push(post);
         }
       });
+      postsFollowing.sort((a,b) => a.date-b.date);
       if (user.status === 'online' && (user.rank === 'admin' || user.rank === 'owner')) {
         // const allUsers = await User.find();
         const allUsers = (await db.collection('users').get()).docs.map(doc => doc.data()).sort((a, b) => a.dateJoined - b.dateJoined);

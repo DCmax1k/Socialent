@@ -96,25 +96,11 @@ app.use('/agreements', agreementsRoute);
 
 // app.get('/test', async (req, res) => {
 //   try {
+//     (await db.collection('posts').get()).docs.forEach( async doc => {
+//       await doc.ref.update('date', Date.now());
+//     });
 
-//     // const refDoc = (await db.collection('users').doc('DCmax1k').get()).data();
-
-//     // const account = (await db.collection('users').where('emailData.email', '==', 'dylan.caldwell35@gmail.com').get()).docs[0].ref.update('username', 'DCmax1k');
-//     // const updateAccount = await (await account.get()).update('username', 'lololol');
-
-//     // const accountsFollowers = (await db.collection('users').where('following', 'array-contains', '5f3cb80565f16405540c6de3').get()).docs.map(doc => doc.data());
-
-//     // const createAccount = (await db.collection('users').add({
-//     //   username: 'testing', 
-//     //   date: 'hithere sir',
-//     // }));
-
-//     // const lastMessage = (await db.collection('conversations').where('_id', '==', '602680d2d63c190017bf2be1').get()).docs[0].data().messages[730];
-//     // const lastMessage = (await Conversation.findById('602680d2d63c190017bf2be1')).messages[730];
-
-//     const testing = (await db.collection('conversations').where('people', '==', 'asldfkasjdf').get()).docs.map(doc => doc.data());
-
-//     res.send(testing);
+//     res.send('done');
 //   } catch(err) {
 //     console.error(err);
 //   }

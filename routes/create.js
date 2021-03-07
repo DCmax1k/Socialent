@@ -30,6 +30,7 @@ router.post('/createpost', async (req, res) => {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
     const newPostData = {
+        _id: Date.now().toString(16) + Math.random().toString(16).slice(2),
         author: {
           _id: user._id,
           username: user.username,
@@ -38,8 +39,12 @@ router.post('/createpost', async (req, res) => {
         url: req.body.url,
         urlType: req.body.urlType,
         description: req.body.description,
+        active: true,
+        comments: [],
+        date: Date.now(),
+        likes: [],
     };
-    const createPost = (await db.collection('posts').add(newPostData));
+    const createPost = (await db.collection('posts').doc(newPostData._id).set(newPostData));
     // const createPost = await new Post({
     //   author: {
     //     _id: user._id,

@@ -31,7 +31,7 @@ router.get('/:username', async (req, res) => {
       if (post.active) {
         return post;
       }
-    })
+    }).sort((a,b) => a.date-b.date);
     // const account = await User.findOne({ username: req.params.username });
     // const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
     // const accountsFollowers = await User.find({following: account._id});
