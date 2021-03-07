@@ -49,7 +49,8 @@ router.post('/loadconversation', async (req, res) => {
             // });
             // const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
             if (conversation.seenFor === user._id) {
-                const setSeen = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update('seen', 'read');
+                const setSeen = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0];
+                if (setSeen) { setSeen.ref.update('seen', 'read')};
             }
             
             // Crop messages
@@ -83,15 +84,17 @@ router.post('/addconversation', async (req, res) => {
         if (user.status === 'online') {
             if (req.body.receiver) {
                 // const receiver = await User.findOne({ username: req.body.receiver });
-                const receiver = (await db.collection('users').where('username', '==', req.body.receiver).get()).docs[0].data();
+                let receiver = (await db.collection('users').where('username', '==', req.body.receiver).get()).docs[0];
                 // Check if receiver exists
                 if (receiver) {
+                       receiver = receiver.data();
                        if (receiver._id !== user._id) {
                        // Check to see if they already have a conversation
                         // const check1 = await Conversation.find({people: [user._id, receiver._id]});
                         // const check2 = await Conversation.find({people: [receiver._id, user._id]});
-                        const check1 = (await db.collection('conversations').where('people', 'array-contains', user._id).where('people', 'array-contains', receiver._id).get()).docs.map(doc => doc.data());
-                        if (check1.length == 0 /* && check2.length == 0 */) {
+                        const check1 = (await db.collection('conversations').where('people', '==', [user._id, receiver._id]).get()).docs.map(doc => doc.data());
+                        const check2 = (await db.collection('conversations').where('people', '==', [receiver._id, user._id]).get()).docs.map(doc => doc.data());
+                        if (check1.length == 0 && check2.length == 0) {
 
                                 // const createConversation = await new Conversation({people: [user._id, receiver._id],messages: [],});
                                 // const saveConversation = await createConversation.save();
@@ -101,6 +104,7 @@ router.post('/addconversation', async (req, res) => {
                                     messages: [],
                                     seen: 'read',
                                     seenFor: user._id,
+                                    dateActive: Date.now(),
                                 };
                                 const createConversation = await db.collection('conversations').doc(`${user.username}, ${receiver.username}`).set(convoData);
 

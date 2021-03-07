@@ -223,9 +223,7 @@ addConversationInput.addEventListener('input', async (e) => {
         if (resJSON.status === 'wrong user') {
           window.location.href = '/login';
         } else if (resJSON.status === 'success') {
-          const parsedAccounts = resJSON.searchedAccounts.map((account) =>
-            JSON.parse(account)
-          );
+          const parsedAccounts = resJSON.searchedAccounts;
           addConversationSuggestions.innerHTML = '';
           parsedAccounts.forEach((account) => {
             const node = document.createElement('div');
@@ -319,7 +317,9 @@ const checkConversations = async () => {
                     node.addEventListener('click', () => { clickedConversation(node) });
                     
                     //Remove node that is about to be replaced
-                    messagesList.removeChild(messagesList.childNodes[i]);
+                    if (messagesList.childNodes[i]) {
+                        messagesList.removeChild(messagesList.childNodes[i]);
+                    }
                     // Load html here
                     messagesList.insertBefore(node, messagesList.childNodes[i]);
                 });
