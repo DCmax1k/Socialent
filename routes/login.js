@@ -3,7 +3,7 @@ const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 
-const User = require('../models/User');
+// const User = require('../models/User');
 
 // Login page
 router.get('/', async (req, res) => {

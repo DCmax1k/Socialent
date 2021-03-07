@@ -65,7 +65,7 @@ const loadConversation = async (conversationID) => {
                         node.classList.add('text-box');
                         node.setAttribute('data-text-index', resJSON.messages.length-i)
                         node.setAttribute('data-text-read', message.seen);
-                        if (JSON.stringify(message.sender) === JSON.stringify(userID)) {
+                        if (message.sender === userID) {
                             node.classList.add('sent-text');
                         } else {
                             node.classList.add('received-text');
@@ -128,7 +128,7 @@ setInterval(async () => {
         conversationLoading = false;  
     }
       
-}, 500)
+}, 3000)
 
 // Add conversation
 addConversation.addEventListener('click', () => {
@@ -313,7 +313,7 @@ const checkConversations = async () => {
                     `
                     <h2>${prefixHTML} ${receiverUser.username}</h2>
                     <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value : 'Start Messaging!'}</h4>
-                    <i class="fas fa-circle notification ${conversation.messages[conversation.messages.length - 1].seen === 'unread' && conversation.messages[conversation.messages.length - 1].sender !== userID ? 'active' : ''}"></i>
+                    <i class="fas fa-circle notification ${conversation.seen === 'unread' && conversation.seenFor == userID ? 'active' : ''}"></i>
                     `;
 
                     node.addEventListener('click', () => { clickedConversation(node) });
@@ -347,7 +347,7 @@ setInterval(async () => {
         checkConversationsLoading = false;
     }
     
-}, 500);
+}, 3000);
 
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {

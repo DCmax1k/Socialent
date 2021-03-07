@@ -123,7 +123,7 @@
           </p>
         </div>
         <div class="date-created">
-          <p><%= post.date.toLocaleDateString() %></p>
+          <p><%= post.date %></p>
         </div>
         <div class="add-comment">
           <input
@@ -142,8 +142,8 @@
           <div data-post-id="<%= post._id %>" class="comments-area">
             <% post.comments.reverse().forEach(comment => {%>
             <div class="comment">
-              <b><%= comment[0] %></b>&nbsp;<%= comment[1] %>
-              <p class="comment-date"><%= comment[2] %></p>
+              <b><%= comment.username %></b>&nbsp;<%= comment.value %>
+              <p class="comment-date"><%= comment.date %></p>
             </div>
             <hr class="light-hr" />
             <% }) %>

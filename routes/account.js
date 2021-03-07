@@ -15,8 +15,8 @@ oAuth2Client.setCredentials({refresh_token: REFRESH_TOKEN});
 
 
 
-const User = require('../models/User');
-const Post = require('../models/Post');
+// const User = require('../models/User');
+// const Post = require('../models/Post');
 
 const deleteUser = require('../globalFunctions/deleteAccount');
 
@@ -45,7 +45,6 @@ router.get('/:username', async (req, res) => {
     if (req.query.k) {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
-      console.log(accountsFollowers);
       if (user.status === 'online') {
         res.render('account', {
           user,

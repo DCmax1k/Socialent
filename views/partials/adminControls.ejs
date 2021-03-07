@@ -150,6 +150,7 @@
         right: 20px;
         height: 600px;
         width: 400px;
+        overflow-y: scroll;
         background-color: #303030;
         border-radius: 10px;
         border: 2px solid rgb(44, 44, 44);
@@ -158,6 +159,9 @@
         transition: clip-path 0.3s ease;
         box-shadow: 2px 2px 5px black;
         pointer-events: none;
+    }
+    #adminControls > .subUser:last-child {
+        margin-bottom: 80px;
     }
     #adminControls.active {
         clip-path: circle(75%);
@@ -185,11 +189,11 @@
         outline: none;
     }
     #adminControlsKeyIcon {
-        position: absolute;
-        bottom: 1.5%;
-        right: 1.5%;
-        height: 10%;
-        width: 15%;
+        position: fixed;
+        bottom: 67px;
+        right: 21px;
+        height: 70px;
+        width: 70px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -198,6 +202,9 @@
         cursor: pointer;
         transform: rotate(135deg);
         pointer-events: all !important;
+        border-radius: 50%;
+        background-color: #303030;
+        z-index: 1;
     }
     .subUser {
         display: flex;
@@ -245,8 +252,15 @@
             height: 450px;
             width: 300px;
         }
+        #adminControls > .subUser:last-child {
+            margin-bottom: 50px;
+        }
         #adminControlsKeyIcon {
             font-size: 20px;
+            bottom: 65px;
+            right: 21px;
+            height: 53px;
+            width: 53px;
         }
         #adminControlsTop {
             height: 60px;
@@ -267,7 +281,13 @@
             height: 390px;
             width: 260px;
         }
-
+        #adminControlsKeyIcon {
+            font-size: 20px;
+            bottom: 64px;
+            right: 20px;
+            height: 47px;
+            width: 47px;
+        }
         #adminControlsTop {
             height: 60px;
         }       

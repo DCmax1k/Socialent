@@ -71,8 +71,8 @@
         <div id="commentsCont">
           <% post.comments.reverse().forEach(comment => { %>
           <div class="comment">
-            <p><b><%= comment[0] %></b> <%= comment[1] %></p>
-            <span><%= comment[2] %></span>
+            <p><b><%= comment.username %></b> <%= comment.value %></p>
+            <span><%= comment.date %></span>
           </div>
           <% }) %>
         </div>
@@ -96,7 +96,7 @@
         <div id="description">
           <b><%= post.author.username %></b> &nbsp;<%= post.description %>
         </div>
-        <div id="postDate"><%= post.date.toLocaleDateString() %></div>
+        <div id="postDate"><%= post.date%></div>
         <% if (loggedin) { %>
         <div id="addAComment">
           <input type="text" id="commentInput" placeholder="Add a comment..." />

@@ -40,7 +40,7 @@
   background-color: rgba(255, 255, 255, 0.37);
   border-radius: 15px;
   min-height: 600px;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #bodyCont * {
@@ -199,7 +199,7 @@
 
 #postsGrid {
   width: 1000px;
-  margin: 20px auto;
+  margin: 20px auto 100px auto;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
 }

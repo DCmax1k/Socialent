@@ -462,13 +462,13 @@ setInterval(async () => {
 const generateWarnings = () => {
   warnAlerts.innerHTML = '';
   currentWarnings.forEach((warning, i) => {
-    if (warning[1] == true) {
+    if (warning.active == true) {
       const node = document.createElement('div');
       node.classList.add('warning');
       node.innerHTML = 
       `
       <i class="warn-icon fas fa-exclamation"></i>
-      <h1>${warning[0]}</h1>
+      <h1>${warning.text}</h1>
       <button class='dismiss-btn' data-warning-index='${i}'>Dismiss</button>
       `;
       giveDisEventListener(node.childNodes[5]);

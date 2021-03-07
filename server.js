@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 require('dotenv').config();
 
 const admin = require("firebase-admin");
@@ -27,9 +27,9 @@ const db = admin.firestore();
 
 
 // Models
-const User = require('./models/User');
-const Post = require('./models/Post');
-const Conversation = require('./models/Conversation');
+// const User = require('./models/User');
+// const Post = require('./models/Post');
+// const Conversation = require('./models/Conversation');
 
 // Middlewares
 app.use(express.urlencoded({ extended: false }));
@@ -93,6 +93,7 @@ const JSONTransport = require('nodemailer/lib/json-transport');
 app.use('/agreements', agreementsRoute);
 
 // Testing purposes
+
 // app.get('/test', async (req, res) => {
 //   try {
 
@@ -111,7 +112,9 @@ app.use('/agreements', agreementsRoute);
 //     // const lastMessage = (await db.collection('conversations').where('_id', '==', '602680d2d63c190017bf2be1').get()).docs[0].data().messages[730];
 //     // const lastMessage = (await Conversation.findById('602680d2d63c190017bf2be1')).messages[730];
 
-//     res.send('ok');
+//     const testing = (await db.collection('conversations').where('people', '==', 'asldfkasjdf').get()).docs.map(doc => doc.data());
+
+//     res.send(testing);
 //   } catch(err) {
 //     console.error(err);
 //   }
@@ -147,6 +150,7 @@ app.use('/agreements', agreementsRoute);
 //           description: user.description || '',
 //           following: user.following,
 //           warnings: usersWarnings,
+//           dateJoined: Date.now(),
 //         };
 //         const setUser = await db.collection('users').doc(userData.username).set(userData);
 //       } catch(err) {    
@@ -208,17 +212,31 @@ app.use('/agreements', agreementsRoute);
 //         conversationid1.pop();
 //         conversationid1.shift();
 //         const conversationid = conversationid1.join('');
+//         let seen = 'read';
+//         let seenFor = '';
 //         const conversationsMessages = conversation.messages.map(message => { 
 //           const senderID = JSON.stringify(message.sender).split('');
 //           senderID.pop();
 //           senderID.shift();
 //           const newSender = senderID.join('');
+//           if (message.seen === 'unread') {
+//             seen = 'unread';
+//           }
+//           let forSeenFor = JSON.stringify(message.sender) === conversation.people[0] ? conversation.people[1] : conversation.people[0];
+//           forSeenFor = JSON.stringify(forSeenFor).split('');
+//           forSeenFor.pop();
+//           forSeenFor.shift();
+//           seenFor = forSeenFor.join('');
+
 //           return { sender: newSender, value: message.value, type: message.type, date: message.date}
 //         });
 //         const userData = {
 //           _id: conversationid,
 //           people: conversation.people,
 //           messages: conversationsMessages,
+//           dateActive: conversation.dateActive,
+//           seen,
+//           seenFor,
 //         };
 //         const person1 = (await db.collection('users').where('_id', '==', userData.people[0]).get()).docs[0].data().username;
 //         const person2 = (await db.collection('users').where('_id', '==', userData.people[1]).get()).docs[0].data().username;
@@ -236,13 +254,13 @@ app.use('/agreements', agreementsRoute);
 
 
 // DB connection
-mongoose.connect(
-  process.env.DB_CONNECTION,
-  { useNewUrlParser: true, useUnifiedTopology: true },
-  () => {
-    console.log('Connected to DB');
-  }
-);
+// mongoose.connect(
+//   process.env.DB_CONNECTION,
+//   { useNewUrlParser: true, useUnifiedTopology: true },
+//   () => {
+//     console.log('Connected to DB');
+//   }
+// );
 
 
 

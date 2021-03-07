@@ -3,8 +3,8 @@ const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 
-const User = require('../models/User');
-const Post = require('../models/Post');
+// const User = require('../models/User');
+// const Post = require('../models/Post');
 
 // Get route
 router.get('/', async (req, res) => {
