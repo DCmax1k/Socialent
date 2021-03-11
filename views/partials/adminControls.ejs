@@ -11,7 +11,7 @@
     <% allUsers.forEach((subUser, i) => { %>
         <div class="subUser">
             <h3><%= i + 1 %>.</h3>
-            <% if (subUser.prefix.active && subUser.prefix.title) { %>
+            <% if (subUser.prefix.title) { %>
                 <% if (subUser.rank === 'owner') { %>
                   <p class="prefix owner">[<%= subUser.prefix.title.split('')[0] %>]&nbsp;</p>
                 <% } else if (subUser.rank === 'admin') { %>

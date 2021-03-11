@@ -434,29 +434,32 @@ postImgs.forEach(postImg => {
 let currentWarnings = [];
 
 const checkForWarnings = async () => {
-  const response = await fetch('/home/checkwarnings', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      userID,
-      device: window.navigator.userAgent,
-    }),
-  });
-  const resJSON = await response.json();
-  if (resJSON.status === 'success') {
-    if (currentWarnings == resJSON.warnings) {
-      return;
-    } else {
-      currentWarnings = resJSON.warnings;
-      generateWarnings();
-    }
+  if (!document.hidden) {
+    const response = await fetch('/home/checkwarnings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userID,
+        device: window.navigator.userAgent,
+      }),
+    });
+    const resJSON = await response.json();
+    if (resJSON.status === 'success') {
+      if (currentWarnings == resJSON.warnings) {
+        return;
+      } else {
+        currentWarnings = resJSON.warnings;
+        generateWarnings();
+      }
+    }  
   }
+  
 }
 checkForWarnings();
 setInterval(async () => {
-  await checkForWarnings();
+  await checkForWarnings(); 
 }, 3000);
 
 const generateWarnings = () => {
