@@ -97,6 +97,7 @@ body::-webkit-scrollbar-track {
   transform: translateY(-50%);
   width: 100%;
   text-align: center;
+  padding: 20px;
 }
 
 .alert > button {

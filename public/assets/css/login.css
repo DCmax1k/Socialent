@@ -91,6 +91,14 @@ body {
   cursor: pointer;
 }
 
+#forgotPassword {
+  position: absolute;
+  font-size: 13px;
+  top: -20px;
+  right: 5px;
+  color: #dfeefb;
+}
+
 #formCont > a {
   color: white;
 }

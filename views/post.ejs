@@ -96,7 +96,7 @@
         <div id="description">
           <b><%= post.author.username %></b> &nbsp;<%= post.description %>
         </div>
-        <div id="postDate"><%= post.date%></div>
+        <div id="postDate"><%= (new Date(post.date).toLocaleDateString()) %></div>
         <% if (loggedin) { %>
         <div id="addAComment">
           <input type="text" id="commentInput" placeholder="Add a comment..." />

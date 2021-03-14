@@ -89,8 +89,10 @@ const messagesRoute = require('./routes/messages');
 app.use('/messages', messagesRoute);
 
 const agreementsRoute = require('./routes/agreements');
-const JSONTransport = require('nodemailer/lib/json-transport');
 app.use('/agreements', agreementsRoute);
+
+const forgotpasswordRoute = require('./routes/forgotpassword');
+app.use('/forgotpassword', forgotpasswordRoute);
 
 // Testing purposes
 
