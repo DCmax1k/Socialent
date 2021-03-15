@@ -116,13 +116,61 @@
 #numbers > div {
   font-size: 30px;
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
 }
+#following, #followers {
+  cursor: pointer;
+}
 
 #numbers > div > span {
   font-size: 15px;
+}
+
+#showFollowers, #showFollowing {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  height: fit-content;
+  max-height: 500px;
+  overflow-y: scroll;
+  width: 200px;
+  background-color: #3382b7;
+  padding: 5px;
+  z-index: 10;
+  border-radius: 10px;
+
+  transform: translateY(-5%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#showFollowers.active, #showFollowing.active {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.seeAccountsAcc {
+  height: 40px;
+  width: 100%;
+  font-size: 15px;
+  margin: 1px;
+  display: flex;
+  text-decoration: none;
+  align-items: center;
+  color: #e9f5fc;
+  background-color: #4e95c4;
+  border-radius: 10px;
+  padding: 2px;
+}
+
+.seeAccountsAcc > .showAccountsProfileImg {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  margin-right: 2px;
 }
 
 #belowNumbers {
@@ -252,7 +300,7 @@
   border-radius: 15px;
   overflow-x: hidden;
   overflow-y: scroll;
-  z-index: 1;
+  z-index: 11;
   color: white;
   padding: 0 40px;
 }
@@ -424,6 +472,10 @@
     min-height: 100px;
     min-width: 100px;
   }
+  #showFollowers, #showFollowing {
+    left: unset;
+    right: 0;
+  }
 }
 
 @media screen and (max-width: 1150px) {
@@ -527,6 +579,9 @@
   }
   #belowNumbers {
     margin-left: -60px;
+  }
+  #showFollowers {
+    right: -50px;
   }
 }
 

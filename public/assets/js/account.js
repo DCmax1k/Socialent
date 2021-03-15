@@ -28,7 +28,37 @@ const setUsersPrefix = document.getElementById('setUsersPrefix');
 const setUsersPrefixInput = document.getElementById('setUsersPrefixInput');
 const prefix = document.querySelector('.prefix');
 const postVideos = document.querySelectorAll('.imgHolder > video');
+const showFollowers = document.getElementById('showFollowers');
+const showFollowing = document.getElementById('showFollowing');
+const followers = document.getElementById('followers');
+const following = document.getElementById('following');
 
+let showingFollowers = false;
+let showingFollowing = false;
+
+followers.addEventListener('click', () => {
+  if (showingFollowers) {
+    showFollowers.classList.remove('active');
+    showingFollowers = false;
+  } else {
+    showFollowers.classList.add('active');
+    showingFollowers = true;
+    showFollowing.classList.remove('active');
+    showingFollowing = false;
+  }
+  
+});
+following.addEventListener('click', () => {
+  if (showingFollowing) {
+    showFollowing.classList.remove('active');
+    showingFollowing = false;
+  } else {
+    showFollowing.classList.add('active');
+    showingFollowing = true;
+    showFollowers.classList.remove('active');
+    showingFollowers = false;
+  }
+});
 
 // Follow
 if (followBtn) {

@@ -130,10 +130,23 @@
               <span
                 >Follower<%= accountsFollowers.length === 1 ? '' : 's' %></span
               >
+
+              <div id="showFollowers">
+                <% accountsFollowers.forEach(acc => { %>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>?k=<%= user._id %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><%= acc.username %></a>
+                <% }) %>
+              </div>
             </div>
             <div id="following">
-              <%= account.following.length %>
+              <!-- <%= account.following.length %> -->
+              <%= accountsFollowing.length %>
               <span>Following</span>
+
+              <div id="showFollowing">
+                <% accountsFollowing.forEach(acc => { %>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>?k=<%= user._id %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><%= acc.username %></a>
+                <% }) %>
+              </div>
             </div>
           </div>
           <div id="belowNumbers">

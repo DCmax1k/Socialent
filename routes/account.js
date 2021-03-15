@@ -28,7 +28,13 @@ router.get('/:username', async (req, res) => {
 
     const account = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0].data();
     const oriAccountsPosts = (await db.collection('posts').where('author._id', '==', account._id).get()).docs.map(doc => doc.data());
-    const accountsFollowers = (await db.collection('users').where('following', 'array-contains', account._id).get()).docs.map(doc => doc.data());
+    const accountsFollowers = (await db.collection('users').where('following', 'array-contains', account._id).get()).docs.map(doc => doc.data()).sort((a,b) => b.score-a.score);
+    const oriAccountsFollowing = (await db.collection('users').get()).docs.map(doc => doc.data());
+    const accountsFollowing = oriAccountsFollowing.filter(acc => {
+      if (account.following.includes(acc._id)) {
+        return acc;
+      }
+    }).sort((a,b) => b.score-a.score);
     const accountsPosts = oriAccountsPosts.filter(post => {
       if (post.active) {
         return post;
@@ -52,6 +58,7 @@ router.get('/:username', async (req, res) => {
           user,
           account,
           accountsFollowers,
+          accountsFollowing,
           accountsPosts,
           loggedin: true,
         });
@@ -62,6 +69,7 @@ router.get('/:username', async (req, res) => {
       res.render('account', {
         account,
         accountsFollowers,
+        accountsFollowing,
         accountsPosts,
         loggedin: false,
       });
