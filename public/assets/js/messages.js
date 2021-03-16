@@ -148,6 +148,7 @@ const checkConversations = async () => {
                     },
                     body: JSON.stringify({
                         userID,
+                        conversationLoaded,
                     }),
                 });
                 const resJSON = await response.json();

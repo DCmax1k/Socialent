@@ -150,11 +150,17 @@ router.post('/checkconversations', async (req, res) => {
         // const user = await User.findById(req.body.userID);
         const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
         if (user.status === 'online') {
+            if (req.body.conversationLoaded) {
+                const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
+                if (conversation.data().seenFor === user._id) {
+                    await conversation.ref.update('seen', 'read');
+                }
+            }
             // const usersConversations = await Conversation.find({people: user._id});
             const usersConversations = (await db.collection('conversations').where('people', 'array-contains', user._id).get()).docs.map(doc => doc.data());
             usersConversations.sort((a,b) => {
                 return a.dateActive - b.dateActive;
-            })
+            });
             res.json({
                 status: 'success',
                 usersConversations,
