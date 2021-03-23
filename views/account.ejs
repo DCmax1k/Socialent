@@ -133,7 +133,7 @@
 
               <div id="showFollowers">
                 <% accountsFollowers.forEach(acc => { %>
-                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>?k=<%= user._id %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><%= acc.username %></a>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %><%= user ? `?k=${user._id}` : '' %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><%= acc.username %></a>
                 <% }) %>
               </div>
             </div>
@@ -144,7 +144,7 @@
 
               <div id="showFollowing">
                 <% accountsFollowing.forEach(acc => { %>
-                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>?k=<%= user._id %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><%= acc.username %></a>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %><%= user ? `?k=${user._id}` : '' %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><%= acc.username %></a>
                 <% }) %>
               </div>
             </div>

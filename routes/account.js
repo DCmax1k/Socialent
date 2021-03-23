@@ -67,6 +67,7 @@ router.get('/:username', async (req, res) => {
       }
     } else {
       res.render('account', {
+        user: null,
         account,
         accountsFollowers,
         accountsFollowing,
