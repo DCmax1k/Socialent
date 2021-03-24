@@ -11,7 +11,7 @@ router.get('/window', async (req, res) => {
         res.send('No url!');
     } else {
         try {
-            const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
+            const browser = await puppeteer.launch();
             const page = await browser.newPage();
             await page.goto(url);
             let document = await page.evaluate(() => document.documentElement.outerHTML);
