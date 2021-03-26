@@ -17,7 +17,7 @@
             arr.unshift('http://');
             newURL = arr.join('');
         }
-        const extWindow = window.open(`/proxy/window/?url=${newURL}`, 'Loading...', 'top=50, left=50, height=600, width=800');
+        const extWindow = window.open(`https://socialent-proxy.herokuapp.com/prox/?url=${btoa(newURL)}`, 'Loading...', 'top=50, left=50, height=600, width=800');
         extWindow.document.title = 'Starting Unblocker v1.0...';
     }
 </script>
