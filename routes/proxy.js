@@ -24,6 +24,32 @@ router.get('/window', async (req, res) => {
 
     }
 
+});
+
+router.post('/checksite', async (req, res) => {
+    try {
+        const url = req.body.url;
+        const blockedsites = ['youtube', 'porn', 'google'];
+        if (blockedsites.some(v => url.indexOf(v) >= 0)) {
+            res.json({
+                status: 'blocked',
+            });
+        } else {
+            let newURL = url;
+            if (!newURL.includes('http')) {
+                let arr = [newURL];
+                arr.unshift('http://');
+                newURL = arr.join('');
+            }
+            const encoded = Buffer.from(newURL, 'binary').toString('base64')
+            res.json({
+                status: 'success',
+                fullURL: `https://proxy-socialent.herokuapp.com/prox/?url=${encoded}`,
+            });
+        }
+    } catch(err) {
+        console.error(err);
+    }
 })
 
 

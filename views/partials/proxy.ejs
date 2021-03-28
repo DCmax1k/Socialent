@@ -1,5 +1,5 @@
 <div id="proxy">
-    PROXY BETA: Unblocker v1.0
+    PROXY BETA: Unblocker v2.0
     <input id="proxyInput" type="url" placeholder="https://example.com">
 </div>
 
@@ -10,15 +10,30 @@
             openProxyWindow(e.target.value)
         }
     })
-    const openProxyWindow =(url) => {
-        let newURL = url;
-        if (!newURL.includes('http')) {
-            let arr = [newURL];
-            arr.unshift('http://');
-            newURL = arr.join('');
+    const openProxyWindow = async (url) => {
+        try {
+            const response = await fetch('/proxy/checksite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    url,
+                    userID,
+                }),
+            });
+            const resJSON = await response.json();
+            if (resJSON.status === 'blocked') {
+                myAlert('Unfortunatly, that website is currently unsupported/blocked!');
+            } else if (resJSON.status === 'success') {
+                const extWindow = window.open(resJSON.fullURL, 'Loading...', 'top=50, left=50, height=600, width=800');
+                extWindow.document.title = 'Starting Unblocker v1.0...';    
+            }
+            
+        } catch(err) {
+            console.error(err);
         }
-        const extWindow = window.open(`https://socialent-proxy.herokuapp.com/prox/?url=${btoa(newURL)}`, 'Loading...', 'top=50, left=50, height=600, width=800');
-        extWindow.document.title = 'Starting Unblocker v1.0...';
+        
     }
 </script>
 
