@@ -29,7 +29,7 @@ router.get('/window', async (req, res) => {
 router.post('/checksite', async (req, res) => {
     try {
         const url = req.body.url;
-        const blockedsites = ['youtube', 'porn', 'google'];
+        const blockedsites = ['youtube', 'google'];
         if (blockedsites.some(v => url.indexOf(v) >= 0)) {
             res.json({
                 status: 'blocked',
