@@ -22,6 +22,8 @@ let conversationLoaded = '';
 let editMode = false;
 let conversationLoading = false;
 let checkConversationsLoading = false;
+let lastSentMessages = [];
+let lastSentMessageIndex = -1;
 
 // // Load conversation takes a conversation ID and loads its messages & removes and adds new html
 // const loadConversation = async (conversationID) => {
@@ -186,10 +188,11 @@ const checkConversations = async () => {
                             prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
                             }
                         }
+                        
                         node.innerHTML = 
                         `
                         <h2>${prefixHTML} ${receiverUser.username}</h2>
-                        <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value : 'Start Messaging!'}</h4>
+                        <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;') : 'Start Messaging!'}</h4>
                         <i class="fas fa-circle notification ${conversation.seen === 'unread' && conversation.seenFor == userID ? 'active' : ''}"></i>
                         `;
 
@@ -221,7 +224,7 @@ const checkConversations = async () => {
                                         messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                                     }
                                 }); 
-                                const previousHTML = internalMessages.innerText;
+                                const previousHTML = internalMessages.innerHTML;
                                 // Removes previous html
                                 internalMessages.innerHTML = '';
                                 // Loops through messages generating html
@@ -238,7 +241,9 @@ const checkConversations = async () => {
                                     if (message.type === 'img') {
                                         node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i>`;
                                     } else {
-                                        node.innerHTML = `<div class="text">${message.value}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i></div>`;
+                                        const newMessageValue = message.value.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;');
+                                        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i></div>`;
+                                        
                                     }
                                     
                                     // Add event listener to delete buttons
@@ -250,7 +255,7 @@ const checkConversations = async () => {
                                     // Load html
                                     internalMessages.appendChild(node);
                                 });
-                                const newHTML = internalMessages.innerText;
+                                const newHTML = internalMessages.innerHTML;
                                 // Scroll to bottom
                                 if (previousHTML !== newHTML && !editMode) {
                                     internalMessages.scrollTop = internalMessages.scrollHeight;
@@ -469,11 +474,26 @@ const autofillSearchUsername = username => {
   
 // Send message
 messageInput.addEventListener('keyup', (e) => {
-    if (e.keyCode == 13 || e.which == 13) {
+    if (e.key == 'Enter') {
         if (conversationLoaded) {
             sendMessage(conversationLoaded, userID, e.target.value);
         }
+    } else if (e.key == 'ArrowUp') {
+        if (lastSentMessageIndex != lastSentMessages.length - 1) {
+            lastSentMessageIndex += 1;
+            messageInput.value = lastSentMessages[lastSentMessageIndex];
+        }
+    } else if (e.key == 'ArrowDown') {
+        if (lastSentMessageIndex != -1) {
+            if (lastSentMessageIndex != 0) {
+                lastSentMessageIndex -= 1;
+                messageInput.value = lastSentMessages[lastSentMessageIndex];
+            } else {
+                messageInput.value = '';
+            }  
+        }
     }
+
 });
 
 sendMessageBtn.addEventListener('click', () => {
@@ -488,7 +508,8 @@ const instantMessageSend = (message) => {
         node.classList.add('text-box');
         node.setAttribute('data-text-read', 'read');
         node.classList.add('sent-text');
-        node.innerHTML = `<div class="text">${message}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i></div>`;
+        const newMessageValue = message.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;');
+        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i></div>`;
         internalMessages.appendChild(node);
         internalMessages.scrollTop = internalMessages.scrollHeight;    
     } else {
@@ -515,6 +536,7 @@ instantImgSend = (img) => {
 
 const sendMessage = async (conversationID, senderID, message) => {
     messageInput.value = '';
+    lastSentMessages.unshift(message);
     // Instantly show message sent
     if (conversationLoaded) {
         instantMessageSend(message);

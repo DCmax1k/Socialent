@@ -99,17 +99,17 @@ app.use('/proxy', proxyRoute);
 
 // Testing purposes
 
-app.get('/test', async (req, res) => {
-  try {
-    (await db.collection('users').get()).docs.forEach( async doc => {
-      await doc.ref.update('proxy', false);
-    });
+// app.get('/test', async (req, res) => {
+//   try {
+//     (await db.collection('users').get()).docs.forEach( async doc => {
+//       await doc.ref.update('proxy', false);
+//     });
 
-    res.send('done');
-  } catch(err) {
-    console.error(err);
-  }
-});
+//     res.send('done');
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
 
 
 // DB connection
