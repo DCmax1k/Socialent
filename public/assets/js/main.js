@@ -36,3 +36,8 @@ const lookupUsername = async (receiverID) => {
     const resJSON = await response.json();
     return resJSON;
 }
+
+// REDIRECT to SECRURE site
+if (location.protocol === 'http:' && location.host.includes('socialent')) {
+    location.href = 'https://socialent-app.herokuapp.com';
+}
