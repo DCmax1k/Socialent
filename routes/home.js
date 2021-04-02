@@ -41,6 +41,25 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Edit Description of post
+router.post('/editdesc', async (req, res) => {
+  try { 
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const udpatePost = await (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].ref.update('description', req.body.desc);
+      res.json({
+        status: 'success',
+      });
+    } else {
+      res.json({
+        status: '!Wrong user!'
+      })
+    }
+  } catch(err) {
+    console.error(err);
+  }
+})
+
 // Admin delete post
 router.post('/admindeletepost', async (req, res) => {
   try {

@@ -63,8 +63,13 @@
         <div class="open-delete-post-menu">
           <i class="fas fa-ellipsis-h"></i>
         </div>
-        <div class="delete-post-menu">
-          <div class="delete-post">Delete post</div>
+        <div data-post-id="<%= post._id %>" class="delete-post-menu">
+          <div data-post-id="<%= post._id %>" class="edit-post post-menu-item">
+            Edit
+          </div>
+          <div data-post-id="<%= post._id %>" class="delete-post post-menu-item">
+            Delete post
+          </div>
         </div>
         <% } %>
 
@@ -95,7 +100,10 @@
           </div>
         </div>
         <div id="description">
-          <b><%= post.author.username %></b> &nbsp;<%= post.description %>
+          <b class="descUsername"><%= post.author.username %></b> &nbsp; 
+          <p class="descText" data-post-id="<%= post._id %>">
+            <%= JSON.stringify(post.description) %>
+          </p>
         </div>
         <div id="postDate"><%= (new Date(post.date).toLocaleDateString()) %></div>
         <% if (loggedin) { %>
@@ -119,7 +127,16 @@
       </div>
     </div>
 
+    
+
     <% if (loggedin) { %>
+      <div id="editDescriptionBody" data-post-id="">
+        <textarea name="editDescriptionTextarea" id="editDescriptionTextarea" cols="30" rows="10" placeholder="Description..."></textarea>
+        <div class="edit-desc-btns">
+          <button id="editDescCancel">Cancel</button>
+          <button id="editDescSubmit">Submit</button>
+        </div>
+      </div>
     <script src="/assets/js/deviceverification.js"></script>
     <%- include('partials/sideNavBar') %> <% } %> <%- include('partials/footer')
     %>

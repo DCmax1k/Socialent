@@ -88,7 +88,7 @@ if (followBtn) {
 
 // Set return values
 function fixDescription() {
-  let descText = description.innerText.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;');
+  let descText = description.innerText.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
   descText = descText.trim();
   descText = descText.split('');
   descText.pop();
@@ -106,7 +106,7 @@ if (editProfileBtn) {
 
   // the textarea one
   function fixBio() {
-    let descText = bio.value.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;');
+    let descText = bio.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
     descText = descText.trim();
     descText = descText.split('');
     descText.pop();

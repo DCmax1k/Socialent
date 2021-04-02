@@ -152,22 +152,41 @@
   position: absolute;
   top: 30px;
   right: 40px;
-  background-color: white;
-  padding: 5px 10px;
-  border-radius: 10px;
-  border: 1px solid black;
-  display: none;
+  background-color: rgb(44, 44, 44);
+  border-radius: 5px;
+  border: 1px solid rgb(192, 192, 192);
   z-index: 6;
+
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-10%);
+
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .delete-post-menu.active {
-  display: inline-block;
+  pointer-events: all;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.post-menu-item {
+  font-size: 13px;
+  cursor: pointer;
+  color: white;
+  text-align: center;
+  padding: 5px 10px;
+
+  transition: background-color 0.3s ease;
+}
+
+.post-menu-item:hover {
+  background-color: rgba(158, 158, 158, 0.5);
+  border-radius: 3px;
 }
 
 .delete-post {
   color: rgb(206, 0, 0);
-  font-size: 13px;
-  cursor: pointer;
 }
 
 .post-img {
@@ -255,13 +274,15 @@
 }
 
 .description {
-  display: flex;
   margin-top: -2px;
   margin-left: 3px;
   word-wrap: break-word;
   font-size: 8px;
   max-height: 100px;
   overflow: scroll;
+}
+.descUsername, .descText {
+  display: inline;
 }
 .description::-webkit-scrollbar {
   width: 3px;
@@ -388,6 +409,57 @@
   font-weight: bold;
   margin-top: 3px;
   margin-bottom: -3px;
+}
+
+#editDescriptionBody {
+  position: fixed;
+  left: 0;
+  bottom: -200px;
+  width: 100vw;
+  height: 200px;
+  background-color: rgb(48, 48, 48);
+  z-index: 21;
+  padding: 20px;
+  
+  transition: bottom 0.5s cubic-bezier(1,.12,0,.9);
+}
+
+#editDescriptionBody.active {
+  bottom: 0;
+}
+
+#editDescriptionBody > textarea {
+  width: 90%;
+  height: 60%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid grey;
+  padding: 5px;
+  outline: none;
+  border-radius: 5px;
+}
+
+.edit-desc-btns {
+  width: 90%;
+  height: 40%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+}
+.edit-desc-btns > button {
+  height: 100%;
+  width: 49%;
+  padding: 5px;
+  font-size: 20px; 
+  background-color: rgb(83, 83, 83);
+  border: none;
+  outline: none;
+  cursor: pointer;
+  color: white;
+  border-radius: 5px;
+}
+
+#editDescSubmit {
+  float: right;
 }
 
 @media screen and (max-width: 1000px) {

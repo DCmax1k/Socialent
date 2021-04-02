@@ -10,17 +10,23 @@ const commentsAreas = document.querySelectorAll('.comments-area');
 const addCommentInputs = document.querySelectorAll('.add-comment > input');
 const submitCommentBtns = document.querySelectorAll('.submit-comment');
 const descriptions = document.querySelectorAll('.description');
+const descTexts = document.querySelectorAll('.descText');
 const shareBtns = document.querySelectorAll('.share-btn > i');
 const copyPosts = document.querySelectorAll('.copy-post');
 const openDeleteMenus = document.querySelectorAll('.open-delete-post-menu');
 const deletePostMenus = document.querySelectorAll('.delete-post-menu');
 const deletePosts = document.querySelectorAll('.delete-post');
+const editPosts = document.querySelectorAll('.edit-post');
 const playBtns = document.querySelectorAll('.play-btn');
 const videos = document.querySelectorAll('.post-img > video');
 const warnAlerts = document.getElementById('warnAlerts');
 const dismissBtns = document.querySelectorAll('.dismiss-btn')
 const authorSpaces = document.querySelectorAll('.author');
 const bottomBtns = document.querySelectorAll('.bottom-btns');
+const editDescriptionBody = document.getElementById('editDescriptionBody');
+const editDescriptionTextarea = document.getElementById('editDescriptionTextarea');
+const editDescCancel = document.getElementById('editDescCancel');
+const editDescSubmit = document.getElementById('editDescSubmit');
 
 // Add prefix to username in author space at top of post
 authorSpaces.forEach(async authorSpace => {
@@ -149,7 +155,7 @@ playBtns.forEach((playBtn) => {
   });
 });
 
-// Delete post
+// Delete post/Edit psot
 
 // Open menu
 openDeleteMenus.forEach((openDeleteMenu) => {
@@ -199,6 +205,70 @@ deletePosts.forEach((deletePost) => {
   });
 });
 
+// Actual edit description
+editPosts.forEach(editPost => {
+  editPost.addEventListener('click', () => {
+    const postID = editPost.getAttribute('data-post-id');
+    editDescriptionBody.setAttribute('data-post-id', postID);
+    editDescriptionBody.classList.add('active');
+    descTexts.forEach(descText => {
+      if (descText.getAttribute('data-post-id') === postID) {
+        editDescriptionTextarea.innerHTML = descText.innerHTML.replace(/<br>/ig, '&#10;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;')
+      }
+    });
+    deletePostMenus.forEach((deletePostMenu) => {
+      if (deletePostMenu.getAttribute('data-post-id') === postID) {
+        deletePostMenu.classList.remove('active');
+      }
+    });
+  });
+
+});
+
+editDescCancel.addEventListener('click', () => {
+  editDescriptionBody.classList.remove('active');
+  editDescriptionBody.setAttribute('data-post-id', '');
+})
+
+editDescSubmit.addEventListener('click', async () => {
+  editDescSubmit.innertext = 'Loading...';
+  const postID = editDescriptionBody.getAttribute('data-post-id')
+  if (postID) {
+    descTexts.forEach(descText => {
+      if (descText.getAttribute('data-post-id') === postID) {
+        descText.innerText = editDescriptionTextarea.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;').replace(/\\n/gi, '<br />');
+      }
+    })
+    try {
+
+      const response = await fetch('/home/editdesc', {
+        method: 'POST', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userID,
+          postID,
+          desc: editDescriptionTextarea.value,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON = await response.json();
+      editDescSubmit.innertext = 'Submit';
+      if (resJSON.status !== 'success') {
+        myAlert(resJSON.status);
+      } else {
+        editDescriptionBody.classList.remove('active');
+        editDescriptionBody.setAttribute('data-post-id', '');
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  } else {
+    myAlert('Error... Please refresh the page and try again!')
+  }
+})
+
 // Share post
 shareBtns.forEach((shareBtn) => {
   shareBtn.addEventListener('click', () => {
@@ -224,17 +294,15 @@ shareBtns.forEach((shareBtn) => {
 });
 
 // Develope return values in post description
-descriptions.forEach((description) => {
-  const username = description.innerHTML.split('&nbsp; ')[0] + '&nbsp; ';
-  let descText = description.innerHTML.split('&nbsp; ')[1];
+descTexts.forEach((desc) => {
+  let descText = desc.innerText;
   descText = descText.trim();
   descText = descText.split('');
   descText.pop();
   descText.shift();
   descText = descText.join('');
-  descText = descText.replace(/\\n/gi, '<br />');
-  const finalHTML = username + descText;
-  description.innerHTML = finalHTML;
+  descText = descText.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;').replace(/\\n/gi, '<br />');
+  desc.innerHTML = descText;
 });
 
 // Post Comment

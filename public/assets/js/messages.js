@@ -192,7 +192,7 @@ const checkConversations = async () => {
                         node.innerHTML = 
                         `
                         <h2>${prefixHTML} ${receiverUser.username}</h2>
-                        <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;') : 'Start Messaging!'}</h4>
+                        <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;') : 'Start Messaging!'}</h4>
                         <i class="fas fa-circle notification ${conversation.seen === 'unread' && conversation.seenFor == userID ? 'active' : ''}"></i>
                         `;
 
@@ -241,7 +241,7 @@ const checkConversations = async () => {
                                     if (message.type === 'img') {
                                         node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i>`;
                                     } else {
-                                        const newMessageValue = message.value.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;');
+                                        const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
                                         node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i></div>`;
                                         
                                     }
@@ -508,7 +508,7 @@ const instantMessageSend = (message) => {
         node.classList.add('text-box');
         node.setAttribute('data-text-read', 'read');
         node.classList.add('sent-text');
-        const newMessageValue = message.replace('<', '&lt;').replace('>', '&gt;').replace('/', '&#47;');
+        const newMessageValue = message.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
         node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i></div>`;
         internalMessages.appendChild(node);
         internalMessages.scrollTop = internalMessages.scrollHeight;    
