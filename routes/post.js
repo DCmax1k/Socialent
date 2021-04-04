@@ -108,7 +108,7 @@ router.post('/addcomment', async (req, res) => {
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       // const updateComments = await Post.findByIdAndUpdate(post._id,{$push: { comments: [user.username, req.body.comment, req.body.date] },},{ useFindAndModify: false });
       // const save = await updateComments.save();
-      const updateComments = (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.update('comments', [...post.comments, {username: user.username, date: req.body.date, value: req.body.comment}]);
+      const updateComments = await (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.update('comments', [...post.comments, {username: user.username, date: req.body.date, value: req.body.comment}]);
       res.json({
         status: 'successful',
         username: user.username,

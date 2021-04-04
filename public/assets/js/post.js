@@ -84,90 +84,7 @@ if (loggedIn) {
   const likeBtnText = document.querySelector('#likeBtn > p');
   const commentInput = document.getElementById('commentInput');
   const submitComment = document.getElementById('submitComment');
-  const openDeleteMenu = document.querySelector('.open-delete-post-menu');
-  const deletePostMenu = document.querySelector('.delete-post-menu');
-  const deletePost = document.querySelector('.delete-post');
-  const editDescriptionBody = document.getElementById('editDescriptionBody');
-  const editDescriptionTextarea = document.getElementById('editDescriptionTextarea');
-  const editDescCancel = document.getElementById('editDescCancel');
-  const editDescSubmit = document.getElementById('editDescSubmit');
-  const editPost = document.querySelector('.edit-post');
-  // Delete post
-  openDeleteMenu.addEventListener('click', () => {
-    deletePostMenu.classList.toggle('active');
-  });
-
-  deletePost.addEventListener('click', async () => {
-    deletePost.innerText = 'Loading...';
-    const response = await fetch('/home/deletepost', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        postID,
-        userID,
-        device: window.navigator.userAgent,
-      }),
-    });
-    const resJSON = await response.json();
-    if (resJSON.status === 'successful') {
-      window.location.href = `/account/${resJSON.username}?k=${resJSON._id}`;
-    } else {
-      window.location.href = '/login';
-    }
-  });
-
-  // Actual edit description
-
-editPost.addEventListener('click', () => {
-  const postID = editPost.getAttribute('data-post-id');
-  editDescriptionBody.setAttribute('data-post-id', postID);
-  editDescriptionBody.classList.add('active');
-  editDescriptionTextarea.innerHTML = descText.innerHTML.replace(/<br>/ig, '&#10;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;')
-  deletePostMenu.classList.remove('active');
-});
-
-
-editDescCancel.addEventListener('click', () => {
-  editDescriptionBody.classList.remove('active');
-  editDescriptionBody.setAttribute('data-post-id', '');
-})
-
-editDescSubmit.addEventListener('click', async () => {
-  editDescSubmit.innertext = 'Loading...';
-  const postID = editDescriptionBody.getAttribute('data-post-id')
-  if (postID) {
-    descText.innerText = editDescriptionTextarea.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;').replace(/\\n/gi, '<br />');
-    try {
-
-      const response = await fetch('/home/editdesc', {
-        method: 'POST', 
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userID,
-          postID,
-          desc: editDescriptionTextarea.value,
-          device: window.navigator.userAgent,
-        }),
-      });
-      const resJSON = await response.json();
-      editDescSubmit.innertext = 'Submit';
-      if (resJSON.status !== 'success') {
-        myAlert(resJSON.status);
-      } else {
-        editDescriptionBody.classList.remove('active');
-        editDescriptionBody.setAttribute('data-post-id', '');
-      }
-    } catch(err) {
-      console.error(err);
-    }
-  } else {
-    myAlert('Error... Please refresh the page and try again!')
-  }
-})
+  
 
 
   // Post comment
@@ -261,6 +178,97 @@ editDescSubmit.addEventListener('click', async () => {
           likeBtn.setAttribute('data-post-liked', 'false');
         }
       }
+    }
+  });
+}
+
+// If logged in and post is the authors 
+if (loggedIn && userID === document.getElementById('username').getAttribute('data-author-id')) {
+
+  const openDeleteMenu = document.querySelector('.open-delete-post-menu');
+  const deletePostMenu = document.querySelector('.delete-post-menu');
+  const deletePost = document.querySelector('.delete-post');
+  const editDescriptionBody = document.getElementById('editDescriptionBody');
+  const editDescriptionTextarea = document.getElementById('editDescriptionTextarea');
+  const editDescCancel = document.getElementById('editDescCancel');
+  const editDescSubmit = document.getElementById('editDescSubmit');
+  const editPost = document.querySelector('.edit-post');
+
+
+    // Delete post
+    openDeleteMenu.addEventListener('click', () => {
+      deletePostMenu.classList.toggle('active');
+    });
+
+    deletePost.addEventListener('click', async () => {
+      deletePost.innerText = 'Loading...';
+      const response = await fetch('/home/deletepost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postID,
+          userID,
+          device: window.navigator.userAgent,
+        }),
+      });
+      const resJSON = await response.json();
+      if (resJSON.status === 'successful') {
+        window.location.href = `/account/${resJSON.username}?k=${resJSON._id}`;
+      } else {
+        window.location.href = '/login';
+      }
+    });
+
+    // Actual edit description
+
+  editPost.addEventListener('click', () => {
+    const postID = editPost.getAttribute('data-post-id');
+    editDescriptionBody.setAttribute('data-post-id', postID);
+    editDescriptionBody.classList.add('active');
+    editDescriptionTextarea.innerHTML = descText.innerHTML.replace(/<br>/ig, '&#10;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;')
+    deletePostMenu.classList.remove('active');
+  });
+
+
+  editDescCancel.addEventListener('click', () => {
+    editDescriptionBody.classList.remove('active');
+    editDescriptionBody.setAttribute('data-post-id', '');
+  })
+
+  editDescSubmit.addEventListener('click', async () => {
+    editDescSubmit.innertext = 'Loading...';
+    const postID = editDescriptionBody.getAttribute('data-post-id')
+    if (postID) {
+      descText.innerText = editDescriptionTextarea.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;').replace(/\\n/gi, '<br />');
+      try {
+
+        const response = await fetch('/home/editdesc', {
+          method: 'POST', 
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userID,
+            postID,
+            desc: editDescriptionTextarea.value,
+            device: window.navigator.userAgent,
+          }),
+        });
+        const resJSON = await response.json();
+        editDescSubmit.innertext = 'Submit';
+        if (resJSON.status !== 'success') {
+          myAlert(resJSON.status);
+        } else {
+          editDescriptionBody.classList.remove('active');
+          editDescriptionBody.setAttribute('data-post-id', '');
+        }
+      } catch(err) {
+        console.error(err);
+      }
+    } else {
+      myAlert('Error... Please refresh the page and try again!')
     }
   });
 }
