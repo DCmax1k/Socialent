@@ -222,6 +222,16 @@ const checkConversations = async () => {
                     
                                         // Set header user
                                         messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
+
+                                        let person = '';
+                                            if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
+                                                person = usersFromDB[conversation.people[1]].username;
+                                            } else {
+                                                person = usersFromDB[conversation.people[0]].username;
+                                            }
+                                        messagingHeaderUser.addEventListener('click', () => {
+                                            window.location.href = `/account/${person}?k=${userID}`;
+                                        });
                                     }
                                 }); 
                                 const previousHTML = internalMessages.innerHTML;
