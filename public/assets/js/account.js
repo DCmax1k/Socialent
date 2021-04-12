@@ -32,6 +32,7 @@ const showFollowers = document.getElementById('showFollowers');
 const showFollowing = document.getElementById('showFollowing');
 const followers = document.getElementById('followers');
 const following = document.getElementById('following');
+const lastOnlineDiv = document.getElementById('lastOnlineDiv');
 
 let showingFollowers = false;
 let showingFollowing = false;
@@ -59,6 +60,29 @@ following.addEventListener('click', () => {
     showingFollowers = false;
   }
 });
+
+// Set last seen online number
+const setLastSeen = () => {
+  const lastOnlineNumber = lastOnlineDiv.innerText;
+  const currentTime = Date.now();
+  if (currentTime - lastOnlineNumber > 86400000 ) {
+    const number = (((currentTime - lastOnlineNumber)/1000/60/60/24).toString().split('.')[0])
+    lastOnlineDiv.innerText = number + ` day${number == 1 ? '' : 's'} ago`;
+  }  else if (currentTime - lastOnlineNumber > 3600000) {
+    const number = (((currentTime - lastOnlineNumber)/1000/60/60).toString().split('.')[0])
+    lastOnlineDiv.innerText = number  + ` hour${number == 1 ? '' : 's'} ago`;
+  } else if (currentTime - lastOnlineNumber > 60000) {
+    const number = (((currentTime - lastOnlineNumber)/1000/60).toString().split('.')[0])
+    lastOnlineDiv.innerText = number + ` minute${number == 1 ? '' : 's'} ago`;
+  } else if (currentTime - lastOnlineNumber > 1000) {
+    const number = (((currentTime - lastOnlineNumber)/1000).toString().split('.')[0])
+    lastOnlineDiv.innerText = number  + ` second${number == 1 ? '' : 's'} ago`;
+  } else {
+    lastOnlineDiv.innerText = 'Last seen 1 second ago';
+  }
+}
+setLastSeen();
+
 
 // Follow
 if (followBtn) {

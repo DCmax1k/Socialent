@@ -117,6 +117,7 @@
             type="file"
           />
           <% } %> <% } %>
+          <p id="lastOnline"><span id="lastOnlineDiv"> <%= account.lastOnline %></span></p>
         </div>
 
         <div id="profileInfo">
@@ -164,7 +165,8 @@
                 <p><%= account.name %></p>
                 <p>@<%= account.username %></p>
               </h1>
-              <p id="description"><%= JSON.stringify(account.description) %></p>
+              <p id="description"> <%= JSON.stringify(account.description) %></p>
+              
             </div>
           </div>
         </div>

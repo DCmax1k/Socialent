@@ -54,6 +54,8 @@ router.get('/:username', async (req, res) => {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
       if (user.status === 'online') {
+        // Set Last Online
+        const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
         res.render('account', {
           user,
           account,

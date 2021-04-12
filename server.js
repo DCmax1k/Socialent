@@ -102,7 +102,7 @@ app.use('/proxy', proxyRoute);
 // app.get('/test', async (req, res) => {
 //   try {
 //     (await db.collection('users').get()).docs.forEach( async doc => {
-//       await doc.ref.update('proxy', false);
+//       await doc.ref.update('lastOnline', Date.now());
 //     });
 
 //     res.send('done');

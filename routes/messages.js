@@ -19,6 +19,8 @@ router.get('/', async (req, res) => {
             //         usersConversations.push(conversation);
             //     }
             // });
+            // Set Last Online
+            const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
             if (user.status == 'online') {
                 res.render('messages', { user })
             } else {

@@ -34,6 +34,8 @@ router.post('/', async (req, res) => {
         // const saveUser = await changeStatus.save();
         const changeStatus = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('status', 'online');
       }
+      // Set Last Online
+      const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
       res.json({
         response: 'logged in',
         id: findUsername._id,
