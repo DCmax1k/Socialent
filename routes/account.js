@@ -40,6 +40,26 @@ router.get('/:username', async (req, res) => {
         return post;
       }
     }).sort((a,b) => a.date-b.date);
+    let number;
+    let parsedLastOnline = '';
+    const lastOnlineNumber = account.lastOnline;
+    
+    const currentTime = Date.now();
+    if (currentTime - lastOnlineNumber > 86400000 ) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24).toString().split('.')[0])
+      parsedLastOnline = number + ` day${number == 1 ? '' : 's'} ago`;
+    }  else if (currentTime - lastOnlineNumber > 3600000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60).toString().split('.')[0])
+      parsedLastOnline = number  + ` hour${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 60000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60).toString().split('.')[0])
+      parsedLastOnline = number + ` minute${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 1000) {
+      number = (((currentTime - lastOnlineNumber)/1000).toString().split('.')[0])
+      parsedLastOnline = number  + ` second${number == 1 ? '' : 's'} ago`;
+    } else {
+      parsedLastOnline = 'Last seen 1 second ago';
+    }
     // const account = await User.findOne({ username: req.params.username });
     // const accountsPosts = await Post.find({ 'author._id': account._id, active: true });
     // const accountsFollowers = await User.find({following: account._id});
@@ -56,6 +76,7 @@ router.get('/:username', async (req, res) => {
       if (user.status === 'online') {
         // Set Last Online
         const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+        
         res.render('account', {
           user,
           account,
@@ -63,6 +84,7 @@ router.get('/:username', async (req, res) => {
           accountsFollowing,
           accountsPosts,
           loggedin: true,
+          parsedLastOnline,
         });
       } else {
         res.redirect('/login');
@@ -75,6 +97,7 @@ router.get('/:username', async (req, res) => {
         accountsFollowing,
         accountsPosts,
         loggedin: false,
+        parsedLastOnline,
       });
     }
   } catch (err) {
@@ -92,7 +115,7 @@ router.post('/setusersprefix', async (req, res) => {
     if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
       // const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
       // const saveUser = await updateUser.save();
-      const updateUser = await (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
+      const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
       res.json({
         status: 'success',
         prefix: req.body.usersPrefix,

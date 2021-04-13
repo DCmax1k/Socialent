@@ -213,7 +213,7 @@ editPosts.forEach(editPost => {
     editDescriptionBody.classList.add('active');
     descTexts.forEach(descText => {
       if (descText.getAttribute('data-post-id') === postID) {
-        editDescriptionTextarea.innerHTML = descText.innerHTML.replace(/<br>/ig, '&#10;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;')
+        editDescriptionTextarea.innerHTML = descText.innerHTML.replace(/<br>/ig, '&#10;').replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
       }
     });
     deletePostMenus.forEach((deletePostMenu) => {

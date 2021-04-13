@@ -44,6 +44,7 @@ router.post('/', async (req, res) => {
         following: [],
         warnings: [],
         dateJoined: Date.now(),
+        lastOnline: Date.now(),
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
       res.json({
