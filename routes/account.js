@@ -45,10 +45,19 @@ router.get('/:username', async (req, res) => {
     const lastOnlineNumber = account.lastOnline;
     
     const currentTime = Date.now();
-    if (currentTime - lastOnlineNumber > 86400000 ) {
+    if (currentTime - lastOnlineNumber >  31536000000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24/365).toString().split('.')[0])
+      parsedLastOnline = number + ` year${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber >  2628000000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24/30).toString().split('.')[0])
+      parsedLastOnline = number + ` month${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 604800000 ) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24/7).toString().split('.')[0])
+      parsedLastOnline = number + ` week${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 86400000 ) {
       number = (((currentTime - lastOnlineNumber)/1000/60/60/24).toString().split('.')[0])
       parsedLastOnline = number + ` day${number == 1 ? '' : 's'} ago`;
-    }  else if (currentTime - lastOnlineNumber > 3600000) {
+    } else if (currentTime - lastOnlineNumber > 3600000) {
       number = (((currentTime - lastOnlineNumber)/1000/60/60).toString().split('.')[0])
       parsedLastOnline = number  + ` hour${number == 1 ? '' : 's'} ago`;
     } else if (currentTime - lastOnlineNumber > 60000) {
