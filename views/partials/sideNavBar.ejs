@@ -3,17 +3,17 @@
   <div id="logoutBtn">
     <i class="fas fa-sign-out-alt d"></i>
   </div>
-  <div id="conversationsBtn" class="d-back">
+  <div id="conversationsBtn" class="d-back sb-i">
     <i class="fas fa-comment b"></i>
     <i id="messageNotiIcon" class="fas fa-circle"></i>
   </div>
-  <div id="searchBtn" class="d-back">
+  <div id="searchBtn" class="d-back sb-i">
     <i class="fas fa-search b"></i>
   </div>
-  <div id="homeBtn" class="d-back">
+  <div id="homeBtn" class="d-back sb-i">
     <i class="fas fa-home b"></i>
   </div>
-  <div id="createBtn" class="d-back">
+  <div id="createBtn" class="d-back sb-i">
     <i class="fas fa-plus b"></i>
   </div>
 
@@ -48,23 +48,59 @@
     z-index: 10;
   }
 
-  #searchBtn,
-  #homeBtn,
-  #createBtn,
-  #conversationsBtn,
+  .sb-i,
   .fill-space {
-    height: 50px;
-    width: 50px;
-    margin: 10px 0;
+    height: 45px;
+    width: 45px;
+    margin: 10px 2.5px;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
     position: relative;
+    border-radius: 50%;
   }
 
   .fill-space  {
     cursor: default;
+  }
+
+  #conversationsBtn::after {
+      content: 'Messages';
+  }
+  #searchBtn::after {
+      content: 'Search';
+  }
+  #homeBtn::after {
+      content: 'Home';
+  }
+  #createBtn::after {
+      content: 'Create';
+  }
+
+  .sb-i::after {
+    clip-path: circle(26% at 0 50%);
+    transition: clip-path 0.5s ease;
+    pointer-events: none;
+
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    height: 100%;
+    width: fit-content;
+    font-size: 20px;
+    background-color: inherit;
+    padding-left: 35px;
+    padding-right: 10px;
+    border-radius: 0 9999px 9999px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .sb-i:hover::after {
+    clip-path: circle(75%);
+    pointer-events: all;
   }
 
   #profileBtn {

@@ -44,7 +44,7 @@ router.post('/checksite', async (req, res) => {
             const encoded = Buffer.from(newURL, 'binary').toString('base64')
             res.json({
                 status: 'success',
-                fullURL: `https://proxy-socialent.herokuapp.com/prox/?url=${encoded}`,
+                fullURL: `http://proxy-socialent.herokuapp.com/prox/?url=${encoded}`,
             });
         }
     } catch(err) {
