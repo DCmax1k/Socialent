@@ -94,9 +94,6 @@ app.use('/agreements', agreementsRoute);
 const forgotpasswordRoute = require('./routes/forgotpassword');
 app.use('/forgotpassword', forgotpasswordRoute);
 
-const proxyRoute = require('./routes/proxy');
-app.use('/proxy', proxyRoute);
-
 // Testing purposes
 
 // app.get('/test', async (req, res) => {

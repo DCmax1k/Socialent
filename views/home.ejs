@@ -38,9 +38,6 @@
       </div> -->
 
     </div>
-    <% if (user.proxy  || user.rank === 'admin' || user.rank === 'owner') { %>
-      <%- include('partials/proxy') %>
-    <% } %>
     <!-- Start of posts -->
     <div class="all-posts">
       <% postsFollowing.reverse().forEach(post => { %>

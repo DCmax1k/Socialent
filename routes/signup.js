@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const ip = require('ip');
 
 // const User = require('../models/User');
 
@@ -45,6 +46,7 @@ router.post('/', async (req, res) => {
         warnings: [],
         dateJoined: Date.now(),
         lastOnline: Date.now(),
+        ips: [ip.address()],
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
       res.json({

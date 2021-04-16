@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const ip = require('ip');
 
 // const User = require('../models/User');
 // const Post = require('../models/Post');
@@ -12,6 +13,13 @@ router.get('/', async (req, res) => {
     if (req.query.k) {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
+      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      const currentIP = ip.address();
+      if (!user.ips ) {
+        await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [currentIP]);
+      } else if (!user.ips.includes(currentIP)) {
+        await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [...user.ips, currentIP]);
+      }
       // const posts = await Post.find({active: true});
       const posts = (await db.collection('posts').where('active', '==', true).get()).docs.map(doc => doc.data());
       const postsFollowing = [];
