@@ -38,6 +38,9 @@
       </div> -->
 
     </div>
+
+    <a name="Auto Click - Socialent"class="d-back" style=" text-decoration: none; position: absolute; top: 10px; right: 10px; display: flex; justify-content: center; align-items: center; height: 30px; width: 30px;  border-radius: 50%;" href="javascript:(function() {let active = false;let currEle;document.body.addEventListener('mouseover', (e) => {currEle = e.target;});document.addEventListener('keyup', (e) => {if (e.key === '=') {active = true;} else if (e.key === '-') {active = false;}});setInterval(() => {if (active && currEle) {currEle.click();}}, 1)})()"><div style="display: none;">Auto Clicker - Socialent</div><i alt="Auto Clicker - Socialent" style="color: black; text-decoration: none;" class="fas fa-mouse-pointer"></i></a>
+
     <!-- Start of posts -->
     <div class="all-posts">
       <% postsFollowing.reverse().forEach(post => { %>
