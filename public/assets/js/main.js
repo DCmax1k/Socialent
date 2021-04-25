@@ -37,7 +37,7 @@ const lookupUsername = async (receiverID) => {
     return resJSON;
 }
 
-// REDIRECT to SECRURE site
-if (location.protocol === 'http:' && location.host.includes('socialent')) {
-    location.protocol = 'https:';
-}
+// // REDIRECT to SECRURE site
+// if (location.protocol === 'http:' && location.host.includes('socialent')) {
+//     location.protocol = 'https:';
+// }
