@@ -10,6 +10,50 @@
   left: 0;
 }
 
+#bookmarkScripts {
+  padding: 10px;
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  height: fit-content;
+  width: fit-content;
+  background-color: rgb(73, 73, 73);
+  border-radius: 20px;
+  color: rgb(180, 180, 180);
+
+  transition: clip-path 0.3s ease;
+  clip-path: circle(10% at 88.5% 29%);
+}
+
+#bookmarkScripts.active {
+  clip-path: circle(120% at 88.5% 29%);
+}
+
+#bookmarkScriptsIcon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 15px;
+  color: white;
+  cursor: pointer;
+}
+
+#bookmarkIcons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#bookmarkIcons > a {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 #warnAlerts {
   width: 50%;
   height: fit-content;
