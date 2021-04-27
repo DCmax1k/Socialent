@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
-const ip = require('ip');
+const publicIp = require('public-ip');
 
 // const User = require('../models/User');
 
@@ -29,6 +29,7 @@ router.post('/', async (req, res) => {
 //       });
 //       const saveUser = await createUser.save();
       const newID = Date.now().toString(16) + Math.random().toString(16).slice(2);
+      const currentIP = await publicIp.v4();
       const createUserData = {
         _id: newID,
         emailData: { email: req.body.email, verified: false },
@@ -46,7 +47,7 @@ router.post('/', async (req, res) => {
         warnings: [],
         dateJoined: Date.now(),
         lastOnline: Date.now(),
-        ips: [ip.address()],
+        ips: [currentIP],
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
       res.json({

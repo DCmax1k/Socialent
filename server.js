@@ -99,9 +99,7 @@ app.use('/forgotpassword', forgotpasswordRoute);
 // app.get('/test', async (req, res) => {
 //   try {
 //     (await db.collection('users').get()).docs.forEach( async doc => {
-//       if (doc.data().lastOnline == 1618191223440 || doc.data().lastOnline == 1618191223440 || doc.data().lastOnline == 1618191223441 || doc.data().lastOnline == 1618191223442 || doc.data().lastOnline == 1618191223443 || doc.data().lastOnline == 1618191223444 || doc.data().lastOnline == 1618191223445 || doc.data().lastOnline == 1618191223446 || doc.data().lastOnline == 1618191223447 || doc.data().lastOnline == 1618191223448) {
-//         await doc.ref.update('lastOnline', 1302831223441);
-//       }
+//       await doc.ref.update('ips', []);
 //     });
 
 //     res.send('done');
