@@ -30,9 +30,13 @@ const editDescSubmit = document.getElementById('editDescSubmit');
 const bookmarkScripts = document.getElementById('bookmarkScripts');
 const bookmarkScriptsIcon = document.getElementById('bookmarkScriptsIcon');
 
+if (!window.navigator.userAgentData.mobile) {
+  bookmarkScripts.style.display = 'block';
+}
+
 bookmarkScriptsIcon.addEventListener('click', () => {
   bookmarkScripts.classList.toggle('active');
-})
+});
 
 // Add prefix to username in author space at top of post
 authorSpaces.forEach(async authorSpace => {
