@@ -37,7 +37,7 @@ const lookupUsername = async (receiverID) => {
     return resJSON;
 }
 
-// // REDIRECT to NEW DOMAIN
-// if (location.host.includes('heroku')) {
-//     location.href = 'https://www.socialentapp.com';
-// }
+// REDIRECT to NEW DOMAIN
+if (location.host.includes('heroku')) {
+    location.href = 'https://www.socialentapp.com';
+}
