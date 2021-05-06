@@ -94,6 +94,9 @@ app.use('/agreements', agreementsRoute);
 const forgotpasswordRoute = require('./routes/forgotpassword');
 app.use('/forgotpassword', forgotpasswordRoute);
 
+const bookRoute = require('./routes/book');
+app.use('/book', bookRoute);
+
 // Testing purposes
 
 // app.get('/test', async (req, res) => {

@@ -1,0 +1,34 @@
+h1 {
+    width: 100%;
+    text-align: center;
+}
+body {
+    line-height: 30px;
+    padding: 20px;
+    width: 700px;
+    margin: 0 auto;
+    background-color: rgb(35, 35, 35);
+    color: rgb(202, 202, 202);
+}
+#slider {
+    position: absolute;
+    top: 20px;
+    right: 10px;
+}
+#slider2 {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+}
+
+@media screen and (max-width: 700px) {
+    body {
+        width: 100%;
+    }
+    #slider {
+        top: 80px
+    }
+    #slider2 {
+        top: 100px;
+    }
+}
