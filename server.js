@@ -63,6 +63,10 @@ app.post('/deviceverification', async (req, res) => {
   }
 });
 
+app.get('/proxy', (req, res) => {
+  res.render('proxy');
+})
+
 // Import Routes
 const signupRoute = require('./routes/signup');
 app.use('/signup', signupRoute);
