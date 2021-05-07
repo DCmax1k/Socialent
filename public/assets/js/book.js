@@ -1,5 +1,12 @@
 const slider = document.getElementById('slider');
 const body = document.querySelector('body');
+const openChapters = document.getElementById('openChapters');
+const tbl = document.querySelector('.tbl');
+
+
+openChapters.addEventListener('click', () => {
+    tbl.classList.toggle('active');
+})
 
 let bgC = 255;
 slider.addEventListener('input', (e) => {
