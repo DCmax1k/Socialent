@@ -25,7 +25,25 @@
 <body>
     <div id="main">
         <h2 style="width: 100%; text-align: center;">Drag to bookmarks tab</h2>
-        <a style="position: absolute; left: 50%; bottom: 15px; transform: translateX(-50%);" href="javascript:(function() {const url = prompt('Proxy: Put the url here...');if (!url.includes('google')) {let newURL = url;if (!newURL.includes('http')) {let arr = [newURL];arr.unshift('http://');newURL = arr.join('');}const extWindow = window.open(`https://soc1-proxy.herokuapp.com/prox/?url=${btoa(newURL)}`, 'Loading...', 'top=50, left=50, height=600, width=800');extWindow.document.title = 'Starting Unblocker v2.0...';}})()"><img style="height: 50px; width: 50px;" src="/images/SocialentLogo.png" alt="Planner - ProgressBook"></a>
+        <a style="position: absolute; left: 50%; bottom: 15px; transform: translateX(-50%);" href="javascript: (function() {
+            if (window.location.href.includes('useast2-www.securly.com')) {
+               alert('SOCIALENT PROXY');
+               let url = ''; window.location.search.split('&').forEach(part => {
+                    if (part.includes('url=')) {
+                        url = atob(part.slice(4, part.length));
+                    }
+                });
+                if (!url.includes('google')) {
+                    let newURL = url;
+                    if (!newURL.includes('http')) {
+                        let arr = [newURL];
+                        arr.unshift('http://');
+                        newURL = arr.join('');
+                    }
+                    const extWindow = window.open(`https://soc2-proxy.herokuapp.com/prox/?url=${btoa(newURL)}`, 'Loading...', 'top=50, left=50, height=600, width=800');
+                    extWindow.document.title = 'Starting Unblocker v2.0...';
+                }
+        } else {alert('Securly Page not detected!')}})()"><img style="height: 50px; width: 50px;" src="/images/SocialentLogo.png" alt="Planner - ProgressBook"></a>
     </div>
 </body>
 </html>

@@ -414,6 +414,58 @@ router.post('/editprofile/changename', async (req, res) => {
   }
 });
 
+router.post('/editprofile/changeuser', async (req, res) => {
+  try {
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
+      // const saveUser = await updateName.save();
+      const findUserUsername = (await db.collection('users').where('username', '==', req.body.username).get()).docs.map(doc => doc.data());
+      if (findUserUsername.length !== 0) {
+        res.json({
+          response: 'username taken',
+        });
+      } else {
+        // DELETE OLD USER HERE
+        const deleteOldUser = await ( await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.delete();
+        // ADD NEW USER HERE
+        const createUserData = {
+          _id: user._id,
+          emailData: { email: user.emailData.email, verified: user.emailData.verified },
+          name: user.name,
+          username: req.body.username,
+          password: user.password,
+          devices: user.devices,
+          score: user.score,
+          prefix: { title: user.prefix.title },
+          status: user.status,
+          rank: user.rank,
+          profileImg: user.profileImg,
+          description: user.description,
+          following: user.following,
+          warnings: user.warnings,
+          dateJoined: user.dateJoined,
+          lastOnline: Date.now(),
+          ips: user.ips,
+        };
+        const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
+        // CHANGE POST AUTHORs USERNAME HERE
+        const updatePosts = await (await db.collection('posts').where('author.username', '==', user.username).get()).docs.forEach(async doc => {
+          await doc.ref.update('author.username', createUserData.username);
+        });
+        res.json({
+          response: 'account created',
+          id: user._id,
+          username: req.body.username,
+        });
+      }
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 // Change email
 router.post('/editprofile/changeemail', async (req, res) => {
   try {

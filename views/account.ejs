@@ -34,6 +34,20 @@
       <i id="closeEditProfileCont" class="fas fa-times"></i>
       <h1>Edit Profile</h1>
       <div>
+        <div id="changeUserCont">
+          <i id="selectUser" class="pencil c fas fa-pencil-alt"></i>
+          <i
+            id="submitUser"
+            class="pencil c fas fa-check"
+            style="display: none"
+          ></i>
+          <input
+            id="changeUserInput"
+            class="editProfileInputBlend"
+            type="text"
+            value="<%= user.username %>"
+          />
+        </div>
         <div id="changeNameCont">
           <i id="selectName" class="pencil c fas fa-pencil-alt"></i>
           <i

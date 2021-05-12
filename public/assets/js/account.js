@@ -2,11 +2,14 @@ const accountUsername = window.location.href.split('/')[4].split('?')[0];
 const navBarProfilePic = document.querySelector('#profileBtn > img');
 const loginBtn = document.getElementById('loginBtn');
 const changeNameInput = document.getElementById('changeNameInput');
+const changeUserInput = document.getElementById('changeUserInput');
 const changeEmailInput = document.getElementById('changeEmailInput');
 const selectName = document.getElementById('selectName');
 const selectEmail = document.getElementById('selectEmail');
+const selectUser = document.getElementById('selectUser');
 const submitName = document.getElementById('submitName');
 const submitEmail = document.getElementById('submitEmail');
+const submitUser = document.getElementById('submitUser');
 const submitChangePassword = document.getElementById('submitChangePassword');
 const currentPassword = document.getElementById('currentPassword');
 const newPassword = document.getElementById('newPassword');
@@ -323,12 +326,12 @@ if (editProfileBtn) {
   // Change Password
 
   currentPassword.addEventListener('keyup', (e) => {
-    if (e.keyCode == 13 || e.which == 13) {
+    if (e.key == 'Enter') {
       submitChangePassword.click();
     }
   });
   newPassword.addEventListener('keyup', (e) => {
-    if (e.keyCode == 13 || e.which == 13) {
+    if (e.key == 'Enter') {
       submitChangePassword.click();
     }
   });
@@ -376,6 +379,12 @@ if (editProfileBtn) {
     submitName.style.display = 'inline-block';
     nameChanged = true;
   });
+  let userChanged = false;
+  changeUserInput.addEventListener('input', () => {
+    selectUser.style.display = 'none';
+    submitUser.style.display = 'inline-block';
+    userChanged = true;
+  });
 
   let emailChanged = false;
   changeEmailInput.addEventListener('input', () => {
@@ -389,6 +398,14 @@ if (editProfileBtn) {
     if (e.key == 'Enter') {
       if (nameChanged) {
         submitName.click();
+      }
+    }
+  });
+
+  changeUserInput.addEventListener('keyup', (e) => {
+    if (e.key == 'Enter') {
+      if (userChanged) {
+        submitUser.click();
       }
     }
   });
@@ -419,13 +436,42 @@ if (editProfileBtn) {
       });
       const resJSON = await response.json();
       changeNameInput.value = nameValue;
-      if ((resJSON.status = 'success')) {
+      if ((resJSON.status == 'success')) {
         submitName.style.color = 'green';
       }
     } else {
       submitName.style.color = 'red';
     }
   });
+    // Change Username
+    submitUser.addEventListener('click', async () => {
+      if (changeUserInput.value) {
+        const userValue = changeUserInput.value;
+        changeUserInput.value = 'Loading...';
+        const response = await fetch('/account/editprofile/changeuser', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userID,
+            username: userValue,
+            device: window.navigator.userAgent,
+          }),
+        });
+        const resJSON = await response.json();
+        changeUserInput.value = userValue;
+        if ((resJSON.response == 'account created')) {
+          submitName.style.color = 'green';
+          window.location.pathname = `/account/${userValue}`;
+        } else if (resJSON.response == 'username taken') {
+          submitUser.style.color = 'red';
+          myAlert('Username taken!');
+        }
+      } else {
+        submitUser.style.color = 'red';
+      }
+    });
 
   // Change email
   submitEmail.addEventListener('click', async () => {
