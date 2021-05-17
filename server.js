@@ -104,15 +104,16 @@ app.use('/book', bookRoute);
 // Testing purposes
 
 // app.get('/test', async (req, res) => {
-//   try {
-//     (await db.collection('users').get()).docs.forEach( async doc => {
-//       await doc.ref.update('ips', []);
-//     });
+//   res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
+//   // try {
+//   //   (await db.collection('users').get()).docs.forEach( async doc => {
+//   //     await doc.ref.update('ips', []);
+//   //   });
 
-//     res.send('done');
-//   } catch(err) {
-//     console.error(err);
-//   }
+//   //   res.send('done');
+//   // } catch(err) {
+//   //   console.error(err);
+//   // }
 // });
 
 
