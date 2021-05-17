@@ -41,6 +41,7 @@
   border-radius: 15px;
   min-height: 600px;
   overflow-x: hidden;
+  overflow-y: visible;
 }
 
 #bodyCont * {
