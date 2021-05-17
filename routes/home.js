@@ -225,8 +225,11 @@ router.post('/promote', async (req, res) => {
           // const saveUser = await promoteUser.save();
           // const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': 'Admin' }, { useFindAndModify: false });
           // const savePrefix = await setPrefix.save();
-          const promoteUser = await (await db.collection('users').where('_id', '==', user_id).get()).docs[0].ref.update('rank', 'admin');
-          const setPrefix = await (await db.collection('users').where('_id', '==', user_id).get()).docs[0].ref.update('prefix.title', 'Admin');
+          const promoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'admin');
+          if (!user.prefix.title) {
+            const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', 'Admin');  
+          }
+          
           res.json({
             status: 'success',
             username: user.username,
@@ -237,8 +240,11 @@ router.post('/promote', async (req, res) => {
           // const saveUser = await demoteUser.save();
           // const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': '' }, { useFindAndModify: false });
           // const savePrefix = await setPrefix.save();
-          const demoteUser = await (await db.collection('users').where('_id', '==', user_id).get()).docs[0].ref.update('rank', 'user');
-          const setPrefix = await (await db.collection('users').where('_id', '==', user_id).get()).docs[0].ref.update('prefix.title', '');
+          const demoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'user');
+          if (user.prefix.title == 'Admin') {
+            const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', '');  
+          }
+          
           res.json({
             status: 'success',
             username: user.username,
