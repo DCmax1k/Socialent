@@ -39,5 +39,5 @@ const lookupUsername = async (receiverID) => {
 
 // REDIRECT to NEW DOMAIN
 if (location.host.includes('heroku')) {
-    location.href = 'https://www.socialentapp.com';
+    location.host = 'www.socialentapp.com';
 }

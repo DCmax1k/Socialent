@@ -148,7 +148,7 @@
 
               <div id="showFollowers">
                 <% accountsFollowers.forEach(acc => { %>
-                  <a class="seeAccountsAcc" href="/account/<%= acc.username %><%= user ? `?k=${user._id}` : '' %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><p class="prefix<% acc.rank === 'owner' ? 'owner' : acc.rank === 'admin' ? 'admin' : '' %>"><%= acc.prefix.title %></p><%= acc.username %></a>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %><%= user ? `?k=${user._id}` : '' %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
                 <% }) %>
               </div>
             </div>
@@ -159,7 +159,7 @@
 
               <div id="showFollowing">
                 <% accountsFollowing.forEach(acc => { %>
-                  <a class="seeAccountsAcc" href="/account/<%= acc.username %><%= user ? `?k=${user._id}` : '' %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img"><p class="prefix<% acc.rank === 'owner' ? 'owner' : acc.rank === 'admin' ? 'admin' : '' %>"><%= acc.prefix.title %></p><%= acc.username %></a>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %><%= user ? `?k=${user._id}` : '' %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
                 <% }) %>
               </div>
             </div>

@@ -32,7 +32,7 @@ const db = admin.firestore();
 // const Conversation = require('./models/Conversation');
 
 // Middlewares
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(__dirname + '/public'));
 
@@ -101,10 +101,10 @@ app.use('/forgotpassword', forgotpasswordRoute);
 const bookRoute = require('./routes/book');
 app.use('/book', bookRoute);
 
-// Testing purposes
-
+// // Testing purposes
 // app.get('/test', async (req, res) => {
-//   res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
+//   res.render('test');
+//   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
 //   // try {
 //   //   (await db.collection('users').get()).docs.forEach( async doc => {
 //   //     await doc.ref.update('ips', []);
@@ -115,6 +115,9 @@ app.use('/book', bookRoute);
 //   //   console.error(err);
 //   // }
 // });
+// app.post('/test', async (req, res) => {
+//   console.log(req.body);
+// })
 
 
 // DB connection
