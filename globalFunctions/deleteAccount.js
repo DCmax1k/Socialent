@@ -1,6 +1,3 @@
-const User = require('../models/User');
-const Conversation = require('../models/Conversation');
-const Post = require('../models/Post');
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 
