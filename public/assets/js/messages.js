@@ -655,6 +655,15 @@ editMessages.addEventListener('click', () => {
 const deleteText = async (textIndex) => {
     checkConversationsLoading = true;
     try {
+        editMessages.style.visibility = 'hidden';
+        // Visually instant delete
+        const allTexts = document.querySelectorAll('.text > i');
+        allTexts.forEach(text => {
+            if (text.getAttribute('data-text-index') == textIndex) {
+                text.parentNode.parentNode.remove();
+            }
+        })
+        
         const response = await fetch('/messages/deletetext', {
             method: 'POST',
             headers: {
@@ -668,6 +677,7 @@ const deleteText = async (textIndex) => {
             }),
         });
         const resJSON = await response.json();
+        editMessages.style.visibility = 'visible';
         checkConversationsLoading = false;
         if (resJSON.status === 'unseccessful') {
             window.location.href = '/login';
