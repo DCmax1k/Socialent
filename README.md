@@ -1,4 +1,4 @@
-[Project Link](https://socialent-app.herokuapp.com/)
+[Project Link](https://www.socialentapp.com/)
 
 ## About the Project!
 
