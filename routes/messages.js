@@ -3,12 +3,13 @@ const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const jwt = require('jsonwebtoken');
 
 // const Conversation = require('../models/Conversation');
 // const User = require('../models/User');
 
 // GET Route
-router.get('/', async (req, res) => {
+router.get('/', authToken, async (req, res) => {
     try {
         if (req.query.k) {
             // const user = await User.findById(req.query.k);
@@ -34,6 +35,16 @@ router.get('/', async (req, res) => {
     }
     
 });
+
+function authToken(req, res, next) {
+    const token = req.cookies['auth-token'];
+    if (token == null) return res.redirect('/login');
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+        if (err) return res.redirect('/login');
+        req.user = user;
+        next();
+    })
+}
 
 // Load Conversation
 router.post('/loadconversation', async (req, res) => {

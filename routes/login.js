@@ -41,7 +41,7 @@ router.post('/', async (req, res) => {
       // Set Last Online
       const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
       // Set JSON Web Token
-      const accessToken = jwt.sign({_id: findUsername._id}, process.env.ACCESS_SECRET);
+      const accessToken = jwt.sign({_id: findUsername._id}, process.env.ACCESS_SECRET, { expiresIn: '1d'});
       res.cookie('auth-token', accessToken).json({
         response: 'logged in',
         id: findUsername._id,

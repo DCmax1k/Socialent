@@ -67,7 +67,7 @@ if (playBtn && video) {
 // Share Btn
 shareBtn.addEventListener('click', () => {
   const node = document.createElement('textarea');
-  node.value = `${domain}/post/${postID}`;
+  node.value = `${window.location.host}/post/${postID}`;
   document.body.appendChild(node);
   node.select();
   document.execCommand('copy');

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const jwt = require('jsonwebtoken');
 
 // const Post = require('../models/Post');
 // const User = require('../models/User');
@@ -14,8 +15,16 @@ router.get('/:post', async (req, res) => {
     if (post.active) {
       // const account = await Post.findById(post.author._id);
       const account = (await db.collection('users').where('_id', '==', post.author._id).get()).docs[0].data();
+      const token = req.cookies['auth-token'];
       if (req.query.k) {
         // const user = await User.findById(req.query.k);
+        let passed = true;
+        if (token == null) return res.redirect('/login');
+        jwt.verify(token, process.env.ACCESS_SECRET, (err, us) => {
+          if (err) return passed = false;
+          if (us._id != req.query.k) return passed = false;
+        });
+        if (passed = false) return res.redirect('/login');
         const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
         if (user.status === 'online') {
           let likedpost = false;
@@ -27,7 +36,12 @@ router.get('/:post', async (req, res) => {
           res.redirect('/login');
         }
       } else {
-        res.render('post', { post, account, loggedin: false });
+        if (token == null) return res.render('post', { post, account, loggedin: false });
+        let passed = true;
+        jwt.verify(token, process.env.ACCESS_SECRET, (err, us) => {
+          if (err) return res.render('post', { post, account, loggedin: false });
+          return res.redirect(`/post/${req.params.post}?k=${us._id}`);
+        });
       }  
     } else {
       res.send('This post is no longer available!')

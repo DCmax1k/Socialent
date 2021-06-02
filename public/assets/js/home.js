@@ -286,7 +286,7 @@ shareBtns.forEach((shareBtn) => {
       ) {
         const postID = copyPost.getAttribute('data-post-id');
         const node = document.createElement('textarea');
-        node.value = `${domain}/post/${postID}`;
+        node.value = `${window.location.hostname}/post/${postID}`;
         document.body.appendChild(node);
         node.select();
         document.execCommand('copy');

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require("jsonwebtoken");
 // const nodemailer = require('nodemailer');
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
@@ -21,6 +22,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 // const Post = require('../models/Post');
 
 const deleteUser = require('../globalFunctions/deleteAccount');
+const { render } = require('ejs');
 
 // Get Route
 router.get('/:username', async (req, res) => {
@@ -79,14 +81,24 @@ router.get('/:username', async (req, res) => {
     //     accountsFollowers.push(allUser._id);
     //   }
     // });
+    const token = req.cookies['auth-token'];
     if (req.query.k) {
       // const user = await User.findById(req.query.k);
+
       const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
       if (user.status === 'online') {
+        if (token == null) return res.redirect('/login');
+        let passed = true;
+        jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
+          if (err) return passed = false;;
+          if (user1._id != req.query.k) return passed = false;
+        });
+        if (!passed) return res.redirect('/login');
+
         // Set Last Online
         const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
         
-        res.render('account', {
+        return res.render('account', {
           user,
           account,
           accountsFollowers,
@@ -96,10 +108,28 @@ router.get('/:username', async (req, res) => {
           parsedLastOnline,
         });
       } else {
-        res.redirect('/login');
+        return res.redirect('/login');
       }
     } else {
-      res.render('account', {
+      if (token != null) {
+        jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
+          if (err) {
+            return res.render('account', {
+              user: null,
+              account,
+              accountsFollowers,
+              accountsFollowing,
+              accountsPosts,
+              loggedin: false,
+              parsedLastOnline,
+            });
+          }
+          return res.redirect(`/account/${account.username}?k=${user1._id}`)
+        });
+        return;
+        
+      }
+      return res.render('account', {
         user: null,
         account,
         accountsFollowers,

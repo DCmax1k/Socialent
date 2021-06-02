@@ -6,7 +6,7 @@ const db = firebase_admin.firestore();
 // const User = require('../models/User');
 
 // GET route
-router.get('/', async (req, res) => {
+router.get('/', authToken, async (req, res) => {
   try {
     if (req.query.k) {
       // const user = await User.findById(req.query.k);
@@ -21,6 +21,16 @@ router.get('/', async (req, res) => {
     console.error(err);
   }
 });
+
+function authToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.redirect('/login');
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+      if (err) return res.redirect('/login');
+      req.user = user;
+      next();
+  })
+}
 
 // Searching for account route
 router.post('/', async (req, res) => {
