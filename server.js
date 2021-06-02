@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 // const mongoose = require('mongoose');
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
+const cookieParser = require('cookie-parser');
+const publicIp = require('public-ip');
 
 const admin = require("firebase-admin");
 
@@ -35,13 +38,15 @@ const db = admin.firestore();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(__dirname + '/public'));
+app.use(cookieParser());
 
 // View Engine
 app.set('view engine', 'ejs');
 
 // Index Route
-app.get('/', (req, res) => {
-  res.render('index');
+app.get('/', authHomeToken, async (req, res) => {
+  const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+  res.redirect(`/home?k=${user._id}`);
 });
 
 // Device verification
@@ -65,7 +70,17 @@ app.post('/deviceverification', async (req, res) => {
 
 app.get('/proxy', (req, res) => {
   res.render('proxy');
-})
+});
+
+function authHomeToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.render('index');
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.render('index');
+    req.user = user;
+    next();
+  })
+}
 
 // Import Routes
 const signupRoute = require('./routes/signup');
@@ -111,10 +126,7 @@ app.use('/forgotpassword', forgotpasswordRoute);
 //   // } catch(err) {
 //   //   console.error(err);
 //   // }
-// });
-// app.post('/test', async (req, res) => {
-//   console.log(req.body);
-// })
+// });  
 
 
 // DB connection

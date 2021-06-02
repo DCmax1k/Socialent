@@ -322,7 +322,7 @@ router.post('/logout', async (req, res) => {
       // const changeStatus = await User.findByIdAndUpdate(user._id,{$set: { status: 'offline' },},{ useFindAndModify: false });
       // const save = await changeStatus.save();
       const changeStatus = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('status', 'offline');
-      res.json({
+      res.clearCookie('auth-token').json({
         status: 'logged out',
       });
     }

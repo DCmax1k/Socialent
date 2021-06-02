@@ -1,13 +1,17 @@
+const { render } = require('ejs');
 const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const jwt = require('jsonwebtoken');
+
 
 // const User = require('../models/User');
 
 // Login page
-router.get('/', async (req, res) => {
-  res.render('login');
+router.get('/', authLoginToken, async (req, res) => {
+  const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+  res.redirect(`/home?k=${user._id}`);
 });
 
 // Login request
@@ -36,7 +40,9 @@ router.post('/', async (req, res) => {
       }
       // Set Last Online
       const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
-      res.json({
+      // Set JSON Web Token
+      const accessToken = jwt.sign({_id: findUsername._id}, process.env.ACCESS_SECRET);
+      res.cookie('auth-token', accessToken).json({
         response: 'logged in',
         id: findUsername._id,
       });
@@ -51,5 +57,15 @@ router.post('/', async (req, res) => {
     });
   }
 });
+
+function authLoginToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.render('login');
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.render('login');
+    req.user = user;
+    next();
+  })
+}
 
 module.exports = router;
