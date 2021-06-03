@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const jwt = require('jsonwebtoken');
 
 // const User = require('../models/User');
 
