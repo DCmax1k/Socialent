@@ -39,15 +39,19 @@ searchInput.addEventListener('input', async (e) => {
             `openURL('/account/${account.username}?k=${userID}')`
           );
           let prefixHTML = ``;
-            if (account.prefix.title) {
-                if (account.rank === 'owner') {
-                  prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
-                } else if (account.rank === 'admin') {
-                  prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
-                } else {
-                  prefixHTML = `<p class="prefix">[${account.prefix.title}]</p>`;
-                }
-            }
+          if (account.prefix.title) {
+              if (account.rank === 'owner') {
+                prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
+              } else if (account.rank === 'admin') {
+                prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
+              } else {
+                prefixHTML = `<p class="prefix">[${account.prefix.title}]</p>`;
+              }
+          }
+          let verifiedHTML = '';
+          if (account.verified) {
+            verifiedHTML = `<img class="verified" height: 15px; width: 15px;" src="/images/verified.svg" alt="verifiedIcon"></img>`
+          }
           node.innerHTML = `
             <div class="profileImagePlace">
                 <img src="${
@@ -57,7 +61,7 @@ searchInput.addEventListener('input', async (e) => {
               }" alt="Profile Image" />
             </div>
             <div class="right-side">
-                <span class="username">${prefixHTML} ${account.username}</span>
+                <span class="username">${prefixHTML} ${account.username} ${verifiedHTML}</span>
                 <span class="name">${account.name}</span>
             </div>
               `;

@@ -48,7 +48,7 @@ authorSpaces.forEach(async authorSpace => {
       node.innerHTML = `<p class="prefix">[${authorUser.prefix.title}]</p>&nbsp;`;
     }
   }
-  authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 1]);
+  authorSpace.insertBefore(node, authorSpace.childNodes[2]);
 });
 
 // Admin delete post

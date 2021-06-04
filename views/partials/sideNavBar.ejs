@@ -185,11 +185,17 @@
   const conversationsBtn = document.getElementById('conversationsBtn');
   const homeBtn = document.getElementById('homeBtn');
   const createBtn = document.getElementById('createBtn');
-  const userID = window.location.href.split('=')[1];
   const profileBtn = document.getElementById('profileBtn');
   const openMenu = document.getElementById('openMenu');
   const sideNavBar = document.getElementById('sideNavBar');
   const messageNotiIcon = document.getElementById('messageNotiIcon');
+
+  let userID = '';
+  document.cookie.split(';').forEach(el => {
+      if (el.includes('auth-token')) {
+          userID = JSON.parse(atob(el.split('=')[1].split('.')[1]))._id;
+      }
+  });
 
   const checkMessageNotis = async () => {
     if (!document.hidden) {
@@ -240,21 +246,21 @@
   });
 
   conversationsBtn.addEventListener('click', () => {
-    window.location.href = '/messages?k=<%= user._id %>';
+    window.location.href = '/messages';
   })
 
   searchBtn.addEventListener('click', () => {
-    window.location.href = '/search?k=<%= user._id %>';
+    window.location.href = '/search';
   });
   homeBtn.addEventListener('click', () => {
-    window.location.href = '/home?k=<%= user._id %>';
+    window.location.href = '/home';
   });
   createBtn.addEventListener('click', () => {
-    window.location.href = '/create?k=<%= user._id %>';
+    window.location.href = '/create';
   });
 
   profileBtn.addEventListener('click', () => {
-    window.location.href = `/account/<%= user.username %>?k=<%= user._id %>`;
+    window.location.href = `/account/<%= user.username %>`;
   });
 
   // Logout

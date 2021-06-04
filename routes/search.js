@@ -9,15 +9,13 @@ const jwt = require('jsonwebtoken');
 // GET route
 router.get('/', authToken, async (req, res) => {
   try {
-    if (req.query.k) {
       // const user = await User.findById(req.query.k);
-      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
+      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       if (user.status === 'online') {
         res.render('search', { user });
       } else {
         res.redirect('/login');
       }
-    }
   } catch (err) {
     console.error(err);
   }

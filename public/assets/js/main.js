@@ -1,6 +1,7 @@
-const domain = 'https://socialent-app.herokuapp.com';
 
-const customAlert = document.getElementById('customAlert')
+const domain = 'https://socialentapp.com';
+
+const customAlert = document.getElementById('customAlert');
 const customAlertMessage = document.querySelector('#customAlert h1');
 const customAlertOk = document.querySelector('#customAlert button');
 
@@ -16,7 +17,7 @@ const myAlert = (message) => {
     }
     customAlertOk.addEventListener('click', removeAlert);
     document.addEventListener('keyup', (e) => {
-        if (e.keyCode == 13) {
+        if (e.key == 'Enter') {
             removeAlert();
         }
     })

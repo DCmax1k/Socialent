@@ -16,32 +16,23 @@ router.get('/:post', async (req, res) => {
       // const account = await Post.findById(post.author._id);
       const account = (await db.collection('users').where('_id', '==', post.author._id).get()).docs[0].data();
       const token = req.cookies['auth-token'];
-      if (req.query.k) {
+      let passed = true;
+      let usersID = '';
+      if (token == null) passed = false;
+      jwt.verify(token, process.env.ACCESS_SECRET, (err, us) => {
+        if (err) return passed = false;
+        usersID = us._id;
+      });
+      if (passed) { 
         // const user = await User.findById(req.query.k);
-        let passed = true;
-        if (token == null) return res.redirect('/login');
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, us) => {
-          if (err) return passed = false;
-          if (us._id != req.query.k) return passed = false;
-        });
-        if (passed = false) return res.redirect('/login');
-        const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
-        if (user.status === 'online') {
-          let likedpost = false;
-          post.likes.includes(user._id)
-            ? (likedpost = true)
-            : (likedpost = false);
-          res.render('post', { post, user, account, likedpost, loggedin: true });
-        } else {
-          res.redirect('/login');
-        }
+        const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
+        let likedpost = false;
+        post.likes.includes(user._id)
+          ? (likedpost = true)
+          : (likedpost = false);
+        res.render('post', { post, user, account, likedpost, loggedin: true });
       } else {
-        if (token == null) return res.render('post', { post, account, loggedin: false });
-        let passed = true;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, us) => {
-          if (err) return res.render('post', { post, account, loggedin: false });
-          return res.redirect(`/post/${req.params.post}?k=${us._id}`);
-        });
+        return res.render('post', { post, account, loggedin: false });
       }  
     } else {
       res.send('This post is no longer available!')

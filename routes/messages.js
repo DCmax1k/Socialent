@@ -11,9 +11,8 @@ const jwt = require('jsonwebtoken');
 // GET Route
 router.get('/', authToken, async (req, res) => {
     try {
-        if (req.query.k) {
             // const user = await User.findById(req.query.k);
-            const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
+            const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
             // const usersConversations = [];
             // (await Conversation.find({})).forEach(conversation => {
             //     if (conversation.people.includes(user._id)) {
@@ -27,9 +26,6 @@ router.get('/', authToken, async (req, res) => {
             } else {
              res.redirect('/login');
             }
-        } else {
-            res.redirect('/login');
-        }
     } catch(err) {
         console.error(err);
     }

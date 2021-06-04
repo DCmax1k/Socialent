@@ -28,7 +28,9 @@ const { render } = require('ejs');
 router.get('/:username', async (req, res) => {
   try {
 
-    const account = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0].data();
+    const account1 = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0]
+    if (account1 == null) return res.redirect('/');
+    const account = account1.data();
     const oriAccountsPosts = (await db.collection('posts').where('author._id', '==', account._id).get()).docs.map(doc => doc.data());
     const accountsFollowers = (await db.collection('users').where('following', 'array-contains', account._id).get()).docs.map(doc => doc.data()).sort((a,b) => b.score-a.score);
     const oriAccountsFollowing = (await db.collection('users').get()).docs.map(doc => doc.data());
@@ -81,55 +83,16 @@ router.get('/:username', async (req, res) => {
     //     accountsFollowers.push(allUser._id);
     //   }
     // });
+    let passed = true;
     const token = req.cookies['auth-token'];
-    if (req.query.k) {
-      // const user = await User.findById(req.query.k);
-
-      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
-      if (user.status === 'online') {
-        if (token == null) return res.redirect('/login');
-        let passed = true;
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
-          if (err) return passed = false;;
-          if (user1._id != req.query.k) return passed = false;
-        });
-        if (!passed) return res.redirect('/login');
-
-        // Set Last Online
-        const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
-        
-        return res.render('account', {
-          user,
-          account,
-          accountsFollowers,
-          accountsFollowing,
-          accountsPosts,
-          loggedin: true,
-          parsedLastOnline,
-        });
-      } else {
-        return res.redirect('/login');
-      }
-    } else {
-      if (token != null) {
-        jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
-          if (err) {
-            return res.render('account', {
-              user: null,
-              account,
-              accountsFollowers,
-              accountsFollowing,
-              accountsPosts,
-              loggedin: false,
-              parsedLastOnline,
-            });
-          }
-          return res.redirect(`/account/${account.username}?k=${user1._id}`)
-        });
-        return;
-        
-      }
-      return res.render('account', {
+    if (token == null) passed = false;
+    let usersID = '';
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
+      if (err) return passed = false;;
+      usersID = user1._id;
+    });
+    if (!passed) {
+      res.render('account', {
         user: null,
         account,
         accountsFollowers,
@@ -137,7 +100,29 @@ router.get('/:username', async (req, res) => {
         accountsPosts,
         loggedin: false,
         parsedLastOnline,
+      })
+      return;
+    }
+    // const user = await User.findById(req.query.k);
+
+    const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
+    if (user.status === 'online') {
+      
+
+      // Set Last Online
+      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      
+      return res.render('account', {
+        user,
+        account,
+        accountsFollowers,
+        accountsFollowing,
+        accountsPosts,
+        loggedin: true,
+        parsedLastOnline,
       });
+    } else {
+      return res.redirect('/login');
     }
   } catch (err) {
     console.error(err);
@@ -238,7 +223,7 @@ router.post('/deleteaccount', async (req, res) => {
     if (user.status === 'online' && user.devices.includes(req.body.device)) {
       const deleteTheUser = await deleteUser(user._id);
       if (deleteTheUser === 'success') {
-        res.json({
+        res.clearCookie('auth-token').json({
           status: 'success',
         })
       }

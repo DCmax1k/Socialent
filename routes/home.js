@@ -11,9 +11,8 @@ const jwt = require('jsonwebtoken');
 // Home route - see posts from those that you're following
 router.get('/', authToken, async (req, res) => {
   try {
-    if (req.query.k) {
       // const user = await User.findById(req.query.k);
-      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
+      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
       const currentIP = await publicIp.v4();
       if (!user.ips ) {
@@ -42,9 +41,7 @@ router.get('/', authToken, async (req, res) => {
       } else {
         res.redirect('/login');
       }
-    } else {
-      res.redirect('/login');
-    }
+
   } catch (err) {
     console.error(err);
   }

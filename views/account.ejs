@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%= account.username %> - Socialent</title>
-    <link rel="icon" href="/images/SocialentLogo.png" type="image/icon">
+    <link rel="icon" href="/images/SocialentLogo.svg" type="image/icon">
 
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/account.css" />
@@ -169,15 +169,18 @@
               <h1>
                 <% if (account.prefix.title) { %>
                   <% if (account.rank === 'owner') { %>
-                    <p class="prefix owner">[<%= account.prefix.title %>]</p>
+                    <p class="prefix owner name">[<%= account.prefix.title %>]</p>
                   <% } else if (account.rank === 'admin') { %>
-                    <p class="prefix admin">[<%= account.prefix.title %>]</p>
+                    <p class="prefix admin name">[<%= account.prefix.title %>]</p>
                   <% } else { %>
-                    <p class="prefix">[<%= account.prefix.title %>]</p>
+                    <p class="prefix name">[<%= account.prefix.title %>]</p>
                   <% } %>
                 <% } %>
                 <p><%= account.name %></p>
-                <p>@<%= account.username %></p>
+                <p class="greyText">@<%= account.username %></p>
+                <% if (account.verified) { %>
+                  <img class="verified" src="/images/verified.svg" alt="verifiedIcon">
+                <% } %>
               </h1>
               <p id="description"> <%= JSON.stringify(account.description) %></p>
               
@@ -233,7 +236,6 @@
     </div>
     <script src="/assets/js/main.js"></script>
     <% if (loggedin) { %>
-    <script src="/assets/js/deviceverification.js"></script>
     <%- include('partials/sideNavBar') %> <% } %> <%- include('partials/footer')
     %>
     <script src="/assets/js/account.js"></script>

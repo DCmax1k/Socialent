@@ -72,7 +72,7 @@ submit.addEventListener('click', async () => {
         alertCont.classList.add('active');
         password.value = '';
       } else if (resJSON.response === 'logged in') {
-        window.location.href = `/home?k=${resJSON.id}`;
+        window.location.href = `/home`;
         console.log('logged in');
       }
     }

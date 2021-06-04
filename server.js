@@ -46,26 +46,7 @@ app.set('view engine', 'ejs');
 // Index Route
 app.get('/', authHomeToken, async (req, res) => {
   const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-  res.redirect(`/home?k=${user._id}`);
-});
-
-// Device verification
-app.post('/deviceverification', async (req, res) => {
-  try {
-    // const user = await User.findById(req.query.k);
-    const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
-    if (!user.devices.includes(req.body.device)) {
-      res.json({
-        verified: false,
-      });
-    } else {
-      res.json({
-        verified: true,
-      });
-    }
-  } catch (err) {
-    console.error(err);
-  }
+  res.redirect(`/home`);
 });
 
 app.get('/proxy', (req, res) => {
@@ -113,19 +94,20 @@ app.use('/agreements', agreementsRoute);
 const forgotpasswordRoute = require('./routes/forgotpassword');
 app.use('/forgotpassword', forgotpasswordRoute);
 
-// // Testing purposes
-// app.get('/test', async (req, res) => {
-//   res.render('test');
-//   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
-//   // try {
-//   //   (await db.collection('users').get()).docs.forEach( async doc => {
-//   //     await doc.ref.update('ips', []);
-//   //   });
+const adminRoute = require('./routes/admin');
+app.use('/admin', adminRoute);
 
-//   //   res.send('done');
-//   // } catch(err) {
-//   //   console.error(err);
-//   // }
+// Testing purposes
+// app.get('/test', async (req, res) => {
+//   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
+//   try {
+//     (await db.collection('posts').get()).docs.forEach( async doc => {
+//       await doc.ref.update('author.verified', false);
+//     });
+
+//   } catch(err) {
+//     console.error(err);
+//   }
 // });  
 
 

@@ -3,6 +3,7 @@ const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const publicIp = require('public-ip');
+const jwt = require('jsonwebtoken');
 
 // const User = require('../models/User');
 
@@ -50,7 +51,8 @@ router.post('/', async (req, res) => {
         ips: [currentIP],
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
-      res.json({
+      const accessToken = jwt.sign({_id: newID, username: createUserData.username, name: createUserData.name}, process.env.ACCESS_SECRET, { expiresIn: '1d'});
+      res.cookie('auth-token', accessToken).json({
         response: 'account created',
         id: newID,
         username: req.body.username,

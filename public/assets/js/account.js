@@ -567,16 +567,17 @@ if (editProfileBtn || followBtn) {
         myAlert('Failed setting prefix');
       } else if (resJSON.status === 'success') {
         setUsersPrefixInput.blur();
-        if (document.querySelector('.prefix')) {
+        if (document.querySelector('.prefix.name')) {
           if (resJSON.prefix) {
-            document.querySelector('.prefix').innerText = `[${resJSON.prefix}]`;
+            document.querySelector('.prefix.name').innerText = `[${resJSON.prefix}]`;
           } else {
-            document.querySelector('.prefix').innerText = '';
+            document.querySelector('.prefix.name').innerText = '';
           }
         } else {
           // Create prefix div, then set prefix value
           // <p class="prefix">[<%= account.prefix.title %>]</p>
           const node = document.createElement('p');
+          node.classList.add('name');
           node.classList.add('prefix');
           if (resJSON.usersRank === 'owner') {
             node.classList.add('owner');

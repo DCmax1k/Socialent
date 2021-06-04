@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home - Socialent</title>
-    <link rel="icon" href="/images/SocialentLogo.png" type="image/icon">
+    <link rel="icon" href="/images/SocialentLogo.svg" type="image/icon">
 
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/home.css" />
@@ -67,8 +67,10 @@
               alt="Profile Picture"
             />
           </div>  
-            
-          <%= post.author.username %>
+            <p><%= post.author.username %></p>
+          <% if (post.author.verified) { %>
+            <img class="verified" style="margin-left: 5px; height: 12px; width: 12px;" src="/images/verified.svg" alt="verifiedIcon">
+          <% } %>
         </a>
 
         <!-- prettier-ignore -->
@@ -183,9 +185,7 @@
     </div>
 
     <%- include('partials/sideNavBar') %> <%- include('partials/footer') %>
-    
     <script type="text/javascript" src="/assets/js/main.js"></script>
-    <script type="text/javascript" src="/assets/js/deviceverification.js"></script>
     <script type="text/javascript" src="/assets/js/home.js"></script>
     <% if (user.rank == 'admin' || user.rank == 'owner') {%>
       <%- include('partials/adminControls') %>

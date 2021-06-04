@@ -11,22 +11,22 @@ const passwordEye = document.getElementById('passwordEye');
 
 // Press enter to submit
 email.addEventListener('keyup', (e) => {
-  if (e.keyCode == 13 || e.which == 13) {
+  if (e.key == 'Enter') {
     submit.click();
   }
 });
 name.addEventListener('keyup', (e) => {
-  if (e.keyCode == 13 || e.which == 13) {
+  if (e.key == 'Enter') {
     submit.click();
   }
 });
 username.addEventListener('keyup', (e) => {
-  if (e.keyCode == 13 || e.which == 13) {
+  if (e.key == 'Enter') {
     submit.click();
   }
 });
 password.addEventListener('keyup', (e) => {
-  if (e.keyCode == 13 || e.which == 13) {
+  if (e.key == 'Enter') {
     submit.click();
   }
 });
@@ -112,7 +112,7 @@ submit.addEventListener('click', async () => {
       alertCont.classList.add('active');
       submit.innerText = 'Submit';
     } else if (resJSON.response === 'account created') {
-      window.location.href = `/home?k=${resJSON.id}`;
+      window.location.href = `/home`;
     }
   } catch (err) {
     console.log(err);

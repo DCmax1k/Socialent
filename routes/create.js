@@ -10,16 +10,12 @@ const jwt = require('jsonwebtoken');
 // Get route
 router.get('/', authToken, async (req, res) => {
   try {
-    if (req.query.k) {
       // const user = await User.findById(req.query.k);
-      const user = (await db.collection('users').where('_id', '==', req.query.k).get()).docs[0].data();
+      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       
       if (user.status === 'online') {
         res.render('create', { user });
       }
-    } else {
-      res.redirect('/login');
-    }
   } catch (err) {
     console.error(err);
   }
@@ -46,6 +42,7 @@ router.post('/createpost', async (req, res) => {
           _id: user._id,
           username: user.username,
           profileImg: user.profileImg,
+          verified: user.verfied
         },
         url: req.body.url,
         urlType: req.body.urlType,

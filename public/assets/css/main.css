@@ -133,6 +133,11 @@
   color: rgb(41, 97, 201) !important;
 }
 
+.verified {
+  height: 15px;
+  width: 15px;
+}
+
 @media screen and (max-width: 430px) {
   .alert {
     width: 95%;
