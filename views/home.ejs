@@ -52,7 +52,7 @@
       <% postsFollowing.reverse().forEach(post => { %>
       <div data-post-id="<%= post._id %>" class="post-cont">
         <a
-          href="/account/<%= post.author.username %>?k=<%= user._id %>"
+          href="/account/<%= post.author.username %>"
           class="author"
           data-author-id="<%= post.author._id %>"
         >
@@ -67,6 +67,15 @@
               alt="Profile Picture"
             />
           </div>  
+            <% if (post.author.prefix.title) {%>
+              <%if (post.author.rank === 'owner') {%>
+                <p class="prefix owner">[<%= post.author.prefix.title %>]</p>&nbsp;
+              <%} else if (post.author.rank === 'admin') {%>
+                <p class="prefix admin">[<%= post.author.prefix.title %>]</p>&nbsp;
+              <%} else {%>
+                <p class="prefix">[<%= post.author.prefix.title %>]</p>&nbsp;
+              <%}%> 
+            <% } %>
             <p><%= post.author.username %></p>
           <% if (post.author.verified) { %>
             <img class="verified" style="margin-left: 5px; height: 12px; width: 12px;" src="/images/verified.svg" alt="verifiedIcon">
@@ -120,10 +129,13 @@
             </p>
           </div>
             
-          <!-- Admin Delete post example -->
-          <!-- <div class="admin-delete-btn">
+          <!-- Admin Delete post -->
+          <% if (user.rank == 'admin' || user.rank == 'owner') { %>
+          <div class="admin-delete-btn" onclick="adminDeletePost('<%= post._id %>', '<%= user._id %>', '<%= post.author._id %>')">
             <i data-post-id="<%= post._id %>" class="fas fa-ban"></i>
-          </div> -->
+          </div>
+          <% } %>
+          
 
         </div>
         <div class="description">

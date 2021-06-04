@@ -102,8 +102,17 @@ app.use('/admin', adminRoute);
 //   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
 //   try {
 //     (await db.collection('posts').get()).docs.forEach( async doc => {
-//       await doc.ref.update('author.verified', false);
+//       try {
+//         const authorID = ( await doc.data()).author._id;
+//         const user = (await db.collection('users').where('_id', '==', authorID).get()).docs[0].data();
+//         const usersRank = user.rank;
+//         await doc.ref.update('author.rank', usersRank);
+//       } catch(err) {
+//         console.error(err);
+//       }
+      
 //     });
+//     res.send('done');
 
 //   } catch(err) {
 //     console.error(err);

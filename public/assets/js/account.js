@@ -507,11 +507,7 @@ if (editProfileBtn) {
 }
 
 const openPost = (postID) => {
-  if (typeof userID === 'undefined') {
-    window.location.href = `/post/${postID}`;
-  } else {
-    window.location.href = `/post/${postID}?k=${userID}`;
-  }
+  window.location.href = `/post/${postID}`;
 };
 
 if (loginBtn) {

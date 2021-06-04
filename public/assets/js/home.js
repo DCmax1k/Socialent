@@ -34,23 +34,6 @@ bookmarkScriptsIcon.addEventListener('click', () => {
   bookmarkScripts.classList.toggle('active');
 });
 
-
-// Add prefix to username in author space at top of post
-authorSpaces.forEach(async authorSpace => {
-  const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
-  const node = document.createElement('span');
-  if (authorUser.prefix.title) {
-    if (authorUser.rank === 'owner') {
-      node.innerHTML = `<p class="prefix owner">[${authorUser.prefix.title}]</p>&nbsp;`;
-    } else if (authorUser.rank === 'admin') {
-      node.innerHTML = `<p class="prefix admin">[${authorUser.prefix.title}]</p>&nbsp;`;
-    } else {
-      node.innerHTML = `<p class="prefix">[${authorUser.prefix.title}]</p>&nbsp;`;
-    }
-  }
-  authorSpace.insertBefore(node, authorSpace.childNodes[2]);
-});
-
 // Admin delete post
 
 // Function
@@ -103,46 +86,6 @@ const adminDeletePost = async (postID, admin, user) => {
     console.error(err);
   }
 };
-
-// Check rank of user
-const checkUserRank = async authorID => {
-  try {
-    const response = await fetch('/home/checkuserrank', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        authorID,
-      }),
-    });
-    const resJSON = await response.json();
-    if (resJSON.status === 'success') {
-      return resJSON.rank;
-    }
-  } catch(err) {
-    console.error(err);
-  }
-};
-
-bottomBtns.forEach( async bottomBtn => {
-  const postID = bottomBtn.getAttribute('data-post-id');
-  const authorID = bottomBtn.getAttribute('data-author-id');
-  const userRank = await checkUserRank(userID);
-  const authorRank = await checkUserRank(authorID);
-  if ((authorRank === 'owner' && userRank === 'owner') || (userRank === 'owner' && authorRank === 'admin') || (userRank === 'admin' && authorRank !== 'owner') || (authorRank === 'user' && (userRank === 'owner' || userRank === 'admin'))) {
-    const node = document.createElement('div');
-    node.classList.add('admin-delete-btn');
-    node.innerHTML =
-    `
-    <i data-post-id="${postID}" class="fas fa-ban"></i>
-    `;
-    node.addEventListener('click', () => {
-      adminDeletePost(postID, userID, authorID);
-    });
-    bottomBtn.appendChild(node);
-  }
-});
 
 // Play a video
 playBtns.forEach((playBtn) => {

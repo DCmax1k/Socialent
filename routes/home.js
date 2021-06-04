@@ -234,8 +234,16 @@ router.post('/promote', async (req, res) => {
           // const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': 'Admin' }, { useFindAndModify: false });
           // const savePrefix = await setPrefix.save();
           const promoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'admin');
+          // Change posts ranks
+          (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+            await doc.ref.update('author.rank', 'admin');
+          })
           if (!user.prefix.title) {
-            const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', 'Admin');  
+            const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', 'Admin');
+            // Change posts titles
+            (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+              await doc.ref.update('author.prefix.title', 'Admin');
+            })
           }
           
           res.json({
@@ -249,8 +257,16 @@ router.post('/promote', async (req, res) => {
           // const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': '' }, { useFindAndModify: false });
           // const savePrefix = await setPrefix.save();
           const demoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'user');
+          // change posts ranks
+          (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+            await doc.ref.update('author.rank', 'user');
+          })
           if (user.prefix.title == 'Admin') {
             const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', '');  
+            // Change posts titles
+            (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+              await doc.ref.update('author.prefix.title', '');
+            })
           }
           
           res.json({

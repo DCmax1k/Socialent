@@ -140,6 +140,10 @@ router.post('/setusersprefix', async (req, res) => {
       // const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
       // const saveUser = await updateUser.save();
       const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
+      // Change prefix on all posts
+      (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+        await doc.ref.update('author.prefix.title', req.body.usersPrefix);
+      })
       res.json({
         status: 'success',
         prefix: req.body.usersPrefix,

@@ -42,7 +42,11 @@ router.post('/createpost', async (req, res) => {
           _id: user._id,
           username: user.username,
           profileImg: user.profileImg,
-          verified: user.verified
+          verified: user.verified,
+          rank: user.rank,
+          prefix: {
+            title: user.prefix.title,
+          },
         },
         url: req.body.url,
         urlType: req.body.urlType,
