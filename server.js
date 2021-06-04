@@ -54,6 +54,7 @@ app.get('/proxy', (req, res) => {
 });
 
 function authHomeToken(req, res, next) {
+  if (req.hostname.includes('heroku')) return res.redirect('socialentapp.com');
   const token = req.cookies['auth-token'];
   if (token == null) return res.render('index');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {

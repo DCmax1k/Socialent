@@ -4,8 +4,13 @@ const jwt = require('jsonwebtoken');
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 
-router.get('/', authToken, (req, res) => {
-    res.send(`Welcome ${req.user.name}`);
+router.get('/', authToken, async (req, res) => {
+    try {
+        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+        res.render('admin', {user});
+    } catch(err) {
+        console.error(err);
+    }
 });
 
 function authToken(req, res, next) {
