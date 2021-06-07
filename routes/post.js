@@ -43,12 +43,23 @@ router.get('/:post', async (req, res) => {
   }
 });
 
+// ALL POST REQUEST AUTHORIZATION
+function postAuthToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
 // Like post
-router.post('/likepost', async (req, res) => {
+router.post('/likepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       if (!post.likes.includes(user._id)) {
@@ -71,11 +82,11 @@ router.post('/likepost', async (req, res) => {
 });
 
 // unlike post
-router.post('/unlikepost', async (req, res) => {
+router.post('/unlikepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       if (post.likes.includes(user._id)) {
@@ -104,11 +115,11 @@ router.post('/unlikepost', async (req, res) => {
 });
 
 // Add comment
-router.post('/addcomment', async (req, res) => {
+router.post('/addcomment', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       // const updateComments = await Post.findByIdAndUpdate(post._id,{$push: { comments: [user.username, req.body.comment, req.body.date] },},{ useFindAndModify: false });

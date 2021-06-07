@@ -31,12 +31,23 @@ function authToken(req, res, next) {
   })
 }
 
+// ALL POST REQUEST AUTHORIZATION
+function postAuthToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
 // Searching for account route
-router.post('/', async (req, res) => {
+router.post('/', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // Search for account by username
       const dupeDataUsernames = [];
       const searchUsername = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).filter((account) => {

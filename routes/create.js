@@ -31,11 +31,22 @@ function authToken(req, res, next) {
   })
 }
 
+// ALL POST REQUEST AUTHORIZATION
+function postAuthToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
 // Create post
-router.post('/createpost', async (req, res) => {
+router.post('/createpost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     const newPostData = {
         _id: Date.now().toString(16) + Math.random().toString(16).slice(2),
         author: {

@@ -21,14 +21,6 @@ router.post('/', async (req, res) => {
         response: 'username taken',
       });
     } else {
-//       const createUser = await new User({
-//         emailData: { email: req.body.email, verified: false },
-//         name: req.body.name,
-//         username: req.body.username,
-//         password: req.body.password,
-//         devices: [req.body.device],
-//       });
-//       const saveUser = await createUser.save();
       const newID = Date.now().toString(16) + Math.random().toString(16).slice(2);
       const currentIP = await publicIp.v4();
       const createUserData = {
@@ -37,7 +29,6 @@ router.post('/', async (req, res) => {
         name: req.body.name,
         username: req.body.username,
         password: req.body.password,
-        devices: [req.body.device],
         score: 0,
         prefix: { title: ''},
         status: 'online',

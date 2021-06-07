@@ -42,11 +42,22 @@ function authToken(req, res, next) {
     })
 }
 
+// ALL POST REQUEST AUTHORIZATION
+function postAuthToken(req, res, next) {
+    const token = req.cookies['auth-token'];
+    if (token == null) return res.sendStatus(401);
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403);
+      req.user = user;
+      next();
+    });
+  }
+
 // Load Conversation
-router.post('/loadconversation', async (req, res) => {
+router.post('/loadconversation', postAuthToken, async (req, res) => {
     try {
         // const user = await User.findById(req.body.userID);
-        const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
         if (user.status === 'online') {
             // const conversation = await Conversation.findById(req.body.conversationID);
             const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationID).get()).docs[0].data();
@@ -86,10 +97,10 @@ router.post('/loadconversation', async (req, res) => {
 });
 
 // ADD conversation
-router.post('/addconversation', async (req, res) => {
+router.post('/addconversation', postAuthToken, async (req, res) => {
     try {
         // const user = await User.findById(req.body.userID);
-        const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
         if (user.status === 'online') {
             if (req.body.receiver) {
                 // const receiver = await User.findOne({ username: req.body.receiver });
@@ -154,10 +165,10 @@ router.post('/addconversation', async (req, res) => {
 });
 
 // Check for conversations
-router.post('/checkconversations', async (req, res) => {
+router.post('/checkconversations', postAuthToken, async (req, res) => {
     try {
         // const user = await User.findById(req.body.userID);
-        const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
         if (user.status === 'online') {
             if (req.body.conversationLoaded) {
                 const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
@@ -186,7 +197,7 @@ router.post('/checkconversations', async (req, res) => {
 });
 
 // Lookup Username
-router.post('/lookupusername', async (req, res) => {
+router.post('/lookupusername', postAuthToken, async (req, res) => {
     try {
       // const receiver = await User.findById(req.body.receiverID);
       const receiver = (await db.collection('users').where('_id', '==', req.body.receiverID).get()).docs[0].data();
@@ -201,11 +212,11 @@ router.post('/lookupusername', async (req, res) => {
   })
 
   // Send message
-  router.post('/sendmessage', async (req, res) => {
+  router.post('/sendmessage', postAuthToken, async (req, res) => {
     try {
       // const user = await User.findById(req.body.senderID);
-      const user = (await db.collection('users').where('_id', '==', req.body.senderID).get()).docs[0].data();
-      if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+      if (user.status === 'online') {
         // const conversation = await Conversation.findById(req.body.conversationID);
         const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationID).get()).docs[0].data();
         // currentMessages = conversation.messages;
@@ -231,11 +242,11 @@ router.post('/lookupusername', async (req, res) => {
   });
 
   // Send img
-  router.post('/sendimg', async (req, res) => {
+  router.post('/sendimg', postAuthToken, async (req, res) => {
     try {
       // const user = await User.findById(req.body.senderID);
-      const user = (await db.collection('users').where('_id', '==', req.body.senderID).get()).docs[0].data();
-      if (user.status === 'online' && user.devices.includes(req.body.device)) {
+      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+      if (user.status === 'online') {
         // const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, { dateActive: req.body.date, $push: { messages: {sender: user._id, value: req.body.message, type: 'img', date: req.body.date, seen: 'unread'} }}, { useFindAndModify: false });
         const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationID).get()).docs[0].data();
         const messageData = { sender: user._id, value: req.body.message, type: 'img', date: req.body.date };
@@ -258,11 +269,11 @@ router.post('/lookupusername', async (req, res) => {
   });
 
   // Delete text 
-  router.post('/deletetext', async (req, res) => {
+  router.post('/deletetext', postAuthToken, async (req, res) => {
       try {
         // const user = await User.findById(req.body.userID);
-        const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-        if (user.status === 'online' && user.devices.includes(req.body.device)) {
+        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+        if (user.status === 'online') {
             // const conversation = await Conversation.findById(req.body.conversationLoaded);
             const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0].data();
             const currentText = conversation.messages[conversation.messages.length - req.body.textIndex];

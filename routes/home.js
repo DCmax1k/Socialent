@@ -57,11 +57,22 @@ function authToken(req, res, next) {
   })
 }
 
+// ALL POST REQUEST AUTHORIZATION
+function postAuthToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
 // Edit Description of post
-router.post('/editdesc', async (req, res) => {
+router.post('/editdesc', postAuthToken, async (req, res) => {
   try { 
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       const udpatePost = await (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].ref.update('description', req.body.desc);
       res.json({
         status: 'success',
@@ -77,7 +88,7 @@ router.post('/editdesc', async (req, res) => {
 })
 
 // Admin delete post
-router.post('/admindeletepost', async (req, res) => {
+router.post('/admindeletepost', postAuthToken, async (req, res) => {
   try {
     //const admin = await User.findById(req.body.admin);
     const admin = (await db.collection('users').where('_id', '==', req.body.admin).get()).docs[0].data();
@@ -85,7 +96,7 @@ router.post('/admindeletepost', async (req, res) => {
     const user = (await db.collection('users').where('_id', '==', req.body.user).get()).docs[0].data();
     //const post = await Post.findById(req.body.postID);
     const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
-    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
+    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin')))) {
       // Doesn't actually delete post, but rather disables it
       // const deletePost = await Post.findByIdAndDelete(post._id);
       // const disablePost = await Post.findByIdAndUpdate(post._id, { active: false }, { useFindAndModify: false });
@@ -102,7 +113,7 @@ router.post('/admindeletepost', async (req, res) => {
 });
 
 // Check user rank
-router.post('/checkuserrank', async (req, res) => {
+router.post('/checkuserrank', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.authorID);
     const user = (await db.collection('users').where('_id', '==', req.body.authorID).get()).docs[0].data();
@@ -116,13 +127,13 @@ router.post('/checkuserrank', async (req, res) => {
 });
 
 // Warn a user
-router.post('/warn', async (req, res) => {
+router.post('/warn', postAuthToken, async (req, res) => {
   try {
     // const admin = await User.findById(req.body.adminID);
-    const admin = (await db.collection('users').where('_id', '==', req.body.adminID).get()).docs[0].data();
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (admin.status === 'online' && admin.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (admin.status === 'online') {
       if (admin.rank === 'admin' || admin.rank === 'owner') {
         // const updateUser = await User.findByIdAndUpdate(user._id, { $push: { warnings: [ req.body.warning, true ]}}, { useFindAndModify: false });
         // const saveUser = await updateUser.save();
@@ -147,11 +158,11 @@ router.post('/warn', async (req, res) => {
 })
 
 // Check for warnings
-router.post('/checkwarnings', async (req, res) => {
+router.post('/checkwarnings', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       res.json({
         status: 'success',
         warnings: user.warnings,
@@ -167,11 +178,11 @@ router.post('/checkwarnings', async (req, res) => {
 });
 
 // Dismiss warning
-router.post('/dismisswarn', async (req, res) => {
+router.post('/dismisswarn', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       const warnings = user.warnings;
       warnings[req.body.index].active = false;
       // const updateUser = await User.findByIdAndUpdate(user._id, { $set: { warnings }}, { useFindAndModify: false });
@@ -189,14 +200,14 @@ router.post('/dismisswarn', async (req, res) => {
 const deleteUser = require('../globalFunctions/deleteAccount');
 
 //Delete user from admin
-router.post('/deleteuser', async (req, res) => {
+router.post('/deleteuser', postAuthToken, async (req, res) => {
   try {
     // const admin = await User.findById(req.body.userID);
     // const user = await User.findById(req.body.userId);
     const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
-    const admin = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     if (admin.rank == 'owner' || admin.rank == 'admin') {
-      if (admin.status == 'online' || admin.devices.includes(req.body.device)) {
+      if (admin.status == 'online') {
         const deleteTheUser = await deleteUser(user._id);
         if (deleteTheUser === 'success') {
           res.json({
@@ -220,14 +231,14 @@ router.post('/deleteuser', async (req, res) => {
 })
 
 // Promote user
-router.post('/promote', async (req, res) => {
+router.post('/promote', postAuthToken, async (req, res) => {
   try {
     // const admin = await User.findById(req.body.userID);
-    const admin = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     // const user = await User.findById(req.body.userId);
-    const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     if (admin.rank == 'owner' || admin.rank == 'admin') {
-      if (admin.status == 'online' && admin.devices.includes(req.body.device)) {
+      if (admin.status == 'online') {
         if (user.rank == 'user') {
           // const promoteUser = await User.findByIdAndUpdate(user._id, { rank: 'admin' }, { useFindAndModify: false });
           // const saveUser = await promoteUser.save();
@@ -287,13 +298,13 @@ router.post('/promote', async (req, res) => {
 })
 
 // Delet post
-router.post('/deletepost', async (req, res) => {
+router.post('/deletepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     // const post = await Post.findById(req.body.postID);
     const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device) && JSON.stringify(post.author._id) === JSON.stringify(user._id)) {
+    if (user.status === 'online' && JSON.stringify(post.author._id) === JSON.stringify(user._id)) {
       // const deletePost = await Post.deleteOne({ _id: req.body.postID });
       const deletePost = await (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.delete();
       res.json({
@@ -312,13 +323,13 @@ router.post('/deletepost', async (req, res) => {
 });
 
 // Add comment
-router.post('/addcomment', async (req, res) => {
+router.post('/addcomment', postAuthToken, async (req, res) => {
   try {
     const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
     // const post = await Post.findById(req.body.postID);
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const updatePost = await Post.findByIdAndUpdate(post._id,{$push: { comments: [user.username, req.body.comment, req.body.date] },},{ useFindAndModify: false });
       // const savePost = await updatePost.save();
       const updatePost = await (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.update('comments', [ ...post.comments, { date: req.body.date, username: user.username, value: req.body.comment}]);
@@ -338,7 +349,7 @@ router.post('/addcomment', async (req, res) => {
 });
 
 // Logout
-router.post('/logout', async (req, res) => {
+router.post('/logout', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.id);
     const user = (await db.collection('users').where('_id', '==', req.body.id).get()).docs[0].data();
@@ -356,11 +367,11 @@ router.post('/logout', async (req, res) => {
 });
 
 // Like post
-router.post('/likepost', async (req, res) => {
+router.post('/likepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       if (!post.likes.includes(user._id)) {
@@ -382,11 +393,11 @@ router.post('/likepost', async (req, res) => {
 });
 
 // Unlike post
-router.post('/unlikepost', async (req, res) => {
+router.post('/unlikepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       if (post.likes.includes(user._id)) {

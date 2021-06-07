@@ -129,14 +129,25 @@ router.get('/:username', async (req, res) => {
   }
 });
 
+// ALL POST REQUEST AUTHORIZATION
+function authToken(req, res, next) {
+  const token = req.cookies['auth-token'];
+  if (token == null) return res.sendStatus(401);
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+}
+
 // Set users prefix
-router.post('/setusersprefix', async (req, res) => {
+router.post('/setusersprefix', authToken, async (req, res) => {
   try {
     // const admin = await User.findById(req.body.userID);
     // const user = await User.findOne({username: req.body.accountUsername});
-    const admin = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     const user = (await db.collection('users').where('username', '==', req.body.accountUsername).get()).docs[0].data();
-    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin'))) && admin.devices.includes(req.body.device)) {
+    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin')))) {
       // const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
       // const saveUser = await updateUser.save();
       const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
@@ -161,12 +172,12 @@ router.post('/setusersprefix', async (req, res) => {
 })
 
 // Change Profile Img
-router.post('/changeimg', async (req, res) => {
+router.post('/changeimg', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
 
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    if (user.status === 'online') {
 
       // Update profile pic
       // const updateProfileImg = await User.findByIdAndUpdate( user._id, { profileImg: req.body.imgURL, }, { useFindAndModify: false });
@@ -200,7 +211,7 @@ router.post('/changeimg', async (req, res) => {
 // router.post('/deleteaccount', async (req, res) => {
 //   try {
 //     const user = await User.findById(req.body.userID);
-//     if (user.status === 'online' && user.devices.includes(req.body.device)) {
+//     if (user.status === 'online') {
 //       const deleteAllPosts = await Post.deleteMany({ 'author._id': user._id });
 //       const deleteIdsFromFollowing = await User.updateMany({
 //         $pull: { following: user._id },
@@ -220,11 +231,11 @@ router.post('/changeimg', async (req, res) => {
 // });
 
 // Delete account using global funciton
-router.post('/deleteaccount', async (req, res) => {
+router.post('/deleteaccount', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       const deleteTheUser = await deleteUser(user._id);
       if (deleteTheUser === 'success') {
         res.clearCookie('auth-token').json({
@@ -238,11 +249,11 @@ router.post('/deleteaccount', async (req, res) => {
 })
 
 // Follow
-router.post('/followprofile', async (req, res) => {
+router.post('/followprofile', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const account = await User.findById(req.body.accountID);
       const account = (await db.collection('users').where('_id', '==', req.body.accountID).get()).docs[0].data();
       if (!user.following.includes(account._id)) {
@@ -286,9 +297,9 @@ router.post('/followprofile', async (req, res) => {
 // Edit profile
 
 // Check email verification
-router.post('/editprofile/verifyemail/checkverification', async (req, res) => {
+router.post('/editprofile/verifyemail/checkverification', authToken, async (req, res) => {
   try {
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     //const user = await User.findById(req.body.userID);
     res.json({
       verified: user.emailData.verified,
@@ -299,11 +310,11 @@ router.post('/editprofile/verifyemail/checkverification', async (req, res) => {
 });
 
 // Verify Email - send email
-router.post('/editprofile/verifyemail', async (req, res) => {
+router.post('/editprofile/verifyemail', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       let verifyEmailCode = JSON.stringify(Math.random())
         .split('')
         .slice(2)
@@ -376,7 +387,7 @@ router.post('/editprofile/verifyemail', async (req, res) => {
 });
 
 // Verify Email - from email
-router.get('/editprofile/verifyemail/:userId', async (req, res) => {
+router.get('/editprofile/verifyemail/:userId', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.params.userId);
     const user = (await db.collection('users').where('_id', '==', req.params.userId).get()).docs[0].data();
@@ -392,11 +403,11 @@ router.get('/editprofile/verifyemail/:userId', async (req, res) => {
 });
 
 // Change Password
-router.post('/editprofile/changepassword', async (req, res) => {
+router.post('/editprofile/changepassword', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       if (req.body.currentPassword === user.password) {
         // const updatePassword = await User.findByIdAndUpdate(user._id,{password: req.body.newPassword,},{ useFindAndModify: false });
         // const saveUser = await updatePassword.save();
@@ -416,11 +427,11 @@ router.post('/editprofile/changepassword', async (req, res) => {
 });
 
 // Change name
-router.post('/editprofile/changename', async (req, res) => {
+router.post('/editprofile/changename', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
       // const saveUser = await updateName.save();
       const updateName = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('name', req.body.name);
@@ -433,11 +444,11 @@ router.post('/editprofile/changename', async (req, res) => {
   }
 });
 
-router.post('/editprofile/changeuser', async (req, res) => {
+router.post('/editprofile/changeuser', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
       // const saveUser = await updateName.save();
       const findUserUsername = (await db.collection('users').where('username', '==', req.body.username).get()).docs.map(doc => doc.data());
@@ -455,7 +466,6 @@ router.post('/editprofile/changeuser', async (req, res) => {
           name: user.name,
           username: req.body.username,
           password: user.password,
-          devices: user.devices,
           score: user.score,
           prefix: { title: user.prefix.title },
           status: user.status,
@@ -486,11 +496,11 @@ router.post('/editprofile/changeuser', async (req, res) => {
 });
 
 // Change email
-router.post('/editprofile/changeemail', async (req, res) => {
+router.post('/editprofile/changeemail', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const updateEmail = await User.findByIdAndUpdate(user._id,{'emailData.email': req.body.email,},{ useFindAndModify: false });
       // const saveUser = await updateEmail.save();
       const updateEmail = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.email', req.body.email);
@@ -507,11 +517,11 @@ router.post('/editprofile/changeemail', async (req, res) => {
 });
 
 // Update Bio
-router.post('/editprofile/updatebio', async (req, res) => {
+router.post('/editprofile/updatebio', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.body.userID).get()).docs[0].data();
-    if (user.status === 'online' && user.devices.includes(req.body.device)) {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.status === 'online') {
       // const update = await User.findByIdAndUpdate(user._id,{ description: req.body.bio },{ useFindAndModify: false });
       // const save = await update.save();
       const updateBio = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('description', req.body.bio);

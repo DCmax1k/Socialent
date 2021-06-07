@@ -96,18 +96,16 @@ const forgotpasswordRoute = require('./routes/forgotpassword');
 app.use('/forgotpassword', forgotpasswordRoute);
 
 const adminRoute = require('./routes/admin');
+const { firebase } = require('googleapis/build/src/apis/firebase');
 app.use('/admin', adminRoute);
 
 // Testing purposes
 // app.get('/test', async (req, res) => {
 //   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
 //   try {
-//     (await db.collection('posts').get()).docs.forEach( async doc => {
+//     (await db.collection('users').get()).docs.forEach( async doc => {
 //       try {
-//         const authorID = ( await doc.data()).author._id;
-//         const user = (await db.collection('users').where('_id', '==', authorID).get()).docs[0].data();
-//         const usersRank = user.rank;
-//         await doc.ref.update('author.rank', usersRank);
+//         await doc.ref.update({devices: admin.firestore.FieldValue.delete()});
 //       } catch(err) {
 //         console.error(err);
 //       }
