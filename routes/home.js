@@ -126,37 +126,6 @@ router.post('/checkuserrank', postAuthToken, async (req, res) => {
   }
 });
 
-// Warn a user
-router.post('/warn', postAuthToken, async (req, res) => {
-  try {
-    // const admin = await User.findById(req.body.adminID);
-    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (admin.status === 'online') {
-      if (admin.rank === 'admin' || admin.rank === 'owner') {
-        // const updateUser = await User.findByIdAndUpdate(user._id, { $push: { warnings: [ req.body.warning, true ]}}, { useFindAndModify: false });
-        // const saveUser = await updateUser.save();
-        const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('warnings', [...user.warnings, { active: true, text: req.body.warning}]);
-        res.json({
-          status: 'success',
-          username: user.username,
-        });
-      } else {
-        res.json({
-          status: 'unseccessful',
-        });
-      }
-    } else {
-      res.json({
-        status: 'unseccessful',
-      });
-    }
-  } catch(err) {
-    console.error(err);
-  }
-})
-
 // Check for warnings
 router.post('/checkwarnings', postAuthToken, async (req, res) => {
   try {
@@ -197,105 +166,7 @@ router.post('/dismisswarn', postAuthToken, async (req, res) => {
   }
 });
 
-const deleteUser = require('../globalFunctions/deleteAccount');
 
-//Delete user from admin
-router.post('/deleteuser', postAuthToken, async (req, res) => {
-  try {
-    // const admin = await User.findById(req.body.userID);
-    // const user = await User.findById(req.body.userId);
-    const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
-    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (admin.rank == 'owner' || admin.rank == 'admin') {
-      if (admin.status == 'online') {
-        const deleteTheUser = await deleteUser(user._id);
-        if (deleteTheUser === 'success') {
-          res.json({
-            status: 'success',
-            username: user.username,
-          });
-        }
-      } else {
-        res.json({
-          status: 'unseccessful',
-        });
-      }
-    } else {
-      res.json({
-        status: 'unseccessful',
-      });
-    }
-  } catch(err) {
-    console.error(err);
-  }
-})
-
-// Promote user
-router.post('/promote', postAuthToken, async (req, res) => {
-  try {
-    // const admin = await User.findById(req.body.userID);
-    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    // const user = await User.findById(req.body.userId);
-    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (admin.rank == 'owner' || admin.rank == 'admin') {
-      if (admin.status == 'online') {
-        if (user.rank == 'user') {
-          // const promoteUser = await User.findByIdAndUpdate(user._id, { rank: 'admin' }, { useFindAndModify: false });
-          // const saveUser = await promoteUser.save();
-          // const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': 'Admin' }, { useFindAndModify: false });
-          // const savePrefix = await setPrefix.save();
-          const promoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'admin');
-          // Change posts ranks
-          (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
-            await doc.ref.update('author.rank', 'admin');
-          })
-          if (!user.prefix.title) {
-            const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', 'Admin');
-            // Change posts titles
-            (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
-              await doc.ref.update('author.prefix.title', 'Admin');
-            })
-          }
-          
-          res.json({
-            status: 'success',
-            username: user.username,
-            promoteOrDemote: 'promote',
-          });
-        } else if (user.rank == 'admin') {
-          // const demoteUser = await User.findByIdAndUpdate(user._id, { rank: 'user'}, { useFindAndModify: false });
-          // const saveUser = await demoteUser.save();
-          // const setPrefix = await User.findByIdAndUpdate(user._id, { 'prefix.title': '' }, { useFindAndModify: false });
-          // const savePrefix = await setPrefix.save();
-          const demoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'user');
-          // change posts ranks
-          (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
-            await doc.ref.update('author.rank', 'user');
-          })
-          if (user.prefix.title == 'Admin') {
-            const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', '');  
-            // Change posts titles
-            (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
-              await doc.ref.update('author.prefix.title', '');
-            })
-          }
-          
-          res.json({
-            status: 'success',
-            username: user.username,
-            promoteOrDemote: 'demote',
-          });
-        }
-      } else {
-        res.json({
-          status: 'unseccessful',
-        });
-      }
-    }
-  } catch(err) {
-    console.error(err);
-  }
-})
 
 // Delet post
 router.post('/deletepost', postAuthToken, async (req, res) => {

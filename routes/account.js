@@ -140,37 +140,6 @@ function authToken(req, res, next) {
   });
 }
 
-// Set users prefix
-router.post('/setusersprefix', authToken, async (req, res) => {
-  try {
-    // const admin = await User.findById(req.body.userID);
-    // const user = await User.findOne({username: req.body.accountUsername});
-    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    const user = (await db.collection('users').where('username', '==', req.body.accountUsername).get()).docs[0].data();
-    if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin')))) {
-      // const updateUser = await User.findByIdAndUpdate(user._id, { 'prefix.title': req.body.usersPrefix }, { useFindAndModify: false });
-      // const saveUser = await updateUser.save();
-      const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', req.body.usersPrefix);
-      // Change prefix on all posts
-      (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
-        await doc.ref.update('author.prefix.title', req.body.usersPrefix);
-      })
-      res.json({
-        status: 'success',
-        prefix: req.body.usersPrefix,
-        prefixActive: user.prefix.active,
-        usersRank: user.rank,
-      });
-    } else {
-      res.json({
-        status: 'not admin',
-      });
-    }
-  } catch(err) {
-    console.error(err);
-  }
-})
-
 // Change Profile Img
 router.post('/changeimg', authToken, async (req, res) => {
   try {

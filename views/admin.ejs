@@ -18,6 +18,73 @@
 
 </head>
 <body>
-    
+  <div id="background"></div>
+  <div id="darkerBackground"></div>
+
+  <h1>ADMIN</h1>
+  <div id="links">
+    <a class="active" href="#">General</a>
+    <a href="/admin/rdp">Review Deleted Posts</a>
+    <a href="/admin/br">Bug Reports</a>
+  </div>
+  <div id="search">
+    <i class="fas fa-search"></i>
+    <input id="searchInput" type="text" placeholder="Search">
+  </div>
+  <div id="usersCont">
+    <% allUsers.sort((a, b) => a.dateJoined - b.dateJoined).forEach((subUser, i) => { %>
+      <div data-user-id="<%= subUser._id %>" class="userCont<% if (subUser.rank != 'user') {%> <%= subUser.rank %>BG<% } %>">
+        <div data-user-id="<%= subUser._id %>" class="userControls">
+
+          <div data-user-id="<%= subUser._id %>" data-user-username="<%= subUser.username %>" class="deleteUser <% if (subUser.rank == 'owner' || user.rank != 'owner') {%>na<% } %>"><i class="fas fa-user-times"></i></div>
+          <div class="warnCont">
+            <input placeholder="Warn:" data-user-id="<%= subUser._id %>" type="text" class="warnInput"></input>
+            <div class="warnText textUnderBtns">
+              <b class="warningsLengthNumber" data-user-id="<%= subUser._id %>" ><%= subUser.warnings.length %></b> Warning<% if (subUser.warnings.length != 1) { %>s<% } %>
+              <br>
+              <b class="warningsActiveNumber" data-user-id="<%= subUser._id %>" ><%= subUser.warnings.filter(warning => { return warning.active == true }).length %></b> active warning<% if (subUser.warnings.filter(warning => { return warning.active == true }).length != 1) { %>s<% } %>
+            </div>
+          </div>
+          <div class="promoteCont">
+            <div data-user-id="<%= subUser._id %>" data-user-username="<%= subUser.username %>" class="promoteBtn <% if (subUser.rank == 'user') {%>promo<% } else {%>demo<% } %> <% if (!((user.rank == 'owner' && subUser.rank == 'user') || (user.rank == 'admin' && subUser.rank == 'user') || (user.rank == 'owner' && subUser.rank == 'admin'))) {%>na<% } %>"><% if (subUser.rank == 'user') {%>Promote<% } else {%>Demote<% } %></div>
+            <div class="promoteText textUnderBtns">
+              Current Rank:
+              <br>
+              <b class="seeRankFromUser" data-user-id="<%= subUser._id %>" ><%= subUser.rank[0].toUpperCase() + subUser.rank.slice(1) %></b>
+            </div>
+          </div>
+          <div class="prefixCont">
+            <input data-user-id="<%= subUser._id %>" value="<%= subUser.prefix.title %>" type="text" class="prefixInput"></input>
+            <div data-user-id="<%= subUser._id %>" class="prefixText textUnderBtns">
+              Set Prefix
+            </div>
+          </div>
+
+          <div data-user-id="<%= subUser._id %>" class="closeUserControls">
+            <i class="fas fa-times"></i>
+            <div class="closeUserControlsUsername"><%= subUser.username %></div>
+          </div>
+        </div>
+        <div class="user">
+          <div class="profileImgCont">
+            <img src="<% if (subUser.profileImg == 'none') { %>/images/profilePlaceholder.svg<% } else { %><%= subUser.profileImg %><% } %>" alt="">
+            <div class="usersIndexNum"><%= i + 1 %></div>
+          </div>
+          <div class="userNames">
+            <a href="/account/<%= subUser.username %>" class="username"><div data-user-id="<%= subUser._id %>" class="prefix <% if (subUser.rank != 'user') {%><%= subUser.rank %><%}%>" ><% if (subUser.prefix.title) { %>[<%= subUser.prefix.title %>]<% } %></div> <%= subUser.username %></a>
+            <div class="name"><%= subUser.name %></div>
+          </div>
+          <div data-user-id="<%= subUser._id %>" class="openControls">
+            <i class="fas fa-ellipsis-h"></i>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+
+  <%- include('partials/sideNavBar') %> <%- include('partials/footer') %>
+  <script type="text/javascript" src="/assets/js/main.js"></script>
+  <script type="text/javascript" src="/assets/js/admin.js"></script>
 </body>
 </html>

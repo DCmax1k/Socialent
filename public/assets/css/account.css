@@ -10,26 +10,6 @@
   left: 0;
 }
 
-#setUsersPrefix {
-  position: absolute;
-  top: 10px;
-  right: 20px;
-  background-color: rgba(128, 128, 128, 0.651);
-  border-radius: 10px;
-  padding: 5px;
-  z-index: 5;
-  font-size: 15px;
-}
-
-#setUsersPrefix input {
-  height: 25px;
-  width: 100px;
-  border-radius: 10px;
-  outline: none;
-  padding: 5px;
-  border: none;
-}
-
 #bodyCont {
   width: 90%;
   position: absolute;

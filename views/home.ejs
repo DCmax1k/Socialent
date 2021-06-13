@@ -200,7 +200,7 @@
     <script type="text/javascript" src="/assets/js/main.js"></script>
     <script type="text/javascript" src="/assets/js/home.js"></script>
     <% if (user.rank == 'admin' || user.rank == 'owner') {%>
-      <%- include('partials/adminControls') %>
+      <a id="adminLink" href="/admin"><i class="fas fa-user-lock"></i></a>
     <% } %>
   </body>
 </html>
