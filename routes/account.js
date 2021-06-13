@@ -446,13 +446,15 @@ router.post('/editprofile/changeuser', authToken, async (req, res) => {
           dateJoined: user.dateJoined,
           lastOnline: Date.now(),
           ips: user.ips,
+          verified: user.verified,
         };
         const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
         // CHANGE POST AUTHORs USERNAME HERE
         const updatePosts = await (await db.collection('posts').where('author.username', '==', user.username).get()).docs.forEach(async doc => {
           await doc.ref.update('author.username', createUserData.username);
         });
-        res.json({
+        const accessToken = jwt.sign({_id: createUserData._id, username: createUserData.username, name: createUserData.name}, process.env.ACCESS_SECRET, { expiresIn: '1d'});
+        res.cookie('auth-token', accessToken).json({
           response: 'account created',
           id: user._id,
           username: req.body.username,

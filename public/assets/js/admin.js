@@ -35,16 +35,12 @@ prefixInputs.forEach(prefixInput => {
         if (e.key == 'Enter') {
             const newPrefix = e.target.value;
             sendPrefix(dataID, newPrefix);
-            prefixTexts.forEach(prefixText => {
-                if (prefixText.getAttribute('data-user-id') == dataID) {
-                    if (newPrefix) {
-                        prefixText.innerText = newPrefix;
-                    } else {
-                        prefixText.innerText = 'None';
-                    }
-                    
-                };
-            });
+            const text = Array.from(prefixTexts).find(prefixText => prefixText.getAttribute('data-user-id') == dataID);
+            if (newPrefix) {
+                text.innerText = newPrefix;
+            } else {
+                text.innerText = 'None';
+            }
             prefixs.forEach(prefix => {
                 if (prefix.getAttribute('data-user-id') == dataID) {
                     if (newPrefix) {
@@ -85,58 +81,26 @@ promoteBtns.forEach(promoteBtn => {
             promoteBtn.classList.add('demo');
             promoteBtn.classList.remove('promo');
             promoteBtn.innerText = 'Demote';
-            userContss.forEach(userCont => {
-                if (userCont.getAttribute('data-user-id') == dataID) {
-                    userCont.classList.add('adminBG');
-                };
-            });
-            seeRankFromUsers.forEach(seeRankFromUser => {
-                if (seeRankFromUser.getAttribute('data-user-id') == dataID) {
-                    seeRankFromUser.innerText = 'Admin';
-                }
-            });
-            prefixInputs.forEach(prefixInput => {
-                if (prefixInput.getAttribute('data-user-id') == dataID  && prefixInput.value == '') {
-                    prefixInput.value = 'Admin';
-                }
-            });
-            prefixs.forEach(prefix => {
-                if (prefix.getAttribute('data-user-id') == dataID) {
-                    prefix.classList.add('admin');
-                    if (!prefix.innerText) {
-                        prefix.innerText = `[Admin]`;
-                    }
-                }
-            });
+            Array.from(userContss).find(userCont => userCont.getAttribute('data-user-id') == dataID).classList.add('adminBG');
+            Array.from(seeRankFromUsers).find(seeRankFromUser => seeRankFromUser.getAttribute('data-user-id') == dataID).innerText = 'Admin';
+            const preInput = Array.from(prefixInputs).find(prefixInput => prefixInput.getAttribute('data-user-id') == dataID);
+            if (preInput.value == '') preInput.value = 'Admin';
+            const pre = Array.from(prefixs).find(prefix => prefix.getAttribute('data-user-id') == dataID);
+            pre.classList.add('admin');
+            if (!pre.innerText) pre.innerText = '[Admin]';
         } else if (promoteBtn.classList.contains('demo')) {
             if (promoteBtn.classList.contains('na')) return alert(`You do not have permission to demote ${dataUsername}'s account!`);
             demoteUser(dataID);
             promoteBtn.classList.add('promo');
             promoteBtn.classList.remove('demo');
             promoteBtn.innerText = 'Promote';
-            userContss.forEach(userCont => {
-                if (userCont.getAttribute('data-user-id') == dataID) {
-                    userCont.classList.remove('adminBG');
-                };
-            });
-            seeRankFromUsers.forEach(seeRankFromUser => {
-                if (seeRankFromUser.getAttribute('data-user-id') == dataID) {
-                    seeRankFromUser.innerText = 'User';
-                }
-            });
-            prefixInputs.forEach(prefixInput => {
-                if (prefixInput.getAttribute('data-user-id') == dataID  && prefixInput.value == 'Admin') {
-                    prefixInput.value = '';
-                }
-            });
-            prefixs.forEach(prefix => {
-                if (prefix.getAttribute('data-user-id') == dataID) {
-                    prefix.classList.remove('admin');
-                    if (prefix.innerText == '[Admin]') {
-                        prefix.innerText = ``;
-                    }
-                }
-            });
+            Array.from(userContss).find(userCont => userCont.getAttribute('data-user-id') == dataID).classList.remove('adminBG');
+            Array.from(seeRankFromUsers).find(seeRankFromUser => seeRankFromUser.getAttribute('data-user-id') == dataID).innerText = 'User';
+            const preInput = Array.from(prefixInputs).find(prefixInput => prefixInput.getAttribute('data-user-id') == dataID);
+            if (preInput.value == 'Admin') preInput.value = '';
+            const pre = Array.from(prefixs).find(prefix => prefix.getAttribute('data-user-id') == dataID);
+            pre.classList.remove('admin');
+            if (pre.innerText == '[Admin]') pre.innerText = '';
         }
     });
 });

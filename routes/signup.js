@@ -40,6 +40,7 @@ router.post('/', async (req, res) => {
         dateJoined: Date.now(),
         lastOnline: Date.now(),
         ips: [currentIP],
+        verified: false,
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
       const accessToken = jwt.sign({_id: newID, username: createUserData.username, name: createUserData.name}, process.env.ACCESS_SECRET, { expiresIn: '1d'});

@@ -462,11 +462,14 @@ if (editProfileBtn) {
         const resJSON = await response.json();
         changeUserInput.value = userValue;
         if ((resJSON.response == 'account created')) {
-          submitName.style.color = 'green';
-          window.location.pathname = `/account/${userValue}`;
+          submitUser.style.color = 'green';
+          window.location.href = `/account/${resJSON.username}`
         } else if (resJSON.response == 'username taken') {
           submitUser.style.color = 'red';
           myAlert('Username taken!');
+        } else {
+          submitUser.style.color = 'red';
+          myalert('An error as occured');
         }
       } else {
         submitUser.style.color = 'red';
