@@ -11,7 +11,22 @@ const prefixInputs = document.querySelectorAll('.prefixInput');
 const prefixTexts = document.querySelectorAll('.prefixText');
 const prefixs = document.querySelectorAll('.prefix');
 const userContss = document.querySelectorAll('.userCont');
+const searchInput = document.getElementById('searchInput');
 
+// Search user
+searchInput.addEventListener('keyup', (e) => {
+    userContss.forEach(userCont => {
+        if (e.target.value) {
+            if (userCont.childNodes[3].childNodes[3].childNodes[1].innerText.toLowerCase().includes(e.target.value.toLowerCase()) || userCont.childNodes[3].childNodes[3].childNodes[3].innerText.toLowerCase().includes(e.target.value.toLowerCase())) {
+                userCont.style.display = 'block';
+            } else {
+                userCont.style.display = 'none';
+            }
+        } else {
+            userCont.style.display = 'block';
+        }
+    })
+});
 
 // Set users prefix
 prefixInputs.forEach(prefixInput => {
