@@ -14,6 +14,7 @@ router.get('/', authToken, async (req, res) => {
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       
       if (user.status === 'online') {
+        if (req.body.fromApp) return res.json({user});
         res.render('create', { user });
       }
   } catch (err) {
@@ -22,7 +23,7 @@ router.get('/', authToken, async (req, res) => {
 });
 
 function authToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.redirect('/login');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
       if (err) return res.redirect('/login');
@@ -33,7 +34,7 @@ function authToken(req, res, next) {
 
 // ALL POST REQUEST AUTHORIZATION
 function postAuthToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.sendStatus(401);
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);

@@ -15,7 +15,7 @@ router.get('/:post', async (req, res) => {
     if (post.active) {
       // const account = await Post.findById(post.author._id);
       const account = (await db.collection('users').where('_id', '==', post.author._id).get()).docs[0].data();
-      const token = req.cookies['auth-token'];
+      const token = req.cookies['auth-token'] || req.body.auth_token;
       let passed = true;
       let usersID = '';
       if (token == null) passed = false;
@@ -30,11 +30,14 @@ router.get('/:post', async (req, res) => {
         post.likes.includes(user._id)
           ? (likedpost = true)
           : (likedpost = false);
+        if (req.body.fromApp) return res.json({ post, user, account, likedpost, loggedin: true });
         res.render('post', { post, user, account, likedpost, loggedin: true });
       } else {
+        if (req.body.fromApp) return res.json({status: 'unseccessful'});
         return res.render('post', { post, account, loggedin: false });
       }  
     } else {
+      if (req.body.fromApp) return res.json({status: 'unseccessful'});
       res.send('This post is no longer available!')
     }
     
@@ -45,7 +48,7 @@ router.get('/:post', async (req, res) => {
 
 // ALL POST REQUEST AUTHORIZATION
 function postAuthToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.sendStatus(401);
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);

@@ -22,6 +22,7 @@ router.get('/', authToken, async (req, res) => {
             // Set Last Online
             const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
             if (user.status == 'online') {
+                if (req.body.fromApp) return res.json({user});
                 res.render('messages', { user })
             } else {
              res.redirect('/login');
@@ -33,7 +34,7 @@ router.get('/', authToken, async (req, res) => {
 });
 
 function authToken(req, res, next) {
-    const token = req.cookies['auth-token'];
+    const token = req.cookies['auth-token'] || req.body.auth_token;
     if (token == null) return res.redirect('/login');
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
         if (err) return res.redirect('/login');
@@ -44,7 +45,7 @@ function authToken(req, res, next) {
 
 // ALL POST REQUEST AUTHORIZATION
 function postAuthToken(req, res, next) {
-    const token = req.cookies['auth-token'];
+    const token = req.cookies['auth-token'] || req.body.auth_token;
     if (token == null) return res.sendStatus(401);
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
       if (err) return res.sendStatus(403);

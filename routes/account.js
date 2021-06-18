@@ -84,7 +84,7 @@ router.get('/:username', async (req, res) => {
     //   }
     // });
     let passed = true;
-    const token = req.cookies['auth-token'];
+    const token = req.cookies['auth-token'] || req.body.auth_token;
     if (token == null) passed = false;
     let usersID = '';
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
@@ -92,6 +92,7 @@ router.get('/:username', async (req, res) => {
       usersID = user1._id;
     });
     if (!passed) {
+      if (req.body.fromApp) return res.json({status: 'unseccessful'});
       res.render('account', {
         user: null,
         account,
@@ -111,7 +112,16 @@ router.get('/:username', async (req, res) => {
 
       // Set Last Online
       const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
-      
+      if (req.body.fromApp) return res.json({
+        user,
+        account,
+        accountsFollowers,
+        accountsFollowing,
+        accountsPosts,
+        loggedin: true,
+        parsedLastOnline,
+        status: 'success',
+      });
       return res.render('account', {
         user,
         account,
@@ -131,7 +141,7 @@ router.get('/:username', async (req, res) => {
 
 // ALL POST REQUEST AUTHORIZATION
 function authToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.sendStatus(401);
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);

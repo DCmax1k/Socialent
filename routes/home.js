@@ -32,13 +32,11 @@ router.get('/', authToken, async (req, res) => {
         }
       });
       postsFollowing.sort((a,b) => a.date-b.date);
-      if (user.status === 'online' && (user.rank === 'admin' || user.rank === 'owner')) {
-        // const allUsers = await User.find();
-        const allUsers = (await db.collection('users').get()).docs.map(doc => doc.data()).sort((a, b) => a.dateJoined - b.dateJoined);
-        res.render('home', { user, postsFollowing, allUsers });
-      } else if (user.status === 'online') {
+      if (user.status === 'online') {
+        if (req.body.fromApp) return res.json({user, postsFollowing});
         res.render('home', { user, postsFollowing });
       } else {
+        if (req.body.fromApp) return res.json({status: 'unseccessful'});
         res.redirect('/login');
       }
 
@@ -48,7 +46,7 @@ router.get('/', authToken, async (req, res) => {
 });
 
 function authToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.redirect('/login');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
       if (err) return res.redirect('/login');
@@ -59,7 +57,7 @@ function authToken(req, res, next) {
 
 // ALL POST REQUEST AUTHORIZATION
 function postAuthToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.sendStatus(401);
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
     if (err) return res.sendStatus(403);

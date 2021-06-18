@@ -9,6 +9,7 @@ router.get('/', authToken, async (req, res) => {
         const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
         if (user.rank != 'admin' && user.rank != 'owner') return res.status(403).send('nice try lol');
         const allUsers = (await db.collection('users').get()).docs.map(doc => { return doc.data(); });
+        if (req.body.fromApp) return res.json({user, allUsers});
         res.render('admin', {user, allUsers});
     } catch(err) {
         console.error(err);
@@ -16,7 +17,7 @@ router.get('/', authToken, async (req, res) => {
 });
 
 function authToken(req, res, next) {
-    const token = req.cookies['auth-token'];
+    const token = req.cookies['auth-token'] || req.body.auth_token;
     if (token == null) return res.sendStatus(401);
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
@@ -27,7 +28,7 @@ function authToken(req, res, next) {
 
 // ALL POST REQUEST AUTHORIZATION
 function postAuthToken(req, res, next) {
-    const token = req.cookies['auth-token'];
+    const token = req.cookies['auth-token'] || req.body.auth_token;
     if (token == null) return res.sendStatus(401);
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
       if (err) return res.sendStatus(403);

@@ -32,6 +32,7 @@ router.post('/', async (req, res) => {
       const accessToken = jwt.sign({_id: findUsername._id, username: findUsername.username, name: findUsername.name}, process.env.ACCESS_SECRET, { expiresIn: '1d'});
       res.cookie('auth-token', accessToken).json({
         response: 'logged in',
+        auth_token: accessToken,
         id: findUsername._id,
       });
     } else {
@@ -47,7 +48,7 @@ router.post('/', async (req, res) => {
 });
 
 function authLoginToken(req, res, next) {
-  const token = req.cookies['auth-token'];
+  const token = req.cookies['auth-token'] || req.body.auth_token;
   if (token == null) return res.render('login');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
     if (err) return res.render('login');
