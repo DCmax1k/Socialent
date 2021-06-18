@@ -92,7 +92,6 @@ router.get('/:username', async (req, res) => {
       usersID = user1._id;
     });
     if (!passed) {
-      if (req.body.fromApp) return res.json({status: 'unseccessful'});
       res.render('account', {
         user: null,
         account,
@@ -112,16 +111,6 @@ router.get('/:username', async (req, res) => {
 
       // Set Last Online
       const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
-      if (req.body.fromApp) return res.json({
-        user,
-        account,
-        accountsFollowers,
-        accountsFollowing,
-        accountsPosts,
-        loggedin: true,
-        parsedLastOnline,
-        status: 'success',
-      });
       return res.render('account', {
         user,
         account,
@@ -133,6 +122,99 @@ router.get('/:username', async (req, res) => {
       });
     } else {
       return res.redirect('/login');
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+router.post('/:username/getfromapp', authToken, async (req, res) => {
+  try {
+
+    const account1 = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0]
+    if (account1 == null) return res.redirect('/');
+    const account = account1.data();
+    const oriAccountsPosts = (await db.collection('posts').where('author._id', '==', account._id).get()).docs.map(doc => doc.data());
+    const accountsFollowers = (await db.collection('users').where('following', 'array-contains', account._id).get()).docs.map(doc => doc.data()).sort((a,b) => b.score-a.score);
+    const oriAccountsFollowing = (await db.collection('users').get()).docs.map(doc => doc.data());
+    const accountsFollowing = oriAccountsFollowing.filter(acc => {
+      if (account.following.includes(acc._id)) {
+        return acc;
+      }
+    }).sort((a,b) => b.score-a.score);
+    const accountsPosts = oriAccountsPosts.filter(post => {
+      if (post.active) {
+        return post;
+      }
+    }).sort((a,b) => a.date-b.date);
+    let number;
+    let parsedLastOnline = '';
+    const lastOnlineNumber = account.lastOnline;
+    
+    const currentTime = Date.now();
+    if (currentTime - lastOnlineNumber >  31536000000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24/365).toString().split('.')[0])
+      parsedLastOnline = number + ` year${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber >  2628000000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24/30).toString().split('.')[0])
+      parsedLastOnline = number + ` month${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 604800000 ) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24/7).toString().split('.')[0])
+      parsedLastOnline = number + ` week${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 86400000 ) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60/24).toString().split('.')[0])
+      parsedLastOnline = number + ` day${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 3600000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60/60).toString().split('.')[0])
+      parsedLastOnline = number  + ` hour${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 60000) {
+      number = (((currentTime - lastOnlineNumber)/1000/60).toString().split('.')[0])
+      parsedLastOnline = number + ` minute${number == 1 ? '' : 's'} ago`;
+    } else if (currentTime - lastOnlineNumber > 1000) {
+      number = (((currentTime - lastOnlineNumber)/1000).toString().split('.')[0])
+      parsedLastOnline = number  + ` second${number == 1 ? '' : 's'} ago`;
+    } else {
+      parsedLastOnline = 'Last seen 1 second ago';
+    }
+    let passed = true;
+    const token = req.body.auth_token;
+    if (token == null) passed = false;
+    let usersID = '';
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user1) => {
+      if (err) return passed = false;;
+      usersID = user1._id;
+    });
+    if (!passed) {
+      res.render('account', {
+        user: null,
+        account,
+        accountsFollowers,
+        accountsFollowing,
+        accountsPosts,
+        loggedin: false,
+        parsedLastOnline,
+      })
+      return;
+    }
+    // const user = await User.findById(req.query.k);
+
+    const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
+    if (user.status === 'online') {
+      
+
+      // Set Last Online
+      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      return res.json({
+        user,
+        account,
+        accountsFollowers,
+        accountsFollowing,
+        accountsPosts,
+        loggedin: true,
+        parsedLastOnline,
+        status: 'success',
+      });
+    } else {
+      return res.json({status: 'error'});
     }
   } catch (err) {
     console.error(err);

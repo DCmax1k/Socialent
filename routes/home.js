@@ -33,11 +33,42 @@ router.get('/', authToken, async (req, res) => {
       });
       postsFollowing.sort((a,b) => a.date-b.date);
       if (user.status === 'online') {
-        if (req.body.fromApp) return res.json({user, postsFollowing});
         res.render('home', { user, postsFollowing });
       } else {
-        if (req.body.fromApp) return res.json({status: 'unseccessful'});
         res.redirect('/login');
+      }
+
+  } catch (err) {
+    console.error(err);
+  }
+});
+router.post('/getfromapp', postAuthToken, async (req, res) => {
+  try {
+      // const user = await User.findById(req.query.k);
+      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      const currentIP = await publicIp.v4();
+      if (!user.ips ) {
+        await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [currentIP]);
+      } else if (!user.ips.includes(currentIP)) {
+        await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [...user.ips, currentIP]);
+      }
+      // const posts = await Post.find({active: true});
+      const posts = (await db.collection('posts').where('active', '==', true).get()).docs.map(doc => doc.data());
+      const postsFollowing = [];
+      posts.forEach((post) => {
+        if (
+          user.following.includes(post.author._id) ||
+          JSON.stringify(post.author._id) === JSON.stringify(user._id)
+        ) {
+          postsFollowing.push(post);
+        }
+      });
+      postsFollowing.sort((a,b) => a.date-b.date);
+      if (user.status === 'online') {
+        return res.json({user, postsFollowing});
+      } else {
+        return res.json({status: 'unseccessful'});
       }
 
   } catch (err) {
@@ -46,7 +77,7 @@ router.get('/', authToken, async (req, res) => {
 });
 
 function authToken(req, res, next) {
-  const token = req.cookies['auth-token'] || req.body.auth_token;
+  const token = req.cookies['auth-token'];
   if (token == null) return res.redirect('/login');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
       if (err) return res.redirect('/login');

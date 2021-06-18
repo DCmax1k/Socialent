@@ -48,7 +48,7 @@ router.post('/', async (req, res) => {
 });
 
 function authLoginToken(req, res, next) {
-  const token = req.cookies['auth-token'] || req.body.auth_token;
+  const token = req.cookies['auth-token'];
   if (token == null) return res.render('login');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
     if (err) return res.render('login');

@@ -32,9 +32,32 @@ router.get('/', authToken, async (req, res) => {
     }
     
 });
+router.post('/getfromapp', postAuthToken, async (req, res) => {
+    try {
+            // const user = await User.findById(req.query.k);
+            const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+            // const usersConversations = [];
+            // (await Conversation.find({})).forEach(conversation => {
+            //     if (conversation.people.includes(user._id)) {
+            //         usersConversations.push(conversation);
+            //     }
+            // });
+            // Set Last Online
+            const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+            if (user.status == 'online') {
+                return res.json({user});
+
+            } else {
+             res.redirect('/login');
+            }
+    } catch(err) {
+        console.error(err);
+    }
+    
+});
 
 function authToken(req, res, next) {
-    const token = req.cookies['auth-token'] || req.body.auth_token;
+    const token = req.cookies['auth-token'];
     if (token == null) return res.redirect('/login');
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
         if (err) return res.redirect('/login');

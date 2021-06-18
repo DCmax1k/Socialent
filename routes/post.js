@@ -15,7 +15,7 @@ router.get('/:post', async (req, res) => {
     if (post.active) {
       // const account = await Post.findById(post.author._id);
       const account = (await db.collection('users').where('_id', '==', post.author._id).get()).docs[0].data();
-      const token = req.cookies['auth-token'] || req.body.auth_token;
+      const token = req.cookies['auth-token'];
       let passed = true;
       let usersID = '';
       if (token == null) passed = false;
@@ -33,12 +33,44 @@ router.get('/:post', async (req, res) => {
         if (req.body.fromApp) return res.json({ post, user, account, likedpost, loggedin: true });
         res.render('post', { post, user, account, likedpost, loggedin: true });
       } else {
-        if (req.body.fromApp) return res.json({status: 'unseccessful'});
         return res.render('post', { post, account, loggedin: false });
       }  
     } else {
-      if (req.body.fromApp) return res.json({status: 'unseccessful'});
       res.send('This post is no longer available!')
+    }
+    
+  } catch (err) {
+    console.error(err);
+  }
+});
+router.post('/:post/getfromapp', async (req, res) => {
+  try {
+    // const post = await Post.findById(req.params.post);
+    const post = (await db.collection('posts').where('_id', '==', req.params.post).get()).docs[0].data();
+    if (post.active) {
+      // const account = await Post.findById(post.author._id);
+      const account = (await db.collection('users').where('_id', '==', post.author._id).get()).docs[0].data();
+      const token = req.cookies['auth-token'] || req.body.auth_token;
+      let passed = true;
+      let usersID = '';
+      if (token == null) passed = false;
+      jwt.verify(token, process.env.ACCESS_SECRET, (err, us) => {
+        if (err) return passed = false;
+        usersID = us._id;
+      });
+      if (passed) { 
+        // const user = await User.findById(req.query.k);
+        const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
+        let likedpost = false;
+        post.likes.includes(user._id)
+          ? (likedpost = true)
+          : (likedpost = false);
+        return res.json({ post, user, account, likedpost, loggedin: true });
+      } else {
+        return res.json({status: 'unseccessful'});
+      }  
+    } else {
+      return res.json({status: 'unseccessful'});
     }
     
   } catch (err) {
