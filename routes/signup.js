@@ -48,6 +48,8 @@ router.post('/', async (req, res) => {
         response: 'account created',
         id: newID,
         username: req.body.username,
+        user: createUserData,
+        auth_token: accessToken,
       });
     }
   } catch (err) {
