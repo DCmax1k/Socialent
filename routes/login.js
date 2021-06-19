@@ -34,6 +34,7 @@ router.post('/', async (req, res) => {
         response: 'logged in',
         auth_token: accessToken,
         id: findUsername._id,
+        user, findUsername,
       });
     } else {
       res.json({
