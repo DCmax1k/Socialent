@@ -11,11 +11,9 @@ router.get('/', authToken, async (req, res) => {
   try {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-      if (user.status === 'online') {
+
         res.render('search', { user });
-      } else {
-        res.redirect('/login');
-      }
+
   } catch (err) {
     console.error(err);
   }
@@ -24,11 +22,9 @@ router.post('/getfromapp', postAuthToken, async (req, res) => {
   try {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-      if (user.status === 'online') {
+
         return res.json({user});
-      } else {
-        return res.json({status: 'unseccessful'});
-      }
+
   } catch (err) {
     console.error(err);
   }
@@ -60,7 +56,6 @@ router.post('/', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
       // Search for account by username
       const dupeDataUsernames = [];
       const searchUsername = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).filter((account) => {
@@ -87,11 +82,7 @@ router.post('/', postAuthToken, async (req, res) => {
         searchedAccounts: usersFound,
         status: 'success',
       });
-    } else {
-      res.json({
-        status: 'wrong user',
-      });
-    }
+
   } catch (err) {
     console.error(err);
   }

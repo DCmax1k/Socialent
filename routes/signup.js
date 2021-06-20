@@ -4,6 +4,7 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const publicIp = require('public-ip');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 // const User = require('../models/User');
 
@@ -23,15 +24,15 @@ router.post('/', async (req, res) => {
     } else {
       const newID = Date.now().toString(16) + Math.random().toString(16).slice(2);
       const currentIP = await publicIp.v4();
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const createUserData = {
         _id: newID,
         emailData: { email: req.body.email, verified: false },
         name: req.body.name,
         username: req.body.username,
-        password: req.body.password,
+        password: hashedPassword,
         score: 0,
         prefix: { title: ''},
-        status: 'online',
         rank: 'user',
         profileImg: 'none',
         description: '',

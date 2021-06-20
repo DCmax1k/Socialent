@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 // const nodemailer = require('nodemailer');
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const bcrypt = require('bcrypt');
 
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
@@ -106,7 +107,6 @@ router.get('/:username', async (req, res) => {
     // const user = await User.findById(req.query.k);
 
     const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
-    if (user.status === 'online') {
       
 
       // Set Last Online
@@ -120,9 +120,6 @@ router.get('/:username', async (req, res) => {
         loggedin: true,
         parsedLastOnline,
       });
-    } else {
-      return res.redirect('/login');
-    }
   } catch (err) {
     console.error(err);
   }
@@ -198,7 +195,6 @@ router.post('/:username/getfromapp', authToken, async (req, res) => {
     // const user = await User.findById(req.query.k);
 
     const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
-    if (user.status === 'online') {
       
 
       // Set Last Online
@@ -213,9 +209,7 @@ router.post('/:username/getfromapp', authToken, async (req, res) => {
         parsedLastOnline,
         status: 'success',
       });
-    } else {
-      return res.json({status: 'error'});
-    }
+
   } catch (err) {
     console.error(err);
   }
@@ -238,8 +232,6 @@ router.post('/changeimg', authToken, async (req, res) => {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
 
-    if (user.status === 'online') {
-
       // Update profile pic
       // const updateProfileImg = await User.findByIdAndUpdate( user._id, { profileImg: req.body.imgURL, }, { useFindAndModify: false });
       // const saveUser = await updateProfileImg.save();
@@ -258,11 +250,7 @@ router.post('/changeimg', authToken, async (req, res) => {
       res.json({
         status: 'success',
       });
-    } else {
-      res.json({
-        status: 'error',
-      });
-    }
+
   } catch (err) {
     console.error(err);
   }
@@ -296,14 +284,14 @@ router.post('/deleteaccount', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
+
       const deleteTheUser = await deleteUser(user._id);
       if (deleteTheUser === 'success') {
         res.clearCookie('auth-token').json({
           status: 'success',
         })
       }
-    }
+    
   } catch(err) {
     console.error(err);
   }
@@ -314,7 +302,6 @@ router.post('/followprofile', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
       // const account = await User.findById(req.body.accountID);
       const account = (await db.collection('users').where('_id', '==', req.body.accountID).get()).docs[0].data();
       if (!user.following.includes(account._id)) {
@@ -349,7 +336,7 @@ router.post('/followprofile', authToken, async (req, res) => {
           which: 'not following',
         });
       }
-    }
+
   } catch (err) {
     console.error(err);
   }
@@ -375,7 +362,6 @@ router.post('/editprofile/verifyemail', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
       let verifyEmailCode = JSON.stringify(Math.random())
         .split('')
         .slice(2)
@@ -441,7 +427,7 @@ router.post('/editprofile/verifyemail', authToken, async (req, res) => {
         status: 'sent email',
         email: user.emailData.email,
       });
-    }
+
   } catch (err) {
     console.error(err);
   }
@@ -468,11 +454,12 @@ router.post('/editprofile/changepassword', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
-      if (req.body.currentPassword === user.password) {
+      // if (req.body.currentPassword === user.password) {
+        if (await bcrypt.compare(req.body.currentPassword, user.password)) {
         // const updatePassword = await User.findByIdAndUpdate(user._id,{password: req.body.newPassword,},{ useFindAndModify: false });
         // const saveUser = await updatePassword.save();
-        const updatePassword = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('password', req.body.newPassword);
+        const hashedPassword = await bcrypt.hash(req.body.newPassword, 10);
+        const updatePassword = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('password', hashedPassword);
         res.json({
           status: 'success',
         });
@@ -481,7 +468,7 @@ router.post('/editprofile/changepassword', authToken, async (req, res) => {
           status: 'incorrect password',
         });
       }
-    }
+    
   } catch (err) {
     console.error(err);
   }
@@ -492,14 +479,13 @@ router.post('/editprofile/changename', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
       // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
       // const saveUser = await updateName.save();
       const updateName = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('name', req.body.name);
       res.json({
         status: 'success',
       });
-    }
+    
   } catch (err) {
     console.error(err);
   }
@@ -509,7 +495,6 @@ router.post('/editprofile/changeuser', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
       // const updateName = await User.findByIdAndUpdate(user._id,{name: req.body.name,},{ useFindAndModify: false });
       // const saveUser = await updateName.save();
       const findUserUsername = (await db.collection('users').where('username', '==', req.body.username).get()).docs.map(doc => doc.data());
@@ -552,7 +537,7 @@ router.post('/editprofile/changeuser', authToken, async (req, res) => {
           username: req.body.username,
         });
       }
-    }
+    
   } catch (err) {
     console.error(err);
   }
@@ -563,7 +548,7 @@ router.post('/editprofile/changeemail', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
+
       // const updateEmail = await User.findByIdAndUpdate(user._id,{'emailData.email': req.body.email,},{ useFindAndModify: false });
       // const saveUser = await updateEmail.save();
       const updateEmail = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.email', req.body.email);
@@ -573,7 +558,7 @@ router.post('/editprofile/changeemail', authToken, async (req, res) => {
       res.json({
         status: 'success',
       });
-    }
+    
   } catch (err) {
     console.error(err);
   }
@@ -584,7 +569,7 @@ router.post('/editprofile/updatebio', authToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
+
       // const update = await User.findByIdAndUpdate(user._id,{ description: req.body.bio },{ useFindAndModify: false });
       // const save = await update.save();
       const updateBio = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('description', req.body.bio);
@@ -592,7 +577,7 @@ router.post('/editprofile/updatebio', authToken, async (req, res) => {
         status: 'successful',
         bio: req.body.bio,
       });
-    }
+    
   } catch (err) {
     console.error(err);
   }

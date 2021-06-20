@@ -94,7 +94,7 @@ router.post('/likepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
+
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       if (!post.likes.includes(user._id)) {
@@ -106,11 +106,7 @@ router.post('/likepost', postAuthToken, async (req, res) => {
           likesAmount: post.likes.length,
         });
       }
-    } else {
-      res.json({
-        status: 'offline',
-      });
-    }
+
   } catch (err) {
     console.error(err);
   }
@@ -121,7 +117,7 @@ router.post('/unlikepost', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
+
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       if (post.likes.includes(user._id)) {
@@ -139,11 +135,7 @@ router.post('/unlikepost', postAuthToken, async (req, res) => {
           likesAmount: post.likes.length,
         });
       }
-    } else {
-      res.json({
-        status: 'offline',
-      });
-    }
+
   } catch (err) {
     console.error(err);
   }
@@ -154,7 +146,7 @@ router.post('/addcomment', postAuthToken, async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.status === 'online') {
+
       // const post = await Post.findById(req.body.postID);
       const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
       // const updateComments = await Post.findByIdAndUpdate(post._id,{$push: { comments: [user.username, req.body.comment, req.body.date] },},{ useFindAndModify: false });
@@ -166,7 +158,7 @@ router.post('/addcomment', postAuthToken, async (req, res) => {
         comment: req.body.comment,
         date: req.body.date,
       });
-    }
+    
   } catch (err) {
     console.error(err);
   }

@@ -13,9 +13,8 @@ router.get('/', authToken, async (req, res) => {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       
-      if (user.status === 'online') {
         res.render('create', { user });
-      }
+
   } catch (err) {
     console.error(err);
   }
@@ -25,9 +24,9 @@ router.post('/getfromapp', postAuthToken, async (req, res) => {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       
-      if (user.status === 'online') {
+
         return res.json({user});
-      }
+      
   } catch (err) {
     console.error(err);
   }

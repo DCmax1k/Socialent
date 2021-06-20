@@ -4,6 +4,7 @@ const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 
 // const User = require('../models/User');
@@ -19,13 +20,8 @@ router.post('/', async (req, res) => {
   // const findUsername = await User.findOne({ username: req.body.username });
   const findUsername = (await db.collection('users').where('username', '==', req.body.username).get()).docs.map(doc => doc.data())[0];
   if (findUsername) {
-    if (findUsername.password === req.body.password) {
-      
-      if (findUsername.status != 'online') {
-        // const changeStatus = await User.findByIdAndUpdate(findUsername._id,{$set: { status: 'online' },},{ useFindAndModify: false });
-        // const saveUser = await changeStatus.save();
-        const changeStatus = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('status', 'online');
-      }
+    // if (findUsername.password === req.body.password) {
+      if (await bcrypt.compare(req.body.password, findUsername.password)) {
       // Set Last Online
       const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
       // Set JSON Web Token

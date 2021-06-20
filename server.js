@@ -5,6 +5,7 @@ require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const publicIp = require('public-ip');
+const bcrypt = require('bcrypt');
 
 const admin = require("firebase-admin");
 
@@ -105,7 +106,7 @@ app.use('/admin', adminRoute);
 //   try {
 //     (await db.collection('users').get()).docs.forEach( async doc => {
 //       try {
-//         await doc.ref.update({devices: admin.firestore.FieldValue.delete()});
+//         await doc.ref.update({hashedPassword: admin.firestore.FieldValue.delete()});
 //       } catch(err) {
 //         console.error(err);
 //       }

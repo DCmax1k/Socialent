@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const firebase = require('firebase-admin');
 const db = firebase.firestore();
+const bcrypt = require('bcrypt');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -87,7 +88,8 @@ router.post('/resetpassword',  async (req, res) => {
                         status: 'The confirm password input does not match the first input. They must match!',
                     });
                 } else {
-                    const updatePassword = await checkUser[0].ref.update('password', req.body.confirmPassword);
+                    const hashedPassword = await bcrypt.hash(req.body.confirmPassword, 10);
+                    const updatePassword = await checkUser[0].ref.update('password', hashedPassword);
                     const changeCode = await checkUser[0].ref.update('emailData.emailCode', Date.now().toString(16));
                     res.json({
                         status: 'success',
