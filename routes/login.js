@@ -44,6 +44,35 @@ router.post('/', async (req, res) => {
   }
 });
 
+// Login request from mobile app
+router.post('/fromapp', async (req, res) => {
+  // const findUsername = await User.findOne({ username: req.body.username });
+  const findUsername = (await db.collection('users').where('username', '==', req.body.username).get()).docs.map(doc => doc.data())[0];
+  if (findUsername) {
+    // if (findUsername.password === req.body.password) {
+      if (await bcrypt.compare(req.body.password, findUsername.password)) {
+      // Set Last Online
+      const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      // Set JSON Web Token
+      const accessToken = jwt.sign({_id: findUsername._id, username: findUsername.username, name: findUsername.name}, process.env.ACCESS_SECRET);
+      res.cookie('auth-token', accessToken).json({
+        response: 'logged in',
+        auth_token: accessToken,
+        id: findUsername._id,
+        user: findUsername,
+      });
+    } else {
+      res.json({
+        response: 'wrong password',
+      });
+    }
+  } else {
+    res.json({
+      response: 'wrong username',
+    });
+  }
+});
+
 function authLoginToken(req, res, next) {
   const token = req.cookies['auth-token'];
   if (token == null) return res.render('login');
