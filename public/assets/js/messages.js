@@ -1,4 +1,6 @@
-const socket = io(`${window.location.protocol}//${window.location.host}`);
+const socket = io();
+// Join personal room to listen for new conversations
+socket.emit('joinUserRoom', { userID });
 
 socket.on('message', text => {
     console.log(text);
@@ -209,14 +211,14 @@ const checkConversations = async () => {
     
 }
 checkConversations();
-setInterval(async () => {
-    if (!checkConversationsLoading) {
-        checkConversationsLoading = true;
-        await checkConversations();  
-        checkConversationsLoading = false;
-    }
+// setInterval(async () => {
+//     if (!checkConversationsLoading) {
+//         checkConversationsLoading = true;
+//         await checkConversations();  
+//         checkConversationsLoading = false;
+//     }
 
-}, 3000);
+// }, 3000);
 
 
 // Function for click on conversation - Listener added when the element is created
@@ -231,9 +233,9 @@ const clickedConversation = (conversation) => {
             });
             internalMessages.innerHTML = '';
             // loadConversation();
-            checkConversations();
+            // checkConversations();
         } else {
-
+            socket.emit('leaveConversation', { conversationLoaded });
             socket.emit('joinConversation', { conversationID, userID });
 
             conversationLoaded = conversationID;
@@ -250,7 +252,7 @@ const clickedConversation = (conversation) => {
                     messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                 }
             }); 
-            checkConversations();
+            // checkConversations();
         }
 }
 

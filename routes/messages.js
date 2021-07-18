@@ -11,6 +11,11 @@ const io = socketio(server);
 
 io.on('connection', (socket) => {
     console.log('user connected');
+    // Join own personal user room to listen for new conversations
+    socket.on('joinUserRoom', ({ userID }) => {
+        console.log('Joined user room');
+        socket.join(userID);
+    });
     // Join conversation
     socket.on('joinConversation', async ({conversationID, userID, auth_token}) => {
       console.log('Joined converstaion');
