@@ -2,13 +2,6 @@ const socket = io();
 // Join personal room to listen for new conversations
 socket.emit('joinUserRoom', { userID });
 
-socket.on('message', text => {
-    console.log(text);
-});
-
-function emitMessage(message) {
-    socket.emit('message', message);
-};
 
 let conversations = document.querySelectorAll('.conversation');
 const messaging = document.getElementById('messaging');
@@ -38,6 +31,91 @@ let lastSentMessages = [];
 let lastSentMessageIndex = -1;
 
 const usersFromDB = {};
+
+// ** NEW CODE **
+
+// Listen for new message
+socket.on('message', message => {
+    const node = document.createElement('div');
+    node.classList.add('text-box');
+    // last child of internalMessages
+    node.setAttribute('data-text-date', message.date);
+    node.setAttribute('data-text-type', message.type);
+    if (message.sender === userID) {
+        node.classList.add('sent-text');
+    } else {
+        node.classList.add('received-text');
+    }
+    if (message.type === 'img') {
+        node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>`;
+    } else {
+        const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
+        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i></div>`;
+        
+    }
+    
+    // Add event listener to delete buttons
+    const deleteBtn = node.querySelector('.delete-btn');
+    deleteBtn.addEventListener('click', (e) => {
+        deleteText(e.target.getAttribute('data-text-date'));
+    })
+
+    // Load html
+    internalMessages.appendChild(node);
+    internalMessages.scrollTop = internalMessages.scrollHeight;
+});
+
+socket.on('deleteMessage', textDate => {
+    // Visually instant delete
+    const allTexts = document.querySelectorAll('i');
+    allTexts.forEach(text => {
+        if (text.getAttribute('data-text-date') == textDate) {
+            if (text.getAttribute('data-text-type') == 'img') {
+                text.parentNode.remove();
+            } else {
+                text.parentNode.parentNode.remove();
+            }
+            
+        }
+    })
+});
+
+socket.on('addedConvo', ({sender, conversationID}) => {
+    // Generate conversation html
+    const receiverUser = sender;
+    const node = document.createElement('div');
+    node.classList.add('conversation');
+    node.setAttribute('data-conversation-id', conversationID);
+    let prefixHTML = ``;
+    if (receiverUser.prefix.title) {
+        if (receiverUser.rank === 'owner') {
+        prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+        } else if (receiverUser.rank === 'admin') {
+        prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+        } else {
+        prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
+        }
+    }
+    
+    node.innerHTML = 
+    `
+    <h2>${prefixHTML} ${receiverUser.username}</h2>
+    <h4>Start Messaging!</h4>
+    <i class="fas fa-circle notification active"></i>
+    `;
+
+    node.addEventListener('click', () => { clickedConversation(node) });
+    messagesList.appendChild(node);
+});
+
+// Send message
+function emitMessage(conversationID, message) {
+    // Message = { value: '', type: 'text', sender: userID, date: Date.now() };
+    socket.emit('message', {conversationID, message});
+};
+
+
+// ** OLD CODE **
 
 // Check for Conversations *Right when page loads & periodically*
 const checkConversations = async () => {
@@ -144,25 +222,24 @@ const checkConversations = async () => {
                                 conversation.messages.forEach((message, i) => {
                                     const node = document.createElement('div');
                                     node.classList.add('text-box');
-                                    node.setAttribute('data-text-index', conversation.messages.length-i)
-                                    node.setAttribute('data-text-read', message.seen);
+                                    node.setAttribute('data-text-date', message.date)
                                     if (message.sender === userID) {
                                         node.classList.add('sent-text');
                                     } else {
                                         node.classList.add('received-text');
                                     }
                                     if (message.type === 'img') {
-                                        node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i>`;
+                                        node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>`;
                                     } else {
                                         const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
-                                        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${conversation.messages.length-i}"></i></div>`;
+                                        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i></div>`;
                                         
                                     }
                                     
                                     // Add event listener to delete buttons
                                     const deleteBtn = node.querySelector('.delete-btn');
                                     deleteBtn.addEventListener('click', (e) => {
-                                        deleteText(e.target.getAttribute('data-text-index'));
+                                        deleteText(e.target.getAttribute('data-text-date'));
                                     })
         
                                     // Load html
@@ -233,11 +310,10 @@ const clickedConversation = (conversation) => {
             });
             internalMessages.innerHTML = '';
             // loadConversation();
-            // checkConversations();
+            checkConversations();
         } else {
-            socket.emit('leaveConversation', { conversationLoaded });
+            socket.emit('leaveConversation', { conversationID: conversationLoaded });
             socket.emit('joinConversation', { conversationID, userID });
-
             conversationLoaded = conversationID;
 
             let tempConversations = document.querySelectorAll('.conversation');
@@ -252,7 +328,7 @@ const clickedConversation = (conversation) => {
                     messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                 }
             }); 
-            // checkConversations();
+            checkConversations();
         }
 }
 
@@ -313,17 +389,35 @@ const addConversationSubmitFunction = async () => {
         }
         if (resJSON.status === 'success') {
             // Generate conversation html
-            const receiverUsername = resJSON.username;
+            const receiverUser = resJSON.receiver;
             const node = document.createElement('div');
             node.classList.add('conversation');
             node.setAttribute('data-conversation-id', resJSON.conversationID);
+            let prefixHTML = ``;
+            if (receiverUser.prefix.title) {
+                if (receiverUser.rank === 'owner') {
+                prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                } else if (receiverUser.rank === 'admin') {
+                prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                } else {
+                prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
+                }
+            }
+            
             node.innerHTML = 
             `
-            <h2>${receiverUsername}</h2>
+            <h2>${prefixHTML} ${receiverUser.username}</h2>
             <h4>Start Messaging!</h4>
+            <i class="fas fa-circle notification active"></i>
             `;
+
+            node.addEventListener('click', () => { clickedConversation(node) });
+            messagesList.insertBefore(node, messagesList.firstChild);
+
             addConversationSubmit.innerText = 'Add';
             addConversationInput.value = '';
+            socket.emit('addedConvo', { receiver: resJSON.receiver, conversationID: resJSON.conversationID, sender: resJSON.sender });
+
         } else {
             window.location.href = '/login';
         }    
@@ -419,69 +513,70 @@ sendMessageBtn.addEventListener('click', () => {
     }
 });
 
-const instantMessageSend = (message) => {
-    if (!checkConversationsLoading) {
-        const node = document.createElement('div');
-        node.classList.add('text-box');
-        node.setAttribute('data-text-read', 'read');
-        node.classList.add('sent-text');
-        const newMessageValue = message.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
-        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i></div>`;
-        internalMessages.appendChild(node);
-        internalMessages.scrollTop = internalMessages.scrollHeight;    
-    } else {
-        setTimeout(() => { instantMessageSend(message); }, 100);
-    }
+// const instantMessageSend = (message) => {
+//     if (!checkConversationsLoading) {
+//         const node = document.createElement('div');
+//         node.classList.add('text-box');
+//         node.setAttribute('data-text-read', 'read');
+//         node.classList.add('sent-text');
+//         const newMessageValue = message.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
+//         node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i></div>`;
+//         internalMessages.appendChild(node);
+//         internalMessages.scrollTop = internalMessages.scrollHeight;    
+//     } else {
+//         setTimeout(() => { instantMessageSend(message); }, 100);
+//     }
     
-};
+// };
 
-instantImgSend = (img) => {
-    if (!checkConversationsLoading) {
-        const node = document.createElement('div');
-        node.classList.add('text-box');
-        node.setAttribute('data-text-read', 'read');
-        node.classList.add('sent-text');
-        node.innerHTML = `<img src="${img}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i>`;
-        internalMessages.appendChild(node);
-        internalMessages.childNodes[internalMessages.childNodes.length - 1].childNodes[0].onload = () => {
-            internalMessages.scrollTop = internalMessages.scrollHeight;  
-        }
-    } else {
-        setTimeout(() => { instantImgSend(img); }, 100);
-    }
-}
+// instantImgSend = (img) => {
+//     if (!checkConversationsLoading) {
+//         const node = document.createElement('div');
+//         node.classList.add('text-box');
+//         node.setAttribute('data-text-read', 'read');
+//         node.classList.add('sent-text');
+//         node.innerHTML = `<img src="${img}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i>`;
+//         internalMessages.appendChild(node);
+//         internalMessages.childNodes[internalMessages.childNodes.length - 1].childNodes[0].onload = () => {
+//             internalMessages.scrollTop = internalMessages.scrollHeight;  
+//         }
+//     } else {
+//         setTimeout(() => { instantImgSend(img); }, 100);
+//     }
+// }
 
 const sendMessage = async (conversationID, senderID, message) => {
     messageInput.value = '';
     lastSentMessages.unshift(message);
     // Instantly show message sent
-    if (conversationLoaded) {
-        instantMessageSend(message);
-    }
-    checkConversationsLoading = true;
+    // if (conversationLoaded) {
+    //     instantMessageSend(message);
+    // }
+    // checkConversationsLoading = true;
     // Actually send message
-    const response = await fetch('/messages/sendmessage', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            conversationID,
-            senderID,
-            message,
-            date: Date.now(),
-            device: window.navigator.userAgent,
-        })
-    });
-    const resJSON = await response.json();
-    checkConversationsLoading = false;
-    if (resJSON.status === 'success') {
-        // loadConversation(conversationID);
-        checkConversations();
+    emitMessage(conversationID, { value: message, type: 'text', sender: senderID, date: Date.now() });
+    // const response = await fetch('/messages/sendmessage', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //         conversationID,
+    //         senderID,
+    //         message,
+    //         date: Date.now(),
+    //         device: window.navigator.userAgent,
+    //     })
+    // });
+    // const resJSON = await response.json();
+    // checkConversationsLoading = false;
+    // if (resJSON.status === 'success') {
+    //     // loadConversation(conversationID);
+    //     checkConversations();
 
-    } else {
-        window.location.href = '/login';
-    }
+    // } else {
+    //     window.location.href = '/login';
+    // }
 }
 
 sendImgIcon.addEventListener('click', () => {
@@ -512,7 +607,7 @@ sendImgFile.addEventListener('change', (e) => {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(ev.target, 0, 0, canvas.width, canvas.height);
                 const encodedSrc = ctx.canvas.toDataURL('image/jpeg');
-                instantImgSend(encodedSrc);
+                // instantImgSend(encodedSrc);
                 sendImg(conversationLoaded, userID, encodedSrc);
             }
         }
@@ -520,33 +615,31 @@ sendImgFile.addEventListener('change', (e) => {
 })
 
 const sendImg = async (conversationID, senderID, message) => {
-    try {
-        checkConversationsLoading = true;
-        const response = await fetch('/messages/sendimg', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                conversationID,
-                senderID,
-                message,
-                date: Date.now(),
-                device: window.navigator.userAgent,
-            })
-        });
-        const resJSON = await response.json();
-        checkConversationsLoading = false;
-        if (resJSON.status === 'success') {
-            messageInput.value = '';
-            // loadConversation(conversationID);
-            checkConversations();
-        } else {
-            window.location.href = '/login';
-        }    
-    } catch(err) {
-        myAlert('Something went wrong.')
-    }
+    // checkConversationsLoading = true;
+    // Actually send img
+    emitMessage(conversationID, { value: message, type: 'img', sender: senderID, date: Date.now() });
+    // const response = await fetch('/messages/sendimg', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({
+    //         conversationID,
+    //         senderID,
+    //         message,
+    //         date: Date.now(),
+    //         device: window.navigator.userAgent,
+    //     })
+    // });
+    // const resJSON = await response.json();
+    // checkConversationsLoading = false;
+    // if (resJSON.status === 'success') {
+    //     messageInput.value = '';
+    //     // loadConversation(conversationID);
+    //     checkConversations();
+    // } else {
+    //     window.location.href = '/login';
+    // }    
     
 }
 
@@ -558,44 +651,39 @@ editMessages.addEventListener('click', () => {
     });
 });
 
-const deleteText = async (textIndex) => {
-    checkConversationsLoading = true;
-    try {
-        editMessages.style.visibility = 'hidden';
-        // Visually instant delete
-        const allTexts = document.querySelectorAll('.text > i');
-        allTexts.forEach(text => {
-            if (text.getAttribute('data-text-index') == textIndex) {
-                text.parentNode.parentNode.remove();
-            }
-        })
+const deleteText = (textDate) => {
+
+    socket.emit('deleteMessage', {conversationID: conversationLoaded, textDate, userID});
+    // checkConversationsLoading = true;
+    // try {
+    //     editMessages.style.visibility = 'hidden';
         
-        const response = await fetch('/messages/deletetext', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userID,
-                textIndex,
-                conversationLoaded,
-                device: window.navigator.userAgent,
-            }),
-        });
-        const resJSON = await response.json();
-        editMessages.style.visibility = 'visible';
-        checkConversationsLoading = false;
-        if (resJSON.status === 'unseccessful') {
-            window.location.href = '/login';
-        } else if (resJSON.status === 'wrong-user') {
-            myAlert('You can only delete messages YOU send!');
-        } else if (resJSON.status === 'success') {
-            // await loadConversation(conversationLoaded);
-            await checkConversations();
-        }
-    } catch (err) {
-        console.error(err);
-    }
+    //     const response = await fetch('/messages/deletetext', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify({
+    //             userID,
+    //             textDate,
+    //             conversationLoaded,
+    //             device: window.navigator.userAgent,
+    //         }),
+    //     });
+    //     const resJSON = await response.json();
+    //     editMessages.style.visibility = 'visible';
+    //     checkConversationsLoading = false;
+    //     if (resJSON.status === 'unseccessful') {
+    //         window.location.href = '/login';
+    //     } else if (resJSON.status === 'wrong-user') {
+    //         myAlert('You can only delete messages YOU send!');
+    //     } else if (resJSON.status === 'success') {
+    //         // await loadConversation(conversationLoaded);
+    //         await checkConversations();
+    //     }
+    // } catch (err) {
+    //     console.error(err);
+    // }
 }
 
 //Gets rid of input bar if nothing in conversationLoaded
