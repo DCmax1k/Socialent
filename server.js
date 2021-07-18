@@ -1,5 +1,9 @@
 const express = require('express');
 const app = express();
+
+const server = require('http').createServer(app);
+module.exports = server;
+
 // const mongoose = require('mongoose');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
@@ -131,6 +135,6 @@ app.use('/admin', adminRoute);
 
 
 // PORT
-app.listen(process.env.PORT || 80, () => {
+server.listen(process.env.PORT || 80, () => {
   console.log('Listening...');
 });

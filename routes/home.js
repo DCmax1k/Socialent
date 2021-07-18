@@ -96,12 +96,13 @@ function postAuthToken(req, res, next) {
 router.post('/editdesc', postAuthToken, async (req, res) => {
   try { 
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+      if (user._id == req.body.postID) {
 
       const udpatePost = await (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].ref.update('description', req.body.desc);
       res.json({
         status: 'success',
       });
-
+    }
   } catch(err) {
     console.error(err);
   }

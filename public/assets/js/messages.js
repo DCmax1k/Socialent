@@ -1,3 +1,13 @@
+const socket = io(`${window.location.protocol}//${window.location.host}`);
+
+socket.on('message', text => {
+    console.log(text);
+});
+
+function emitMessage(message) {
+    socket.emit('message', message);
+};
+
 let conversations = document.querySelectorAll('.conversation');
 const messaging = document.getElementById('messaging');
 const addConversation = document.getElementById('addConversation');
@@ -24,115 +34,6 @@ let conversationLoading = false;
 let checkConversationsLoading = false;
 let lastSentMessages = [];
 let lastSentMessageIndex = -1;
-
-// // Load conversation takes a conversation ID and loads its messages & removes and adds new html
-// const loadConversation = async (conversationID) => {
-//     if (!document.hidden) {
-//         try {
-//             // Make the conversation background darker to show it is selected
-//             // First remove other conversation darkened backgrounds
-//             let tempConversations = document.querySelectorAll('.conversation');
-//             tempConversations.forEach(conversation => {
-//                 conversation.classList.remove('active');
-//             });
-//             tempConversations.forEach(conversation1 => {
-//                 if (conversation1.getAttribute('data-conversation-id') == conversationID) {
-//                     conversation1.classList.add('active');
-
-//                     // Set header user
-//                     messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
-//                 }
-//             }); 
-//             if (!conversationLoading) {
-//                 conversationLoading = true;
-//                 if (conversationID) {
-//                     conversationLoaded = conversationID;
-//                     const response = await fetch('/messages/loadconversation', {
-//                         method: 'POST',
-//                         headers: {
-//                             'Content-Type': 'application/json',
-//                         },
-//                         body: JSON.stringify({
-//                             userID,
-//                             conversationID,
-//                         }),
-//                     });
-//                     const resJSON = await response.json();
-//                     if (resJSON.status === 'success') {
-//                         const previousHTML = internalMessages.innerText;
-//                         // Removes previous html
-//                         internalMessages.innerHTML = '';
-//                         // Loops through messages generating html
-//                         resJSON.messages.forEach((message, i) => {
-//                             const node = document.createElement('div');
-//                             node.classList.add('text-box');
-//                             node.setAttribute('data-text-index', resJSON.messages.length-i)
-//                             node.setAttribute('data-text-read', message.seen);
-//                             if (message.sender === userID) {
-//                                 node.classList.add('sent-text');
-//                             } else {
-//                                 node.classList.add('received-text');
-//                             }
-//                             if (message.type === 'img') {
-//                                 node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i>`;
-//                             } else {
-//                                 node.innerHTML = `<div class="text">${message.value}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-index="${resJSON.messages.length-i}"></i></div>`;
-//                             }
-                            
-//                             // Add event listener to delete buttons
-//                             const deleteBtn = node.querySelector('.delete-btn');
-//                             deleteBtn.addEventListener('click', (e) => {
-//                                 deleteText(e.target.getAttribute('data-text-index'));
-//                             })
-
-//                             // Load html
-//                             internalMessages.appendChild(node);
-//                         });
-//                         const newHTML = internalMessages.innerText;
-//                         // Scroll to bottom
-//                         if (previousHTML !== newHTML && !editMode) {
-//                             internalMessages.scrollTop = internalMessages.scrollHeight;
-//                             document.querySelectorAll('.text.img').forEach( img => {
-//                                 img.onload = () => {
-//                                     internalMessages.scrollTop = internalMessages.scrollHeight;
-//                                 };
-//                             });    
-//                         }
-//                     } else {
-//                         window.location.href = '/login';
-//                     }   
-//                 } else {
-//                     internalMessages.innerHTML = '';
-//                     conversationLoaded = '';
-//                     // Make the conversation background light to show it is no longer selected
-//                     conversations = document.querySelectorAll('.conversation');
-//                     conversations.forEach(conversation => {
-//                         conversation.classList.remove('active');
-//                     });
-//                 }  
-//                 conversationLoading = false;  
-//             } else {
-//                 setTimeout(async () => {
-//                     await loadConversation(conversationLoaded);
-//                 }, 500);
-//             }
-            
-//         } catch(err) {
-//             console.error(err);
-//         }    
-//     }
-    
-    
-    
-// }
-// // Periodic load conversation here, all code from above.
-// setInterval(async () => {
-//     if (!conversationLoading) {
-//         conversationLoading = true;
-//         await loadConversation(conversationLoaded);
-//         conversationLoading = false;  
-//     }
-// }, 3000)
 
 const usersFromDB = {};
 
@@ -164,7 +65,7 @@ const checkConversations = async () => {
                             receiverID = conversation.people[0];
                         }
 
-                        let receiverUser; // await lookupUsername(receiverID);  
+                        let receiverUser;  
                         if (usersFromDB[receiverID]) {
                             receiverUser = usersFromDB[receiverID];
                         } else {
@@ -320,7 +221,9 @@ setInterval(async () => {
 
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {
-        if (conversationLoaded === conversation.getAttribute('data-conversation-id')) {
+    const conversationID = conversation.getAttribute('data-conversation-id');
+        if (conversationLoaded === conversationID) {
+            socket.emit('leaveConversation', { conversationID });
             conversationLoaded = '';
             let tempConversations = document.querySelectorAll('.conversation');
             tempConversations.forEach(conversation => {
@@ -330,10 +233,11 @@ const clickedConversation = (conversation) => {
             // loadConversation();
             checkConversations();
         } else {
-            const conversationID = conversation.getAttribute('data-conversation-id');
+
+            socket.emit('joinConversation', { conversationID, userID });
+
             conversationLoaded = conversationID;
-            // Load conversation by ID
-            // loadConversation(conversationID);
+
             let tempConversations = document.querySelectorAll('.conversation');
             tempConversations.forEach(conversation => {
                 conversation.classList.remove('active');

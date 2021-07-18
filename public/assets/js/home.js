@@ -530,5 +530,3 @@ window.addEventListener('load', () => {
   });
 
 });
-
-

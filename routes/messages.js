@@ -5,8 +5,41 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const jwt = require('jsonwebtoken');
 
-// const Conversation = require('../models/Conversation');
-// const User = require('../models/User');
+const server = require('../server.js');
+const socketio = require('socket.io');
+const io = socketio(server);
+
+io.on('connection', (socket) => {
+    console.log('user connected');
+    // Join conversation
+    socket.on('joinConversation', async ({conversationID, userID, auth_token}) => {
+      console.log('Joined converstaion');
+      // Authorize user
+      const token = socket.request.headers.cookie.split('').splice(11).join('') || auth_token;
+      let verified = true;
+      if (token == null) return verified = false;
+      jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+          if (err) return verifed = false;
+      });
+      if (!verified) return;
+      const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
+      if (!conversation.people.includes(userID)) return;
+      socket.join(conversationID);
+      // Send message
+      socket.on('message', text => {
+        io.to(conversationID).emit('message', text);
+      });
+
+
+    });
+
+    // Leave conversation
+    socket.on('leaveConversation', ({conversationID}) => {
+      console.log('Left conversation');
+      socket.leave(conversationID);
+    });
+  
+});
 
 // GET Route
 router.get('/', authToken, async (req, res) => {
