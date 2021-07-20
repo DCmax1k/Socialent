@@ -24,6 +24,7 @@ const messagingHeaderUser = document.querySelector('#messagingHeader > h1');
 const editMessages = document.getElementById('editMessages');
 
 let conversationLoaded = '';
+let conversation = {};
 let editMode = false;
 let conversationLoading = false;
 let checkConversationsLoading = false;
@@ -35,7 +36,8 @@ const usersFromDB = {};
 // ** NEW CODE **
 
 // Listen for new message
-socket.on('message', message => {
+socket.on('message', ({message, conversationID}) => {
+    // Show text on screen
     const node = document.createElement('div');
     node.classList.add('text-box');
     // last child of internalMessages
@@ -63,6 +65,20 @@ socket.on('message', message => {
     // Load html
     internalMessages.appendChild(node);
     internalMessages.scrollTop = internalMessages.scrollHeight;
+});
+
+socket.on('updateConversationsWithMessage', ({messageData: message, conversationID}) => {
+    // Update conversations list so the message is correct, and is at top of list
+    // find certain conversation
+    const conversationNode = document.querySelector(`.conversation[data-conversation-id='${conversationID}']`);
+    if (message.type == 'img') {
+        conversationNode.children[1].innerText = 'Image';
+    } else if (message.type == 'text') {
+        conversationNode.children[1].innerText = message.value;
+    }
+    if (messagesList.children[0] != conversationNode) {
+        messagesList.insertBefore(conversationNode, messagesList.children[0]);
+    }
 });
 
 socket.on('deleteMessage', textDate => {
@@ -105,13 +121,18 @@ socket.on('addedConvo', ({sender, conversationID}) => {
     `;
 
     node.addEventListener('click', () => { clickedConversation(node) });
-    messagesList.appendChild(node);
+    messagesList.insertBefore(node, messagesList.children[0]);
 });
 
 // Send message
 function emitMessage(conversationID, message) {
     // Message = { value: '', type: 'text', sender: userID, date: Date.now() };
     socket.emit('message', {conversationID, message});
+
+    // to update conversations list for those not currently in conversation
+    conversation.people.forEach(person => {
+        socket.emit('updateConversationsWithMessage', {person, messageData: message, conversationID});
+    });
 };
 
 
@@ -136,6 +157,7 @@ const checkConversations = async () => {
                 });
                 const resJSON = await response.json();
                 if (resJSON.status === 'success') {
+                    if (resJSON.conversation) conversation = resJSON.conversation;
                     // Generate html for each conversation
                     resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
                         let receiverID = '';
@@ -180,11 +202,11 @@ const checkConversations = async () => {
                         node.addEventListener('click', () => { clickedConversation(node) });
                         
                         //Remove node that is about to be replaced
-                        if (messagesList.childNodes[i]) {
-                            messagesList.removeChild(messagesList.childNodes[i]);
+                        if (messagesList.children[i]) {
+                            messagesList.removeChild(messagesList.children[i]);
                         }
                         // Load html here
-                        messagesList.insertBefore(node, messagesList.childNodes[i]);
+                        messagesList.insertBefore(node, messagesList.children[i]);
 
                         //
                         // LOADING CONVERSATION HERE INSTEAD OF SEPERATE FUNCTION
@@ -465,7 +487,7 @@ addConversationInput.addEventListener('input', async (e) => {
             `
             ${prefixHTML} ${account.username} - ${account.name}
             `;
-            addConversationSuggestions.insertBefore(node, addConversationSuggestions.childNodes[0]);
+            addConversationSuggestions.insertBefore(node, addConversationSuggestions.children[0]);
           });
         }
       } else {
@@ -555,6 +577,7 @@ const sendMessage = async (conversationID, senderID, message) => {
     // checkConversationsLoading = true;
     // Actually send message
     emitMessage(conversationID, { value: message, type: 'text', sender: senderID, date: Date.now() });
+    // Update messages list for each user when theyre not in the conversation
     // const response = await fetch('/messages/sendmessage', {
     //     method: 'POST',
     //     headers: {

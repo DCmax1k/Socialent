@@ -42,7 +42,10 @@ io.on('connection', (socket) => {
     // Get sent message, log to DB, and send back to correct chat room
     socket.on('message', ({conversationID, message}) => {
         sendMessage(conversationID, message);
-        io.to(conversationID).emit('message', message);
+        io.to(conversationID).emit('message', {message, conversationID});
+    });
+    socket.on('updateConversationsWithMessage', ({person, messageData, conversationID}) => {
+        io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID});
     });
 
     // Get delete message request, delete message from DB, and send info to chat room
@@ -233,23 +236,24 @@ router.post('/checkconversations', postAuthToken, async (req, res) => {
     try {
         // const user = await User.findById(req.body.userID);
         const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-
-            if (req.body.conversationLoaded) {
-                const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
-                if (conversation.data().seenFor === user._id) {
-                    await conversation.ref.update('seen', 'read');
-                }
+        let conversation;
+        if (req.body.conversationLoaded) {
+            conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
+            if (conversation.data().seenFor === user._id) {
+                await conversation.ref.update('seen', 'read');
             }
-            // const usersConversations = await Conversation.find({people: user._id});
-            const usersConversations = (await db.collection('conversations').where('people', 'array-contains', user._id).get()).docs.map(doc => doc.data());
-            usersConversations.sort((a,b) => {
-                return a.dateActive - b.dateActive;
-            });
-            res.json({
-                status: 'success',
-                usersConversations,
-                userID: user._id,
-            });
+        }
+        // const usersConversations = await Conversation.find({people: user._id});
+        const usersConversations = (await db.collection('conversations').where('people', 'array-contains', user._id).get()).docs.map(doc => doc.data());
+        usersConversations.sort((a,b) => {
+            return a.dateActive - b.dateActive;
+        });
+        res.json({
+            status: 'success',
+            usersConversations,
+            userID: user._id,
+            conversation: conversation ? conversation.data() : {},
+        });
 
     } catch(err) {
         console.error(err);
