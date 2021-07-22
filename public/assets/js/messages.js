@@ -1,4 +1,4 @@
-const socket = io(`ws://${window.location.hostname}`);
+const socket = io();
 // Join personal room to listen for new conversations
 socket.emit('joinUserRoom', { userID });
 
