@@ -58,7 +58,18 @@ io.on('connection', (socket) => {
     socket.on('addedConvo', ({receiver, conversationID, sender}) => {
 
         io.to(receiver._id).emit('addedConvo', {sender, conversationID});
-    })
+    });
+
+    // Show typing notification
+    socket.on('istyping', ({conversationID, username}) => {
+        io.to(conversationID).emit('istyping', {username});
+    });
+
+    // Hide typing notification
+    socket.on('stoppedtyping', ({conversationID, username}) => {  
+        io.to(conversationID).emit('stoppedtyping', {username});
+    });
+
   
 });
 
@@ -294,34 +305,6 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
     }
   }
 
-
-//   // Send img
-//   router.post('/sendimg', postAuthToken, async (req, res) => {
-//     try {
-//       // const user = await User.findById(req.body.senderID);
-//       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-
-//         // const updateMessage = await Conversation.findByIdAndUpdate(req.body.conversationID, { dateActive: req.body.date, $push: { messages: {sender: user._id, value: req.body.message, type: 'img', date: req.body.date, seen: 'unread'} }}, { useFindAndModify: false });
-//         const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationID).get()).docs[0].data();
-//         const messageData = { sender: user._id, value: req.body.message, type: 'img', date: req.body.date };
-//         const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: req.body.date, seen: 'unread', seenFor: conversation.people[0] === user._id ? conversation.people[1] : conversation.people[0] });
-
-//         // Add 1 point to score
-//         let usersScore = user.score;
-//         usersScore += 1;
-//         // const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
-//         const updateScore = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('score', usersScore);
-//         // const saveScore = await updateScore.save();
-//         res.json({
-//             status: 'success',
-//             message: req.body.message,
-//         });
-      
-//     } catch(err) {
-//       console.error(err);
-//     }
-//   });
-
   // Delete text 
 
   const deleteMessage = async (conversationID, textDate, userID) => {
@@ -341,33 +324,5 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
       console.error(err);
     }
   }
-
-//   router.post('/deletetext', postAuthToken, async (req, res) => {
-//       try {
-//         // const user = await User.findById(req.body.userID);
-//         const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-
-//             // const conversation = await Conversation.findById(req.body.conversationLoaded);
-//             const conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0].data();
-//             console.log(req.body.textDate);
-//             const currentText = conversation.messages.find(message => message.date == req.body.textDate);
-//             const cutIndex = conversation.messages.indexOf(currentText);
-//             if (currentText.sender === user._id) {
-//                 const allMessages = conversation.messages;
-//                 allMessages.splice(cutIndex, 1);
-//                 const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update('messages', allMessages);
-//                 res.json({
-//                     status: 'success',
-//                 });
-//             } else {
-//                 res.json({
-//                     status: 'wrong-user',
-//                 });
-//             }
-
-//       } catch(err) {
-//           console.error(err);
-//       }
-//   });
 
 module.exports = router;

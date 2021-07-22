@@ -72,11 +72,14 @@
             </div>
             
 
-            <input placeholder="Message" type="text">
+            <input placeholder="Message" type="text" data-user-username='<%= user.username %>'>
             <i id="sendMessageBtn" class="fas fa-arrow-circle-up"></i>
             <div id="sendImgBtn">
                 <i id="sendImgIcon" class="fas fa-camera"></i>
                 <input id="sendImgFile" type="file">
+            </div>
+            <div id="userIsTyping">
+                <span id="usernameTyping"></span> is typing<span id="dot1">.</span><span id="dot2">.</span><span id="dot3">.</span>
             </div>
         </div>
     </div>

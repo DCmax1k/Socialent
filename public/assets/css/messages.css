@@ -278,6 +278,19 @@
     cursor: pointer;
 }
 
+#userIsTyping {
+    position: absolute;
+    bottom: 35px;
+    left: 20px;
+    font-size: 10px;
+    visibility: hidden;
+}
+#dot1,
+#dot2,
+#dot3 {
+    display: none;
+}
+
 .text-box {
     margin: 5px 0;
     display: flex;

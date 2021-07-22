@@ -1,4 +1,4 @@
-const socket = io();
+const socket = io(`ws://${window.location.hostname}`);
 // Join personal room to listen for new conversations
 socket.emit('joinUserRoom', { userID });
 
@@ -22,6 +22,8 @@ const sendImgFile = document.getElementById('sendImgFile');
 const messagingHeader = document.getElementById('messagingHeader');
 const messagingHeaderUser = document.querySelector('#messagingHeader > h1');
 const editMessages = document.getElementById('editMessages');
+const userIsTyping = document.getElementById('userIsTyping');
+const usernameTyping = document.getElementById('usernameTyping');
 
 let conversationLoaded = '';
 let conversation = {};
@@ -123,6 +125,21 @@ socket.on('addedConvo', ({sender, conversationID}) => {
     node.addEventListener('click', () => { clickedConversation(node) });
     messagesList.insertBefore(node, messagesList.children[0]);
 });
+
+socket.on('istyping', username => {
+    // Show typing notification
+    if (username.username != messageInput.getAttribute('data-user-username')) {
+        userIsTyping.style.visibility = 'visible';
+        usernameTyping.innerText = username.username;
+    }
+});
+socket.on('stoppedtyping', username => {
+    // Hide typing notification
+    if (username.username != messageInput.getAttribute('data-user-username')) {
+        userIsTyping.style.visibility = 'hidden';
+    }
+});
+
 
 // Send message
 function emitMessage(conversationID, message) {
@@ -507,6 +524,7 @@ const autofillSearchUsername = username => {
   
 // Send message
 messageInput.addEventListener('keyup', (e) => {
+    // Listen for action keys
     if (e.key == 'Enter') {
         if (conversationLoaded) {
             sendMessage(conversationLoaded, userID, e.target.value);
@@ -525,6 +543,12 @@ messageInput.addEventListener('keyup', (e) => {
                 messageInput.value = '';
             }  
         }
+    }
+    // Emit to tell users when typing
+    if (e.target.value) {
+        socket.emit('istyping', { conversationID: conversationLoaded, username: e.target.getAttribute('data-user-username')});
+    } else {
+        socket.emit('stoppedtyping', { conversationID: conversationLoaded, username: e.target.getAttribute('data-user-username')});
     }
 
 });
@@ -723,3 +747,40 @@ setInterval(() => {
         messagingHeader.style.visibility = 'hidden';
     }
 }, 1)
+
+// Animate dots for when someone is typing
+const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+let currentDot = 0;
+let dotSpeed =  250;
+const dot1 = document.getElementById('dot1');
+const dot2 = document.getElementById('dot2');
+const dot3 = document.getElementById('dot3');
+
+const animateDots = async () => {
+    if (currentDot == 0) {
+        await sleep(dotSpeed);
+        dot1.style.display = 'inline-block';
+        currentDot++;
+        animateDots();
+    } else if (currentDot == 1) {
+        await sleep(dotSpeed);
+        dot2.style.display = 'inline-block';
+        currentDot++;
+        animateDots();
+    } else if (currentDot == 2) {
+        await sleep(dotSpeed);
+        dot3.style.display = 'inline-block';
+        currentDot++;
+        animateDots();
+    } else if (currentDot == 3) {
+        await sleep(dotSpeed + 300);
+        currentDot = 0;
+        dot1.style.display = 'none';
+        dot2.style.display = 'none';
+        dot3.style.display = 'none';
+        animateDots();
+    }
+}
+animateDots();
