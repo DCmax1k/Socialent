@@ -220,14 +220,16 @@
     visibility: hidden;
     box-shadow: rgba(255, 255, 255, 0.8) 0 2px 0px;
 }
-#messagingHeader > h1 {
+#messagingHeader > div {
     position: absolute;
     left: 10px;
     top: 50%;
+    width: calc(100% - 100px);
     transform: translateY(-50%);
-    text-align: center;
+    text-align: left;
     font-size: 20px;
     cursor: pointer;
+    overflow-x: scroll;
 }
 #editMessages {
     position: absolute;
@@ -409,7 +411,7 @@
         padding: 5px;
     }
 
-    #messagingHeader > h1 {
+    #messagingHeader > div {
         font-size: 15px;
     }
     
@@ -425,7 +427,7 @@
     #conversationLoader {
         left: 40px;
     }
-    #messagingHeader > h1 {
+    #messagingHeader > div {
         font-size: 12px;
     }
 }

@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 
 const server = require('../server.js');
 const socketio = require('socket.io');
+const { admin } = require('googleapis/build/src/apis/admin');
 const io = socketio(server);
 
 io.on('connection', (socket) => {
@@ -55,9 +56,9 @@ io.on('connection', (socket) => {
     });
 
     // Send created conversation to user
-    socket.on('addedConvo', ({receiver, conversationID, sender}) => {
+    socket.on('addedConvo', ({receiver, conversationID, senders}) => {
 
-        io.to(receiver._id).emit('addedConvo', {sender, conversationID});
+        io.to(receiver).emit('addedConvo', {senders, conversationID});
     });
 
     // Show typing notification
@@ -153,9 +154,8 @@ router.post('/loadconversation', postAuthToken, async (req, res) => {
             //     }
             // });
             // const updateMessages = await Conversation.findByIdAndUpdate(conversation._id, { messages: allMessages }, { useFindAndModify: false });
-            if (conversation.seenFor === user._id) {
-                const setSeen = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0];
-                if (setSeen) { setSeen.ref.update('seen', 'read')};
+            if (conversation.seenFor.includes(user._id)) {
+                const setSeen = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({'seenFor': firebase_admin.firestore.FieldValue.arrayRemove(user._id)});
             }
             
             // Crop messages
@@ -183,44 +183,52 @@ router.post('/addconversation', postAuthToken, async (req, res) => {
         // const user = await User.findById(req.body.userID);
         const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
 
-            if (req.body.receiver) {
+            if (req.body.receivers) {
                 // const receiver = await User.findOne({ username: req.body.receiver });
-                let receiver = (await db.collection('users').where('username', '==', req.body.receiver).get()).docs[0];
+                const receivers = await Promise.all(req.body.receivers.map( async receiver => {
+                    if (receiver) {
+                        return (await db.collection('users').where('username', '==', receiver).get()).docs[0].data();
+                    }
+                }));
+                // let receiver = (await db.collection('users').where('username', '==', req.body.receiver).get()).docs[0];
                 // Check if receiver exists
-                if (receiver) {
-                       receiver = receiver.data();
-                       if (receiver._id !== user._id) {
+                if (receivers) {
+                       // receiver = receiver.data();
+                       // check if receivers have duplicates
+                       const dupes = receivers.filter( (receiver, index, arr) => arr.indexOf(receiver) !== index);
+                       if (dupes.length == 0) {
                        // Check to see if they already have a conversation
                         // const check1 = await Conversation.find({people: [user._id, receiver._id]});
                         // const check2 = await Conversation.find({people: [receiver._id, user._id]});
-                        const check1 = (await db.collection('conversations').where('people', '==', [user._id, receiver._id]).get()).docs.map(doc => doc.data());
-                        const check2 = (await db.collection('conversations').where('people', '==', [receiver._id, user._id]).get()).docs.map(doc => doc.data());
-                        if (check1.length == 0 && check2.length == 0) {
+                        // const check1 = (await db.collection('conversations').where('people', '==', [user._id, receiver._id]).get()).docs.map(doc => doc.data());
+                        // const check2 = (await db.collection('conversations').where('people', '==', [receiver._id, user._id]).get()).docs.map(doc => doc.data());
+
+                        // if (check1.length == 0 && check2.length == 0) {
 
                                 // const createConversation = await new Conversation({people: [user._id, receiver._id],messages: [],});
                                 // const saveConversation = await createConversation.save();
+                                const people = [user._id, ...receivers.map(receiver => receiver._id)];
                                 const convoData = {
                                     _id: Date.now().toString(16) + Math.random().toString(16).slice(2),
-                                    people: [user._id, receiver._id],
+                                    people,
                                     messages: [],
-                                    seen: 'read',
-                                    seenFor: user._id,
+                                    seenFor: receivers.map(receiver => receiver._id),
                                     dateActive: Date.now(),
                                 };
-                                const createConversation = await db.collection('conversations').doc(`${user.username}, ${receiver.username}`).set(convoData);
+                                await db.collection('conversations').doc(`${user.username}, ${receivers[0].username}${receivers.length > 1 ? ', and more...' : ''}`).set(convoData);
 
                                 const conversationID = convoData._id;
                                 res.json({
                                     status: 'success',
-                                    receiver: receiver,
+                                    receivers,
                                     sender: user,
                                     conversationID,
                                 });    
-                        } else {
-                            res.json({
-                                status: 'already-convo',
-                            });
-                        }  
+                        // } else {
+                        //     res.json({
+                        //         status: 'already-convo',
+                        //     });
+                        // }  
                     
                      
                 } else {
@@ -250,8 +258,8 @@ router.post('/checkconversations', postAuthToken, async (req, res) => {
         let conversation;
         if (req.body.conversationLoaded) {
             conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
-            if (conversation.data().seenFor === user._id) {
-                await conversation.ref.update('seen', 'read');
+            if (conversation.data().seenFor.includes(user._id)) {
+                await (await db.collection('conversations').where('_id', '==', conversation.data()._id).get()).docs[0].ref.update({'seenFor': firebase_admin.firestore.FieldValue.arrayRemove(user._id)});
             }
         }
         // const usersConversations = await Conversation.find({people: user._id});
@@ -292,7 +300,13 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
       const user = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
         const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
         const messageData = message;
-        const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: message.date, seen: 'unread', seenFor: conversation.people[0] === user._id ? conversation.people[1] : conversation.people[0] });
+        const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: message.date, seenFor: conversation.people.map(person => {
+            if (person != user._id) {
+                return person;
+            } else {
+                return null;
+            }
+        })});
 
         // Add 1 point to score
         let usersScore = user.score;
@@ -318,7 +332,11 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
         const index = messages.indexOf(message);
         // remove message from messages
         messages.splice(index, 1);
-        const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: messages, seenFor: conversation.people[0] === user._id ? conversation.people[1] : conversation.people[0] });
+        const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: messages, seenFor: conversation.people.map(person => {
+            if (person._id != user._id) {
+                return person._id;
+            }
+        })});
       
     } catch(err) {
       console.error(err);

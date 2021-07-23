@@ -20,7 +20,7 @@ const sendImgBtn = document.getElementById('sendImgBtn');
 const sendImgIcon = document.getElementById('sendImgIcon');
 const sendImgFile = document.getElementById('sendImgFile');
 const messagingHeader = document.getElementById('messagingHeader');
-const messagingHeaderUser = document.querySelector('#messagingHeader > h1');
+const messagingHeaderUser = document.querySelector('#messagingHeader > div');
 const editMessages = document.getElementById('editMessages');
 const userIsTyping = document.getElementById('userIsTyping');
 const usernameTyping = document.getElementById('usernameTyping');
@@ -98,28 +98,28 @@ socket.on('deleteMessage', textDate => {
     })
 });
 
-socket.on('addedConvo', ({sender, conversationID}) => {
+socket.on('addedConvo', ({senders, conversationID}) => {
     // Generate conversation html
-    const receiverUser = sender;
+    const receiversUser = senders;
     const node = document.createElement('div');
     node.classList.add('conversation');
     node.setAttribute('data-conversation-id', conversationID);
-    let prefixHTML = ``;
-    if (receiverUser.prefix.title) {
-        if (receiverUser.rank === 'owner') {
-        prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
-        } else if (receiverUser.rank === 'admin') {
-        prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
-        } else {
-        prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
-        }
-    }
-    
+    // let prefixHTML = ``;
+    // if (receiverUser.prefix.title) {
+    //     if (receiverUser.rank === 'owner') {
+    //     prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+    //     } else if (receiverUser.rank === 'admin') {
+    //     prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+    //     } else {
+    //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
+    //     }
+    // }
+    const titleHTML = `${receiversUser.map(receiver => receiver.username).join(', ')}`;
     node.innerHTML = 
     `
-    <h2>${prefixHTML} ${receiverUser.username}</h2>
-    <h4>Start Messaging!</h4>
-    <i class="fas fa-circle notification active"></i>
+        <h2>${titleHTML}</h2>
+        <h4>Start Messaging!</h4>
+        <i class="fas fa-circle notification active"></i>
     `;
 
     node.addEventListener('click', () => { clickedConversation(node) });
@@ -155,11 +155,24 @@ function emitMessage(conversationID, message) {
 
 // ** OLD CODE **
 
+const pushIdsToUsers = async (ids) => {
+    return Promise.all(ids.map(async receiverID => {
+        if (usersFromDB[receiverID]) {
+            return usersFromDB[receiverID];
+            
+        } else {
+            const getReceiverUser = await lookupUsername(receiverID);
+            usersFromDB[receiverID] = getReceiverUser;
+            return getReceiverUser;
+        }
+    }));
+}
+
 // Check for Conversations *Right when page loads & periodically*
 const checkConversations = async () => {
     if (!document.hidden) {
         try {
-            if (!checkConversationsLoading) {
+            // if (!checkConversationsLoading) {
                 checkConversationsLoading = true;
                 conversationLoader.classList.add('active');
                 const response = await fetch('/messages/checkconversations', {
@@ -177,20 +190,14 @@ const checkConversations = async () => {
                     if (resJSON.conversation) conversation = resJSON.conversation;
                     // Generate html for each conversation
                     resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
-                        let receiverID = '';
-                        if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
-                            receiverID = conversation.people[1];
-                        } else {
-                            receiverID = conversation.people[0];
-                        }
+                        let receiversID = [];
+                        conversation.people.forEach(person => {
+                            if (person != userID) {
+                                receiversID.push(person);
+                            }
+                        });
 
-                        let receiverUser;  
-                        if (usersFromDB[receiverID]) {
-                            receiverUser = usersFromDB[receiverID];
-                        } else {
-                            receiverUser = await lookupUsername(receiverID);
-                            usersFromDB[receiverID] = receiverUser;
-                        }
+                        const receiversUser = await pushIdsToUsers(receiversID);
 
                         const node = document.createElement('div');
                         node.classList.add('conversation');
@@ -198,22 +205,22 @@ const checkConversations = async () => {
                             node.classList.add('active');
                         }
                         node.setAttribute('data-conversation-id', conversation._id);
-                        let prefixHTML = ``;
-                        if (receiverUser.prefix.title) {
-                            if (receiverUser.rank === 'owner') {
-                            prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                            } else if (receiverUser.rank === 'admin') {
-                            prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                            } else {
-                            prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
-                            }
-                        }
-                        
+                        // let prefixHTML = ``;
+                        // if (receiverUser.prefix.title) {
+                        //     if (receiverUser.rank === 'owner') {
+                        //     prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                        //     } else if (receiverUser.rank === 'admin') {
+                        //     prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+                        //     } else {
+                        //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
+                        //     }
+                        // }
+                        const titleHTML = `${receiversUser.map(receiver => receiver.username).join(', ')}`;
                         node.innerHTML = 
                         `
-                        <h2>${prefixHTML} ${receiverUser.username}</h2>
-                        <h4>${ conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;') : 'Start Messaging!'}</h4>
-                        <i class="fas fa-circle notification ${conversation.seen === 'unread' && conversation.seenFor == userID ? 'active' : ''}"></i>
+                            <h2>${titleHTML}</h2>
+                            <h4>${conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;') : 'Start Messaging!'}</h4>
+                            <i class="fas fa-circle notification ${conversation.seenFor.includes(userID) == true ? 'active' : ''}"></i>
                         `;
 
                         node.addEventListener('click', () => { clickedConversation(node) });
@@ -243,15 +250,15 @@ const checkConversations = async () => {
                                         // Set header user
                                         messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
 
-                                        let person = '';
-                                            if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
-                                                person = usersFromDB[conversation.people[1]].username;
-                                            } else {
-                                                person = usersFromDB[conversation.people[0]].username;
-                                            }
-                                        messagingHeaderUser.addEventListener('click', () => {
-                                            window.location.href = `/account/${person}?k=${userID}`;
-                                        });
+                                        // let person = '';
+                                        //     if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
+                                        //         person = usersFromDB[conversation.people[1]].username;
+                                        //     } else {
+                                        //         person = usersFromDB[conversation.people[0]].username;
+                                        //     }
+                                        // messagingHeaderUser.addEventListener('click', () => {
+                                        //     window.location.href = `/account/${person}?k=${userID}`;
+                                        // });
                                     }
                                 }); 
                                 const previousHTML = internalMessages.innerHTML;
@@ -313,11 +320,11 @@ const checkConversations = async () => {
                 }
                 conversationLoader.classList.remove('active');    
                 checkConversationsLoading = false;
-            } else {
-                setTimeout(async () => {
-                    await checkConversations();
-                }, 500);
-            }
+            // } else {
+            //     setTimeout(async () => {
+            //         await checkConversations();
+            //     }, 500);
+            // }
             
         } catch(err) {
             console.error(err);
@@ -373,6 +380,9 @@ const clickedConversation = (conversation) => {
 
 
 // Add conversation
+
+const clearString = (string) => string.replace(/,/ig, ' ').trim().replace(/\s+/g, ' ').trim();
+
 addConversation.addEventListener('click', () => {
     addConversationDiv.classList.toggle('active');
     addConversationInput.style.display = 'block';
@@ -394,7 +404,13 @@ addConversationInput.addEventListener('keyup', (e) => {
 
 const addConversationSubmitFunction = async () => {
     if (addConversationInput.value) {
-        const receiver = addConversationInput.value;
+        const cleanString = clearString(addConversationInput.value);
+        const receiversInput = addConversationInput.value;
+        const receivers = cleanString.split(' ').map(receiver => {
+            if (receiver) {
+                return receiver.trim();
+            } 
+        });
         addConversationSubmit.innerText = 'Loading...';
         addConversationDiv.classList.remove('active');
         const response = await fetch('/messages/addconversation', {
@@ -404,7 +420,7 @@ const addConversationSubmitFunction = async () => {
             },
             body: JSON.stringify({
                 userID,
-                receiver,
+                receivers,
             }),
         });
         const resJSON = await response.json();
@@ -428,24 +444,24 @@ const addConversationSubmitFunction = async () => {
         }
         if (resJSON.status === 'success') {
             // Generate conversation html
-            const receiverUser = resJSON.receiver;
+            const receiversUser = resJSON.receivers.map(receiver => receiver.username);
             const node = document.createElement('div');
             node.classList.add('conversation');
             node.setAttribute('data-conversation-id', resJSON.conversationID);
-            let prefixHTML = ``;
-            if (receiverUser.prefix.title) {
-                if (receiverUser.rank === 'owner') {
-                prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                } else if (receiverUser.rank === 'admin') {
-                prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                } else {
-                prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
-                }
-            }
-            
+            // let prefixHTML = ``;
+            // if (receiverUser.prefix.title) {
+            //     if (receiverUser.rank === 'owner') {
+            //     prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
+            //     } else if (receiverUser.rank === 'admin') {
+            //     prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
+            //     } else {
+            //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
+            //     }
+            // }
+            const titleHTML = `${receiversUser.map(receiver => receiver.username).join(', ')}`;
             node.innerHTML = 
             `
-            <h2>${prefixHTML} ${receiverUser.username}</h2>
+            <h2>${titleHTML}</h2>
             <h4>Start Messaging!</h4>
             <i class="fas fa-circle notification active"></i>
             `;
@@ -455,7 +471,12 @@ const addConversationSubmitFunction = async () => {
 
             addConversationSubmit.innerText = 'Add';
             addConversationInput.value = '';
-            socket.emit('addedConvo', { receiver: resJSON.receiver, conversationID: resJSON.conversationID, sender: resJSON.sender });
+            resJSON.receivers.forEach(receiver => {
+                const senders = [resJSON.sender.username, ...receiversUser];
+                // remove receiver from senders
+                senders.splice(senders.indexOf(receiver), 1);
+                socket.emit('addedConvo', { receiver: receiver._id, conversationID: resJSON.conversationID, senders, });
+            });
 
         } else {
             window.location.href = '/login';
@@ -468,13 +489,14 @@ const addConversationSubmitFunction = async () => {
 addConversationInput.addEventListener('input', async (e) => {
     try {
       if (e.target.value) {
+        const cleanString = clearString(addConversationInput.value);
         const response = await fetch('/search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            value: e.target.value,
+            value: cleanString.split(' ')[cleanString.split(' ').length - 1],
             userID,
             device: window.navigator.userAgent,
           }),
@@ -516,9 +538,10 @@ addConversationInput.addEventListener('input', async (e) => {
 });
 
 const autofillSearchUsername = username => {
-    const inputArray = addConversationInput.value.split(' ');
+    const cleanString = clearString(addConversationInput.value);
+    const inputArray = cleanString.split(' ');
     inputArray[inputArray.length - 1] = username;
-    addConversationInput.value = inputArray.join();
+    addConversationInput.value = inputArray.join(', ');
     addConversationInput.select();
 }
   

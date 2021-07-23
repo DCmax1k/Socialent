@@ -108,9 +108,9 @@ app.use('/admin', adminRoute);
 // app.get('/test', async (req, res) => {
 //   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
 //   try {
-//     (await db.collection('users').get()).docs.forEach( async doc => {
+//     (await db.collection('conversations').get()).docs.forEach( async doc => {
 //       try {
-//         await doc.ref.update({hashedPassword: admin.firestore.FieldValue.delete()});
+//         // await doc.ref.update({seenFor: [doc.data().seenFor]});
 //       } catch(err) {
 //         console.error(err);
 //       }

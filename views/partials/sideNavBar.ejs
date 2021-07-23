@@ -197,46 +197,46 @@
       }
   });
 
-  const checkMessageNotis = async () => {
-    if (!document.hidden) {
-      try {
-        const response = await fetch('/messages/checkconversations', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userID,
-            }),
-        });
-        const resJSON = await response.json();  
-        if (resJSON.status === 'success') {
-          conversationNoits = [];
-          resJSON.usersConversations.forEach(conversation => {
-            if (conversation.seen === 'unread' && conversation.seenFor === userID) {
-              conversationNoits.push(true);
-            } else {
-              conversationNoits.push(false);
-            }
-          });
-          if (conversationNoits.includes(true)) {
-            messageNotiIcon.style.display = 'block';
-          } else {
-            messageNotiIcon.style.display = 'none';
-          }
-        } else {
-          window.location.href = '/login';
-        }
-      } catch(err) {
-        console.error(err);
-      }  
-    }
+  // const checkMessageNotis = async () => {
+  //   if (!document.hidden) {
+  //     try {
+  //       const response = await fetch('/messages/checkconversations', {
+  //           method: 'POST',
+  //           headers: {
+  //               'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({
+  //               userID,
+  //           }),
+  //       });
+  //       const resJSON = await response.json();  
+  //       if (resJSON.status === 'success') {
+  //         conversationNoits = [];
+  //         resJSON.usersConversations.forEach(conversation => {
+  //           if (conversation.seen === 'unread' && conversation.seenFor === userID) {
+  //             conversationNoits.push(true);
+  //           } else {
+  //             conversationNoits.push(false);
+  //           }
+  //         });
+  //         if (conversationNoits.includes(true)) {
+  //           messageNotiIcon.style.display = 'block';
+  //         } else {
+  //           messageNotiIcon.style.display = 'none';
+  //         }
+  //       } else {
+  //         window.location.href = '/login';
+  //       }
+  //     } catch(err) {
+  //       console.error(err);
+  //     }  
+  //   }
     
-  }
-  checkMessageNotis()
-  setInterval(async () => {
-      await checkMessageNotis();
-  }, 3000);
+  // }
+  // checkMessageNotis()
+  // setInterval(async () => {
+  //     await checkMessageNotis();
+  // }, 3000);
   
 
   openMenu.addEventListener('click', () => {
