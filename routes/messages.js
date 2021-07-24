@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
     // Get sent message, log to DB, and send back to correct chat room
     socket.on('message', ({conversationID, message}) => {
         sendMessage(conversationID, message);
-        io.to(conversationID).emit('message', {message, conversationID});
+        io.to(conversationID).emit('message', {message});
     });
     socket.on('updateConversationsWithMessage', ({person, messageData, conversationID}) => {
         io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID});
@@ -332,11 +332,14 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
         const index = messages.indexOf(message);
         // remove message from messages
         messages.splice(index, 1);
-        const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: messages, seenFor: conversation.people.map(person => {
-            if (person._id != user._id) {
-                return person._id;
+        const seenFor = conversation.people.map(person => {
+            if (person != user._id) {
+                return person;
+            } else {
+                return null;
             }
-        })});
+        });
+        await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({ messages, seenFor, });
       
     } catch(err) {
       console.error(err);

@@ -32,29 +32,49 @@ let conversationLoading = false;
 let checkConversationsLoading = false;
 let lastSentMessages = [];
 let lastSentMessageIndex = -1;
+let pastUserOrigin = '';
 
 const usersFromDB = {};
 
 // ** NEW CODE **
 
 // Listen for new message
-socket.on('message', ({message, conversationID}) => {
-    // Show text on screen
+socket.on('message', ({message}) => {
+    // // Show text on screen
+    let messageUserOriginHtml = '';
+    if (message.sender !== userID) {
+        if (pastUserOrigin != usersFromDB[message.sender].username) {
+            messageUserOriginHtml = conversation.people.length > 2 ? message.sender !== userID ? `<div class="who-sent-message">${usersFromDB[message.sender].username}</div>` : '' : '';
+            pastUserOrigin = usersFromDB[message.sender].username;
+        }
+    } else {
+        pastUserOrigin = '';
+    }
+
     const node = document.createElement('div');
+    messageUserOriginHtml !== '' ? node.style.marginTop = '15px' : null;
     node.classList.add('text-box');
-    // last child of internalMessages
-    node.setAttribute('data-text-date', message.date);
-    node.setAttribute('data-text-type', message.type);
+    node.setAttribute('data-text-date', message.date)
     if (message.sender === userID) {
         node.classList.add('sent-text');
     } else {
         node.classList.add('received-text');
     }
     if (message.type === 'img') {
-        node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>`;
+        node.innerHTML = `
+        <img src="${message.value}" class="text img" />
+        <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
+        ${messageUserOriginHtml}
+        `;
     } else {
         const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
-        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i></div>`;
+        node.innerHTML = `
+        <div class="text">
+            ${newMessageValue}
+            <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
+        </div>
+        ${messageUserOriginHtml}
+        `;
         
     }
     
@@ -168,7 +188,7 @@ const pushIdsToUsers = async (ids) => {
     }));
 }
 
-// Check for Conversations *Right when page loads & periodically*
+// Check for Conversations *Right when page loads*
 const checkConversations = async () => {
     if (!document.hidden) {
         try {
@@ -189,6 +209,7 @@ const checkConversations = async () => {
                 if (resJSON.status === 'success') {
                     if (resJSON.conversation) conversation = resJSON.conversation;
                     // Generate html for each conversation
+                    messagesList.innerHTML = '';
                     resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
                         let receiversID = [];
                         conversation.people.forEach(person => {
@@ -225,12 +246,14 @@ const checkConversations = async () => {
 
                         node.addEventListener('click', () => { clickedConversation(node) });
                         
-                        //Remove node that is about to be replaced
-                        if (messagesList.children[i]) {
-                            messagesList.removeChild(messagesList.children[i]);
-                        }
-                        // Load html here
-                        messagesList.insertBefore(node, messagesList.children[i]);
+                        // Load html
+                        // if (messagesList.children[i]) {
+                        //     messagesList.removeChild(messagesList.children[i]);
+                        //     messagesList.insertBefore(node, messagesList.children[i]);
+                        // } else {
+                        //     messagesList.append(node);
+                        // }
+                        messagesList.append(node);
 
                         //
                         // LOADING CONVERSATION HERE INSTEAD OF SEPERATE FUNCTION
@@ -266,7 +289,18 @@ const checkConversations = async () => {
                                 internalMessages.innerHTML = '';
                                 // Loops through messages generating html
                                 conversation.messages.forEach((message, i) => {
+                                    let messageUserOriginHtml = '';
+                                    if (message.sender !== userID) {
+                                        if (pastUserOrigin != usersFromDB[message.sender].username) {
+                                            messageUserOriginHtml = conversation.people.length > 2 ? message.sender !== userID ? `<div class="who-sent-message">${usersFromDB[message.sender].username}</div>` : '' : '';
+                                            pastUserOrigin = usersFromDB[message.sender].username;
+                                        }
+                                    } else {
+                                        pastUserOrigin = '';
+                                    }
+
                                     const node = document.createElement('div');
+                                    messageUserOriginHtml !== '' ? node.style.marginTop = '15px' : null;
                                     node.classList.add('text-box');
                                     node.setAttribute('data-text-date', message.date)
                                     if (message.sender === userID) {
@@ -275,10 +309,20 @@ const checkConversations = async () => {
                                         node.classList.add('received-text');
                                     }
                                     if (message.type === 'img') {
-                                        node.innerHTML = `<img src="${message.value}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>`;
+                                        node.innerHTML = `
+                                        <img src="${message.value}" class="text img" />
+                                        <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
+                                        ${messageUserOriginHtml}
+                                        `;
                                     } else {
                                         const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
-                                        node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i></div>`;
+                                        node.innerHTML = `
+                                        <div class="text">
+                                            ${newMessageValue}
+                                            <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
+                                        </div>
+                                        ${messageUserOriginHtml}
+                                        `;
                                         
                                     }
                                     
