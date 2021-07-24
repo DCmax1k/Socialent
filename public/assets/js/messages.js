@@ -190,10 +190,8 @@ const pushIdsToUsers = async (ids) => {
 
 // Check for Conversations *Right when page loads*
 const checkConversations = async () => {
-    if (!document.hidden) {
         try {
-            // if (!checkConversationsLoading) {
-                checkConversationsLoading = true;
+                // checkConversationsLoading = true;
                 conversationLoader.classList.add('active');
                 const response = await fetch('/messages/checkconversations', {
                     method: 'POST',
@@ -208,9 +206,10 @@ const checkConversations = async () => {
                 const resJSON = await response.json();
                 if (resJSON.status === 'success') {
                     if (resJSON.conversation) conversation = resJSON.conversation;
+
                     // Generate html for each conversation
                     messagesList.innerHTML = '';
-                    resJSON.usersConversations.reverse().forEach(async (conversation, i) => {
+                    resJSON.usersConversations.forEach(async (conversation, i) => {
                         let receiversID = [];
                         conversation.people.forEach(person => {
                             if (person != userID) {
@@ -226,6 +225,7 @@ const checkConversations = async () => {
                             node.classList.add('active');
                         }
                         node.setAttribute('data-conversation-id', conversation._id);
+                        node.setAttribute('data-conversation-date-active', conversation.dateActive);
                         // let prefixHTML = ``;
                         // if (receiverUser.prefix.title) {
                         //     if (receiverUser.rank === 'owner') {
@@ -236,7 +236,7 @@ const checkConversations = async () => {
                         //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
                         //     }
                         // }
-                        const titleHTML = `${receiversUser.map(receiver => receiver.username).join(', ')}`;
+                        const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ receiver.username).join(', ')}`;
                         node.innerHTML = 
                         `
                             <h2>${titleHTML}</h2>
@@ -254,6 +254,9 @@ const checkConversations = async () => {
                         //     messagesList.append(node);
                         // }
                         messagesList.append(node);
+
+                        // Sort the conversations based on data-conversation-date-active
+                        [...messagesList.children].sort((a, b) => b.getAttribute('data-conversation-date-active') - a.getAttribute('data-conversation-date-active')).forEach(node => messagesList.append(node));
 
                         //
                         // LOADING CONVERSATION HERE INSTEAD OF SEPERATE FUNCTION
@@ -373,11 +376,9 @@ const checkConversations = async () => {
         } catch(err) {
             console.error(err);
         }    
-    }
     
     
 }
-checkConversations();
 // setInterval(async () => {
 //     if (!checkConversationsLoading) {
 //         checkConversationsLoading = true;
@@ -851,3 +852,5 @@ const animateDots = async () => {
     }
 }
 animateDots();
+
+checkConversations();
