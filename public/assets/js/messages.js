@@ -24,6 +24,7 @@ const messagingHeaderUser = document.querySelector('#messagingHeader > div');
 const editMessages = document.getElementById('editMessages');
 const userIsTyping = document.getElementById('userIsTyping');
 const usernameTyping = document.getElementById('usernameTyping');
+const currentUsersInChat = document.getElementById('currentUsersInChat');
 
 let conversationLoaded = '';
 let conversation = {};
@@ -33,6 +34,7 @@ let checkConversationsLoading = false;
 let lastSentMessages = [];
 let lastSentMessageIndex = -1;
 let pastUserOrigin = '';
+let usersInChat = [];
 
 const usersFromDB = {};
 
@@ -160,6 +162,29 @@ socket.on('stoppedtyping', username => {
     }
 });
 
+socket.on('joinConversation', ({users}) => {
+    refreshCurrentUsers(users);
+});
+socket.on('leaveConversation', ({users}) => {
+    refreshCurrentUsers(users);
+});
+
+// Refresh currents users list
+const refreshCurrentUsers = (users) => {
+    usersInChat = users.map(user => user == userID ? null : usersFromDB[user]).filter(user => user != null).map(user => user.username);
+    const userNodes = document.querySelectorAll(`#currentUsersInChat > .user-box`);
+    userNodes.forEach(userNode => {
+        if (usersInChat.includes(userNode.getAttribute('data-username'))) {
+            userNode.style.color = 'lightgreen';
+            userNode.style.border = '1px solid lightgreen';
+        } else {
+            userNode.style.color = 'rgb(138, 138, 138)';
+            userNode.style.border = '1px solid rgb(138, 138, 138)';
+        }
+        
+    });
+};
+
 
 // Send message
 function emitMessage(conversationID, message) {
@@ -218,6 +243,7 @@ const checkConversations = async () => {
                         });
 
                         const receiversUser = await pushIdsToUsers(receiversID);
+
 
                         const node = document.createElement('div');
                         node.classList.add('conversation');
@@ -348,6 +374,25 @@ const checkConversations = async () => {
                                         };
                                     });    
                                 }
+
+                                // currently in chat users
+                                currentUsersInChat.innerHTML = '';
+                                const receiversInChat = conversation.people.filter(user => user != userID);
+                                receiversInChat.forEach(user => {
+                                    const userNode = document.createElement('div');
+                                    userNode.classList.add('user-box');
+                                    userNode.setAttribute('data-username', usersFromDB[user].username);
+                                    userNode.innerText = usersFromDB[user].username;
+                                    if (usersInChat.includes(usersFromDB[user].username)) {
+                                        userNode.style.color = 'lightgreen';
+                                        userNode.style.border = '1px solid lightgreen';
+                                    } else {
+                                        userNode.style.color = 'rgb(138, 138, 138)';
+                                        userNode.style.border = '1px solid rgb(138, 138, 138)';
+                                    }
+
+                                    currentUsersInChat.appendChild(userNode);
+                                });
                                 
                             }
                         } else {
@@ -393,7 +438,12 @@ const checkConversations = async () => {
 const clickedConversation = (conversation) => {
     const conversationID = conversation.getAttribute('data-conversation-id');
         if (conversationLoaded === conversationID) {
-            socket.emit('leaveConversation', { conversationID });
+            messageInput.style.visibility = 'hidden';
+            sendMessageBtn.style.visibility = 'hidden';
+            sendImgBtn.style.visibility = 'hidden';
+            messagingHeader.style.visibility = 'hidden';
+            currentUsersInChat.style.visibility = 'hidden';
+            socket.emit('leaveConversation', { conversationID, userID });
             conversationLoaded = '';
             let tempConversations = document.querySelectorAll('.conversation');
             tempConversations.forEach(conversation => {
@@ -403,7 +453,12 @@ const clickedConversation = (conversation) => {
             // loadConversation();
             checkConversations();
         } else {
-            socket.emit('leaveConversation', { conversationID: conversationLoaded });
+            messageInput.style.visibility = 'visible';
+            sendMessageBtn.style.visibility = 'visible';
+            sendImgBtn.style.visibility = 'visible';
+            messagingHeader.style.visibility = 'visible';
+            currentUsersInChat.style.visibility = 'visible';
+            socket.emit('leaveConversation', { conversationID: conversationLoaded, userID });
             socket.emit('joinConversation', { conversationID, userID });
             conversationLoaded = conversationID;
 
@@ -426,7 +481,7 @@ const clickedConversation = (conversation) => {
 
 // Add conversation
 
-const clearString = (string) => string.replace(/,/ig, ' ').trim().replace(/\s+/g, ' ').trim();
+const clearString = (string) => string.replace(/,/ig, ' ').replace(/\s+/g, ' ').trim();
 
 addConversation.addEventListener('click', () => {
     addConversationDiv.classList.toggle('active');
@@ -450,12 +505,7 @@ addConversationInput.addEventListener('keyup', (e) => {
 const addConversationSubmitFunction = async () => {
     if (addConversationInput.value) {
         const cleanString = clearString(addConversationInput.value);
-        const receiversInput = addConversationInput.value;
-        const receivers = cleanString.split(' ').map(receiver => {
-            if (receiver) {
-                return receiver.trim();
-            } 
-        });
+        const receivers = cleanString.split(' ');
         addConversationSubmit.innerText = 'Loading...';
         addConversationDiv.classList.remove('active');
         const response = await fetch('/messages/addconversation', {
@@ -503,7 +553,7 @@ const addConversationSubmitFunction = async () => {
             //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
             //     }
             // }
-            const titleHTML = `${receiversUser.map(receiver => receiver.username).join(', ')}`;
+            const titleHTML = `${receiversUser.map(receiver => receiver).join(', ')}`;
             node.innerHTML = 
             `
             <h2>${titleHTML}</h2>
@@ -627,71 +677,12 @@ sendMessageBtn.addEventListener('click', () => {
     }
 });
 
-// const instantMessageSend = (message) => {
-//     if (!checkConversationsLoading) {
-//         const node = document.createElement('div');
-//         node.classList.add('text-box');
-//         node.setAttribute('data-text-read', 'read');
-//         node.classList.add('sent-text');
-//         const newMessageValue = message.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
-//         node.innerHTML = `<div class="text">${newMessageValue}<i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i></div>`;
-//         internalMessages.appendChild(node);
-//         internalMessages.scrollTop = internalMessages.scrollHeight;    
-//     } else {
-//         setTimeout(() => { instantMessageSend(message); }, 100);
-//     }
-    
-// };
-
-// instantImgSend = (img) => {
-//     if (!checkConversationsLoading) {
-//         const node = document.createElement('div');
-//         node.classList.add('text-box');
-//         node.setAttribute('data-text-read', 'read');
-//         node.classList.add('sent-text');
-//         node.innerHTML = `<img src="${img}" class="text img" /><i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}"></i>`;
-//         internalMessages.appendChild(node);
-//         internalMessages.childNodes[internalMessages.childNodes.length - 1].childNodes[0].onload = () => {
-//             internalMessages.scrollTop = internalMessages.scrollHeight;  
-//         }
-//     } else {
-//         setTimeout(() => { instantImgSend(img); }, 100);
-//     }
-// }
-
 const sendMessage = async (conversationID, senderID, message) => {
     messageInput.value = '';
     lastSentMessages.unshift(message);
-    // Instantly show message sent
-    // if (conversationLoaded) {
-    //     instantMessageSend(message);
-    // }
-    // checkConversationsLoading = true;
-    // Actually send message
-    emitMessage(conversationID, { value: message, type: 'text', sender: senderID, date: Date.now() });
-    // Update messages list for each user when theyre not in the conversation
-    // const response = await fetch('/messages/sendmessage', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         conversationID,
-    //         senderID,
-    //         message,
-    //         date: Date.now(),
-    //         device: window.navigator.userAgent,
-    //     })
-    // });
-    // const resJSON = await response.json();
-    // checkConversationsLoading = false;
-    // if (resJSON.status === 'success') {
-    //     // loadConversation(conversationID);
-    //     checkConversations();
 
-    // } else {
-    //     window.location.href = '/login';
-    // }
+    emitMessage(conversationID, { value: message, type: 'text', sender: senderID, date: Date.now() });
+
 }
 
 sendImgIcon.addEventListener('click', () => {
@@ -730,31 +721,9 @@ sendImgFile.addEventListener('change', (e) => {
 })
 
 const sendImg = async (conversationID, senderID, message) => {
-    // checkConversationsLoading = true;
     // Actually send img
     emitMessage(conversationID, { value: message, type: 'img', sender: senderID, date: Date.now() });
-    // const response = await fetch('/messages/sendimg', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({
-    //         conversationID,
-    //         senderID,
-    //         message,
-    //         date: Date.now(),
-    //         device: window.navigator.userAgent,
-    //     })
-    // });
-    // const resJSON = await response.json();
-    // checkConversationsLoading = false;
-    // if (resJSON.status === 'success') {
-    //     messageInput.value = '';
-    //     // loadConversation(conversationID);
-    //     checkConversations();
-    // } else {
-    //     window.location.href = '/login';
-    // }    
+  
     
 }
 
@@ -769,52 +738,8 @@ editMessages.addEventListener('click', () => {
 const deleteText = (textDate) => {
 
     socket.emit('deleteMessage', {conversationID: conversationLoaded, textDate, userID});
-    // checkConversationsLoading = true;
-    // try {
-    //     editMessages.style.visibility = 'hidden';
-        
-    //     const response = await fetch('/messages/deletetext', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             userID,
-    //             textDate,
-    //             conversationLoaded,
-    //             device: window.navigator.userAgent,
-    //         }),
-    //     });
-    //     const resJSON = await response.json();
-    //     editMessages.style.visibility = 'visible';
-    //     checkConversationsLoading = false;
-    //     if (resJSON.status === 'unseccessful') {
-    //         window.location.href = '/login';
-    //     } else if (resJSON.status === 'wrong-user') {
-    //         myAlert('You can only delete messages YOU send!');
-    //     } else if (resJSON.status === 'success') {
-    //         // await loadConversation(conversationLoaded);
-    //         await checkConversations();
-    //     }
-    // } catch (err) {
-    //     console.error(err);
-    // }
-}
 
-//Gets rid of input bar if nothing in conversationLoaded
-setInterval(() => {
-    if (conversationLoaded) {
-        messageInput.style.visibility = 'visible';
-        sendMessageBtn.style.visibility = 'visible';
-        sendImgBtn.style.visibility = 'visible';
-        messagingHeader.style.visibility = 'visible';
-    } else if (!conversationLoaded) {
-        messageInput.style.visibility = 'hidden';
-        sendMessageBtn.style.visibility = 'hidden';
-        sendImgBtn.style.visibility = 'hidden';
-        messagingHeader.style.visibility = 'hidden';
-    }
-}, 1)
+}
 
 // Animate dots for when someone is typing
 const sleep = (ms) => {

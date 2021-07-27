@@ -5,74 +5,6 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const jwt = require('jsonwebtoken');
 
-const server = require('../server.js');
-const socketio = require('socket.io');
-const { admin } = require('googleapis/build/src/apis/admin');
-const io = socketio(server);
-
-io.on('connection', (socket) => {
-    console.log('user connected');
-    // Join own personal user room to listen for new conversations
-    socket.on('joinUserRoom', ({ userID }) => {
-        socket.join(userID);
-    });
-    // Join conversation
-    socket.on('joinConversation', async ({conversationID, userID, auth_token}) => {
-      console.log('Joined converstaion ' + conversationID);
-      // Authorize user
-      const token = socket.request.headers.cookie.split('').splice(11).join('') || auth_token;
-      let verified = true;
-      if (token == null) return verified = false;
-      jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
-          if (err) return verifed = false;
-      });
-      if (!verified) return;
-      const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
-      if (!conversation.people.includes(userID)) return;
-      socket.join(conversationID);
-
-
-    });
-
-    // Leave conversation
-    socket.on('leaveConversation', ({conversationID}) => {
-      console.log('Left conversation ' + conversationID);
-      socket.leave(conversationID);
-    });
-
-    // Get sent message, log to DB, and send back to correct chat room
-    socket.on('message', ({conversationID, message}) => {
-        sendMessage(conversationID, message);
-        io.to(conversationID).emit('message', {message});
-    });
-    socket.on('updateConversationsWithMessage', ({person, messageData, conversationID}) => {
-        io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID});
-    });
-
-    // Get delete message request, delete message from DB, and send info to chat room
-    socket.on('deleteMessage', ({conversationID, textDate, userID}) => {
-        deleteMessage(conversationID, textDate, userID);
-        io.to(conversationID).emit('deleteMessage', textDate);
-    });
-
-    // Send created conversation to user
-    socket.on('addedConvo', ({receiver, conversationID, senders}) => {
-
-        io.to(receiver).emit('addedConvo', {senders, conversationID});
-    });
-
-    // Show typing notification
-    socket.on('istyping', ({conversationID, username}) => {
-        io.to(conversationID).emit('istyping', {username});
-    });
-
-    // Hide typing notification
-    socket.on('stoppedtyping', ({conversationID, username}) => {  
-        io.to(conversationID).emit('stoppedtyping', {username});
-    });
-
-  
-});
 
 // GET Route
 router.get('/', authToken, async (req, res) => {
@@ -197,25 +129,17 @@ router.post('/addconversation', postAuthToken, async (req, res) => {
                        // check if receivers have duplicates
                        const dupes = receivers.filter( (receiver, index, arr) => arr.indexOf(receiver) !== index);
                        if (dupes.length == 0) {
-                       // Check to see if they already have a conversation
-                        // const check1 = await Conversation.find({people: [user._id, receiver._id]});
-                        // const check2 = await Conversation.find({people: [receiver._id, user._id]});
-                        // const check1 = (await db.collection('conversations').where('people', '==', [user._id, receiver._id]).get()).docs.map(doc => doc.data());
-                        // const check2 = (await db.collection('conversations').where('people', '==', [receiver._id, user._id]).get()).docs.map(doc => doc.data());
 
-                        // if (check1.length == 0 && check2.length == 0) {
-
-                                // const createConversation = await new Conversation({people: [user._id, receiver._id],messages: [],});
-                                // const saveConversation = await createConversation.save();
                                 const people = [user._id, ...receivers.map(receiver => receiver._id)];
+                                const convoID = Date.now().toString(16) + Math.random().toString(16).slice(2);
                                 const convoData = {
-                                    _id: Date.now().toString(16) + Math.random().toString(16).slice(2),
+                                    _id: convoID,
                                     people,
                                     messages: [],
                                     seenFor: receivers.map(receiver => receiver._id),
                                     dateActive: Date.now(),
                                 };
-                                await db.collection('conversations').doc(`${user.username}, ${receivers[0].username}${receivers.length > 1 ? ', and more...' : ''}`).set(convoData);
+                                await db.collection('conversations').doc(`${user.username}, ${receivers[0].username}${receivers.length > 1 ? ', and more...' : ''} ${convoID}`).set(convoData);
 
                                 const conversationID = convoData._id;
                                 res.json({
@@ -346,4 +270,8 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
     }
   }
 
-module.exports = router;
+module.exports = {
+    messagesRoute: router,
+    sendMessage,
+    deleteMessage,
+};

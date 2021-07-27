@@ -91,7 +91,7 @@ app.use('/search', searchRoute);
 const postRoute = require('./routes/post');
 app.use('/post', postRoute);
 
-const messagesRoute = require('./routes/messages');
+const { messagesRoute } = require('./routes/messages');
 app.use('/messages', messagesRoute);
 
 const agreementsRoute = require('./routes/agreements');
@@ -101,8 +101,10 @@ const forgotpasswordRoute = require('./routes/forgotpassword');
 app.use('/forgotpassword', forgotpasswordRoute);
 
 const adminRoute = require('./routes/admin');
-const { firebase } = require('googleapis/build/src/apis/firebase');
 app.use('/admin', adminRoute);
+
+const socketioRoute = require('./utils/socketio');
+app.use('socketio', socketioRoute);
 
 // Testing purposes
 // app.get('/test', async (req, res) => {

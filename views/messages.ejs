@@ -15,7 +15,7 @@
       integrity="sha384-Bfad6CLCknfcloXFOyFnlgtENryhrpZCe29RTifKEixXQZ38WheV+i/6YWSzkz3V"
       crossorigin="anonymous"
     />
-    <script src="https://cdn.socket.io/4.1.2/socket.io.min.js" integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js" ></script>
 </head>
 <body>
     <div id="background"></div>
@@ -80,6 +80,15 @@
             </div>
             <div id="userIsTyping">
                 <span id="usernameTyping"></span> is typing<span id="dot1">.</span><span id="dot2">.</span><span id="dot3">.</span>
+            </div>
+            <div id="currentUsersInChat">
+                <!-- User examples here -->
+                <!-- <div data-username="Socialent" class="user-box">
+                    Socialent
+                </div>
+                <div data-username="test" class="user-box">
+                    test
+                </div> -->
             </div>
         </div>
     </div>

@@ -247,7 +247,7 @@
     max-height: 100%;
     width: 100%;
     overflow: scroll;
-    padding: 50px 10px;
+    padding: 60px 10px;
     border-radius: 20px;
 }
 
@@ -258,6 +258,8 @@
     cursor: pointer;
     height: 25px;
     width: 25px;
+
+    visibility: hidden;
 }
 #sendImgIcon {
     color: rgb(150, 150, 150);
@@ -278,6 +280,8 @@
     font-size: 25px;
     color: rgb(45, 118, 226);
     cursor: pointer;
+
+    visibility: hidden;
 }
 
 #userIsTyping {
@@ -291,6 +295,23 @@
 #dot2,
 #dot3 {
     display: none;
+}
+
+#currentUsersInChat {
+    position: absolute;
+    bottom: 38px;
+    right: 15px;
+    font-size: 10px;
+    display: flex;
+
+    visibility: hidden;
+}
+#currentUsersInChat > .user-box {
+    padding: 1px 6px;
+    border: 1px solid rgb(138, 138, 138);
+    border-radius: 9999px;
+    color: rgb(138, 138, 138);
+    margin-left: 2px;
 }
 
 .text-box {
@@ -387,6 +408,8 @@
     border-radius: 999999px;
     background-color: rgba(105, 105, 105, 0.5);
     outline: none;
+
+    visibility: hidden;
 }
 
 #messaging input::-webkit-input-placeholder {
