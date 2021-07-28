@@ -35,6 +35,7 @@ let lastSentMessages = [];
 let lastSentMessageIndex = -1;
 let pastUserOrigin = '';
 let usersInChat = [];
+let usersIdsInChat = [];
 
 const usersFromDB = {};
 
@@ -91,9 +92,11 @@ socket.on('message', ({message}) => {
     internalMessages.scrollTop = internalMessages.scrollHeight;
 });
 
-socket.on('updateConversationsWithMessage', ({messageData: message, conversationID}) => {
+socket.on('updateConversationsWithMessage', ({messageData: message, conversationID, usersIds}) => {
     // Update conversations list so the message is correct, and is at top of list
     // find certain conversation
+    let showNoti = usersIds.includes(userID) ? false : true;
+    if (message.sender == userID) showNoti = false;
     const conversationNode = document.querySelector(`.conversation[data-conversation-id='${conversationID}']`);
     if (message.type == 'img') {
         conversationNode.children[1].innerText = 'Image';
@@ -102,6 +105,9 @@ socket.on('updateConversationsWithMessage', ({messageData: message, conversation
     }
     if (messagesList.children[0] != conversationNode) {
         messagesList.insertBefore(conversationNode, messagesList.children[0]);
+    }
+    if (showNoti) {
+        conversationNode.children[2].classList.add('active');
     }
 });
 
@@ -136,7 +142,7 @@ socket.on('addedConvo', ({senders, conversationID}) => {
     //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
     //     }
     // }
-    const titleHTML = `${receiversUser.map(receiver => receiver.username).join(', ')}`;
+    const titleHTML = `${receiversUser.join(', ')}`;
     node.innerHTML = 
     `
         <h2>${titleHTML}</h2>
@@ -172,6 +178,11 @@ socket.on('leaveConversation', ({users}) => {
 // Refresh currents users list
 const refreshCurrentUsers = (users) => {
     usersInChat = users.map(user => user == userID ? null : usersFromDB[user]).filter(user => user != null).map(user => user.username);
+    usersIdsInChat = Object.keys(usersFromDB).filter(id => {
+        if (usersInChat.includes(usersFromDB[id].username)) {
+            return true;
+        }
+    });
     const userNodes = document.querySelectorAll(`#currentUsersInChat > .user-box`);
     userNodes.forEach(userNode => {
         if (usersInChat.includes(userNode.getAttribute('data-username'))) {
@@ -189,11 +200,11 @@ const refreshCurrentUsers = (users) => {
 // Send message
 function emitMessage(conversationID, message) {
     // Message = { value: '', type: 'text', sender: userID, date: Date.now() };
-    socket.emit('message', {conversationID, message});
+    socket.emit('message', {conversationID, message, usersIdsInChat});
 
     // to update conversations list for those not currently in conversation
     conversation.people.forEach(person => {
-        socket.emit('updateConversationsWithMessage', {person, messageData: message, conversationID});
+        socket.emit('updateConversationsWithMessage', {person, messageData: message, conversationID, usersIdsInChat});
     });
 };
 
@@ -593,7 +604,6 @@ addConversationInput.addEventListener('input', async (e) => {
           body: JSON.stringify({
             value: cleanString.split(' ')[cleanString.split(' ').length - 1],
             userID,
-            device: window.navigator.userAgent,
           }),
         });
         const resJSON = await response.json();

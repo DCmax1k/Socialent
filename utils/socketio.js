@@ -52,12 +52,12 @@ io.on('connection', (socket) => {
     });
 
     // Get sent message, log to DB, and send back to correct chat room
-    socket.on('message', ({conversationID, message}) => {
-        sendMessage(conversationID, message);
+    socket.on('message', ({conversationID, message, usersIdsInChat}) => {
+        sendMessage(conversationID, message, usersIdsInChat);
         io.to(conversationID).emit('message', {message});
     });
-    socket.on('updateConversationsWithMessage', ({person, messageData, conversationID}) => {
-        io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID});
+    socket.on('updateConversationsWithMessage', ({person, messageData, conversationID, usersIdsInChat}) => {
+        io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID, usersIds: usersIdsInChat});
     });
 
     // Get delete message request, delete message from DB, and send info to chat room

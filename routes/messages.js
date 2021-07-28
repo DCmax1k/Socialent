@@ -219,18 +219,19 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
   })
 
   // Send message
-  const sendMessage = async (conversationID, message) => {
+  const sendMessage = async (conversationID, message, usersIdsInChat) => {
     try {
       const user = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
         const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
         const messageData = message;
-        const updateConversation = await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: message.date, seenFor: conversation.people.map(person => {
+        const notifyTheseUsers = conversation.people.map(person => {
             if (person != user._id) {
                 return person;
             } else {
                 return null;
             }
-        })});
+        }).filter(personsID => usersIdsInChat.includes(personsID) ? false : true);
+        await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: message.date, seenFor: notifyTheseUsers});
 
         // Add 1 point to score
         let usersScore = user.score;
