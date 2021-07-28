@@ -583,6 +583,9 @@ const addConversationSubmitFunction = async () => {
                 senders.splice(senders.indexOf(receiver), 1);
                 socket.emit('addedConvo', { receiver: receiver._id, conversationID: resJSON.conversationID, senders, });
             });
+        } else if (resJSON.status === 'error') {
+            myAlert(resJSON.message);
+            addConversationSubmit.innerText = 'Add';
 
         } else {
             window.location.href = '/login';

@@ -114,59 +114,54 @@ router.post('/addconversation', postAuthToken, async (req, res) => {
     try {
         // const user = await User.findById(req.body.userID);
         const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+        // remove duplicates from req.body.receivers
+        let receivers = [...new Set(req.body.receivers)];
+        receivers = receivers.filter(receiver => receiver !== user.username);
 
-            if (req.body.receivers) {
-                // const receiver = await User.findOne({ username: req.body.receiver });
-                const receivers = await Promise.all(req.body.receivers.map( async receiver => {
-                    if (receiver) {
-                        return (await db.collection('users').where('username', '==', receiver).get()).docs[0].data();
-                    }
-                }));
-                // let receiver = (await db.collection('users').where('username', '==', req.body.receiver).get()).docs[0];
-                // Check if receiver exists
-                if (receivers) {
-                       // receiver = receiver.data();
-                       // check if receivers have duplicates
-                       const dupes = receivers.filter( (receiver, index, arr) => arr.indexOf(receiver) !== index);
-                       if (dupes.length == 0) {
+        if (receivers.length != 0) {
+            // const receiver = await User.findOne({ username: req.body.receiver });
+            let noUserExist = '';
+            receivers = await Promise.all(receivers.map( async receiver => {
+                if (receiver) {
+                    const find = (await db.collection('users').where('username', '==', receiver).get()).docs[0];
+                    return find ? find.data() : noUserExist = receiver;
+                }
+            }));
+            if (noUserExist) return res.json({status: 'error', message: `'${noUserExist}' is not a valid user, please correct your spelling and try again!`});
+            // let receiver = (await db.collection('users').where('username', '==', req.body.receiver).get()).docs[0];
+            // Check if receiver exists
+            if (receivers) {
+                const people = [user._id, ...receivers.map(receiver => receiver._id)];
+                const convoID = Date.now().toString(16) + Math.random().toString(16).slice(2);
+                const convoData = {
+                    _id: convoID,
+                    people,
+                    messages: [],
+                    seenFor: receivers.map(receiver => receiver._id),
+                    dateActive: Date.now(),
+                };
+                await db.collection('conversations').doc(`${user.username}, ${receivers[0].username}${receivers.length > 1 ? ', and more...' : ''} ${convoID}`).set(convoData);
 
-                                const people = [user._id, ...receivers.map(receiver => receiver._id)];
-                                const convoID = Date.now().toString(16) + Math.random().toString(16).slice(2);
-                                const convoData = {
-                                    _id: convoID,
-                                    people,
-                                    messages: [],
-                                    seenFor: receivers.map(receiver => receiver._id),
-                                    dateActive: Date.now(),
-                                };
-                                await db.collection('conversations').doc(`${user.username}, ${receivers[0].username}${receivers.length > 1 ? ', and more...' : ''} ${convoID}`).set(convoData);
+                const conversationID = convoData._id;
+                res.json({
+                    status: 'success',
+                    receivers: receivers,
+                    sender: user,
+                    conversationID,
+                });    
 
-                                const conversationID = convoData._id;
-                                res.json({
-                                    status: 'success',
-                                    receivers,
-                                    sender: user,
-                                    conversationID,
-                                });    
-                        // } else {
-                        //     res.json({
-                        //         status: 'already-convo',
-                        //     });
-                        // }  
-                    
-                     
-                } else {
-                    res.json({
-                        status: 'yourself',
-                    });
-                }     
-                }  else {
-                    res.json({
-                        status: 'no-user',
-                    });
-                }  
-                
-            }
+            }  else {
+                res.json({
+                    status: 'no-user',
+                });
+            }  
+            
+        } else {
+            res.json({
+                status: 'error',
+                message: 'Must have at least 1 receiver',
+            });
+        }  
             
 
     } catch(err) {
