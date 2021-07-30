@@ -12,6 +12,30 @@ const prefixTexts = document.querySelectorAll('.prefixText');
 const prefixs = document.querySelectorAll('.prefix');
 const userContss = document.querySelectorAll('.userCont');
 const searchInput = document.getElementById('searchInput');
+const verifiedBtns = document.querySelectorAll('.verifiedCont');
+
+// Verify user
+verifiedBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const user = btn.getAttribute('data-user-id');
+        const verifyOrUnverify = btn.classList.contains('active') ? 'unverify' : 'verify';
+        btn.classList.toggle('active');
+        const response = await fetch('/admin/verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user: user,
+                verifyOrUnverify,
+            }),
+        });
+        const resJSON = await response.json();
+        if (resJSON.status !== 'success') {
+            myAlert(resJSON.message);
+        }
+    });
+});
 
 // Search user
 searchInput.addEventListener('keyup', (e) => {

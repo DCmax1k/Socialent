@@ -72,7 +72,16 @@
             <div class="usersIndexNum"><%= i + 1 %></div>
           </div>
           <div class="userNames">
-            <a href="/account/<%= subUser.username %>" class="username"><div data-user-id="<%= subUser._id %>" class="prefix <% if (subUser.rank != 'user') {%><%= subUser.rank %><%}%>" ><% if (subUser.prefix.title) { %>[<%= subUser.prefix.title %>]<% } %></div> <%= subUser.username %></a>
+            <div class="username">
+              <a href="/account/<%= subUser.username %>" class="usernameLink">
+                <div data-user-id="<%= subUser._id %>" class="prefix <% if (subUser.rank != 'user') {%><%= subUser.rank %><%}%>" ><% if (subUser.prefix.title) { %>[<%= subUser.prefix.title %>]<% } %></div>
+                <%= subUser.username %>
+              </a>
+              <span class="verifiedCont<%= subUser.verified == true ? ' active' : '' %>" data-user-id="<%= subUser._id %>">
+                <img class="verified" src="/images//verified.svg" alt="Verified Logo">
+              </span>
+            </div>
+            
             <div class="name"><%= subUser.name %></div>
           </div>
           <div data-user-id="<%= subUser._id %>" class="openControls">

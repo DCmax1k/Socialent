@@ -197,7 +197,7 @@ h1 {
     font-size: 20px;
 }
 
-.userNames > .username {
+.userNames > .username > a {
     font-size: 30px;
     font-weight: bolder;
     color: white;
@@ -205,9 +205,23 @@ h1 {
     text-decoration-color: transparent;
     transition: text-decoration-color 0.3s ease;
 }
-.userNames > .username:hover {
+.userNames > .username > a:hover {
     text-decoration-color: white;
 }
+
+.verifiedCont {
+    cursor: pointer;
+    opacity: 0.1;
+
+    transition: opacity 0.3s ease;
+}
+.verifiedCont:hover {
+    opacity: 1;
+}
+.verifiedCont.active {
+    opacity: 1;
+}
+
 
 .userNames > .name {
     margin-top: -20px;

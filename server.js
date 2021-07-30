@@ -103,8 +103,8 @@ app.use('/forgotpassword', forgotpasswordRoute);
 const adminRoute = require('./routes/admin');
 app.use('/admin', adminRoute);
 
-const socketioRoute = require('./utils/socketio');
-app.use('socketio', socketioRoute);
+const socketio = require('./utils/socketio');
+app.use(socketio);
 
 // Testing purposes
 // app.get('/test', async (req, res) => {
