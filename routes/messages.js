@@ -207,6 +207,7 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
         username: receiver.username,
         prefix: receiver.prefix,
         rank: receiver.rank,
+        verified: receiver.verified,
       });
     } catch(err) {
       console.error(err);

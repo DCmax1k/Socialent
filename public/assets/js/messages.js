@@ -41,6 +41,27 @@ const usersFromDB = {};
 
 // ** NEW CODE **
 
+const formatUsersPrefix = (receiver) => {
+    let prefix = '';
+    if (receiver.prefix.title) {
+        if (receiver.rank === 'owner') {
+            prefix = `<p class="prefix owner" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `
+        } else if (receiver.rank === 'admin') {
+            prefix = `<p class="prefix admin" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `
+        } else {
+            prefix = `<p class="prefix" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `;
+        }
+    }
+    return prefix;
+}
+const formatUsersVerified = (receiver) => {
+    let verified = '';
+    if (receiver.verified) {
+        verified = ` <img class="verified" src="/images//verified.svg" alt="Verified Logo">`;
+    }
+    return verified;
+}
+
 // Listen for new message
 socket.on('message', ({message}) => {
     // // Show text on screen
@@ -142,7 +163,7 @@ socket.on('addedConvo', ({senders, conversationID}) => {
     //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
     //     }
     // }
-    const titleHTML = `${receiversUser.join(', ')}`;
+    const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ formatUsersPrefix(receiver) + receiver.username + formatUsersVerified(receiver)).join(', ')}`;
     node.innerHTML = 
     `
         <h2>${titleHTML}</h2>
@@ -273,7 +294,7 @@ const checkConversations = async () => {
                         //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
                         //     }
                         // }
-                        const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ receiver.username).join(', ')}`;
+                        const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ formatUsersPrefix(receiver) + receiver.username + formatUsersVerified(receiver)).join(', ')}`;
                         node.innerHTML = 
                         `
                             <h2>${titleHTML}</h2>
@@ -550,7 +571,7 @@ const addConversationSubmitFunction = async () => {
         }
         if (resJSON.status === 'success') {
             // Generate conversation html
-            const receiversUser = resJSON.receivers.map(receiver => receiver.username);
+            const receiversUser = resJSON.receivers;
             const node = document.createElement('div');
             node.classList.add('conversation');
             node.setAttribute('data-conversation-id', resJSON.conversationID);
@@ -564,7 +585,7 @@ const addConversationSubmitFunction = async () => {
             //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
             //     }
             // }
-            const titleHTML = `${receiversUser.map(receiver => receiver).join(', ')}`;
+            const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ formatUsersPrefix(receiver) + receiver.username + formatUsersVerified(receiver)).join(', ')}`;
             node.innerHTML = 
             `
             <h2>${titleHTML}</h2>
@@ -578,7 +599,7 @@ const addConversationSubmitFunction = async () => {
             addConversationSubmit.innerText = 'Add';
             addConversationInput.value = '';
             resJSON.receivers.forEach(receiver => {
-                const senders = [resJSON.sender.username, ...receiversUser];
+                const senders = [resJSON.sender, ...receiversUser];
                 // remove receiver from senders
                 senders.splice(senders.indexOf(receiver), 1);
                 socket.emit('addedConvo', { receiver: receiver._id, conversationID: resJSON.conversationID, senders, });
