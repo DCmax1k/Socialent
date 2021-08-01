@@ -30,7 +30,7 @@ const addPrefix = async () => {
       node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
     }
   }
-  authorSpace.insertBefore(node, authorSpace.childNodes[authorSpace.childNodes.length - 2]);
+  authorSpace.insertBefore(node, authorSpace.children[1]);
 }
 addPrefix();
 

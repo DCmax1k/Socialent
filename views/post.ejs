@@ -58,6 +58,9 @@
           </div>
             
           <h1><%= post.author.username %></h1>
+          <% if (post.author.verified) { %>
+            <img class="verified" style="margin-left: 5px; height: 12px; width: 12px;" src="/images/verified.svg" alt="verifiedIcon">
+          <% } %>
         </div>
         <% if (loggedin && JSON.stringify(user._id) === JSON.stringify(post.author._id)) { %>
         <!-- Delete post menu -->
