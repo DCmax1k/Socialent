@@ -25,7 +25,6 @@ router.post('/getfromapp', postAuthToken, async (req, res) => {
   }
 });
 
-
 function authToken(req, res, next) {
     const token = req.cookies['auth-token'];
     if (token == null) return res.sendStatus(401);
@@ -215,5 +214,37 @@ router.post('/warn', postAuthToken, async (req, res) => {
     }
   })
 
+  // * REVEIW DELETED POSTS ROUTE *
+router.get('/rdp', authToken, async (req, res) => {
+    try {
+        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+        if (user.rank != 'admin' && user.rank != 'owner') return res.status(403).send('nice try lol');
+        const deletedPosts = (await db.collection('posts').where('active', '==', false).get()).docs.map(doc => { return doc.data(); });
+        res.render('rdp', {user, deletedPosts});
+    } catch(err) {
+        console.error(err);
+    }
+});
+
+  // Admin delete post
+router.post('/activatepost', postAuthToken, async (req, res) => {
+  try {
+
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+
+    const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
+    if (admin.rank === 'admin' || admin.rank === 'owner') {
+      // Doesn't actually delete post, but rather disables it
+      const disablePost = await (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.update('active', true);
+      //const savePost = await disablePost.save();
+      res.json({
+        status: 'success',
+        postID: post._id,
+      })
+    }
+  } catch(err) {
+    console.error(err);
+  }
+});
 
 module.exports = router;

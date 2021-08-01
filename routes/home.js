@@ -112,15 +112,13 @@ router.post('/editdesc', postAuthToken, async (req, res) => {
 router.post('/admindeletepost', postAuthToken, async (req, res) => {
   try {
     //const admin = await User.findById(req.body.admin);
-    const admin = (await db.collection('users').where('_id', '==', req.body.admin).get()).docs[0].data();
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
     // const user = await User.findById(req.body.user);
     const user = (await db.collection('users').where('_id', '==', req.body.user).get()).docs[0].data();
     //const post = await Post.findById(req.body.postID);
     const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
     if (((user.rank === 'owner' && admin.rank === 'owner') || (admin.rank === 'owner' && user.rank === 'admin') || (admin.rank === 'admin' && user.rank !== 'owner') || (user.rank === 'user' && (admin.rank === 'owner' || admin.rank === 'admin')))) {
       // Doesn't actually delete post, but rather disables it
-      // const deletePost = await Post.findByIdAndDelete(post._id);
-      // const disablePost = await Post.findByIdAndUpdate(post._id, { active: false }, { useFindAndModify: false });
       const disablePost = await (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.update('active', false);
       //const savePost = await disablePost.save();
       res.json({
