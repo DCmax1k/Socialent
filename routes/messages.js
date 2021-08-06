@@ -220,6 +220,8 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
       const user = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
         const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
         const messageData = message;
+
+        // Users to notify/are not in chat
         const notifyTheseUsers = conversation.people.map(person => {
             if (person != user._id) {
                 return person;
@@ -228,6 +230,14 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
             }
         }).filter(personsID => usersIdsInChat.includes(personsID) ? false : true);
         await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({messages: [...conversation.messages, messageData], dateActive: message.date, seenFor: notifyTheseUsers});
+
+        // Send NOTIFICATION to users?firebase/app stuff
+        // if (notifyTheseUsers.length > 0) {
+        //     notifyTheseUsers.forEach(async notiUser => {
+        //         // Send noti
+        //     });
+        // };
+
 
         // Add 1 point to score
         let usersScore = user.score;

@@ -190,29 +190,36 @@ router.post('/demo', postAuthToken, async (req, res) => {
 });
 
 // Warn a user
-router.post('/warn', postAuthToken, async (req, res) => {
-    try {
-      // const admin = await User.findById(req.body.adminID);
-      const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-      // const user = await User.findById(req.body.userID);
-      const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
-      if (admin.rank === 'admin' || admin.rank === 'owner') {
-        // const updateUser = await User.findByIdAndUpdate(user._id, { $push: { warnings: [ req.body.warning, true ]}}, { useFindAndModify: false });
-        // const saveUser = await updateUser.save();
-        const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('warnings', [...user.warnings, { active: true, text: req.body.warning}]);
-        res.json({
-          status: 'success',
-          username: user.username,
-        });
-      } else {
-        res.json({
-          status: 'unseccessful',
-        });
-      }
-    } catch(err) {
-      console.error(err);
+const warnUser = async (adminID, userID, warning) => {
+  try {
+    // const admin = await User.findById(req.body.adminID);
+    const admin = (await db.collection('users').where('_id', '==', adminID).get()).docs[0].data();
+    // const user = await User.findById(req.body.userID);
+    const user = (await db.collection('users').where('_id', '==', userID).get()).docs[0].data();
+    if (admin.rank === 'admin' || admin.rank === 'owner') {
+      // const updateUser = await User.findByIdAndUpdate(user._id, { $push: { warnings: [ req.body.warning, true ]}}, { useFindAndModify: false });
+      // const saveUser = await updateUser.save();
+      const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('warnings', [...user.warnings, { active: true, text: warning}]);
     }
-  })
+  } catch(err) {
+    console.error(err);
+  }
+};
+
+// router.post('/warn', postAuthToken, async (req, res) => {
+//   try {
+//     const adminID = req.user._id;
+//     const userID = req.body.userId;
+//     const warning = req.body.warning;
+//     warnUser(adminID, userID, warning);
+//     res.json({
+//       status: 'success',
+//     });
+
+//   } catch(err) {
+//     console.error(err);
+//   }
+// });
 
   // * REVEIW DELETED POSTS ROUTE *
 router.get('/rdp', authToken, async (req, res) => {
@@ -247,4 +254,7 @@ router.post('/activatepost', postAuthToken, async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = {
+  adminRoute: router,
+  warnUser,
+};

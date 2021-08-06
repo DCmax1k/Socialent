@@ -100,7 +100,7 @@ app.use('/agreements', agreementsRoute);
 const forgotpasswordRoute = require('./routes/forgotpassword');
 app.use('/forgotpassword', forgotpasswordRoute);
 
-const adminRoute = require('./routes/admin');
+const { adminRoute } = require('./routes/admin');
 app.use('/admin', adminRoute);
 
 const socketio = require('./utils/socketio');

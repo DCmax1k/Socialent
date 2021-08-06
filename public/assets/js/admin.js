@@ -1,3 +1,7 @@
+const socket = io();
+// Join personal room to listen for warns to user
+socket.emit('joinUserRoom', { userID });
+
 const openControls = document.querySelectorAll('.openControls');
 const userControls = document.querySelectorAll('.userControls');
 const closeUserControls = document.querySelectorAll('.closeUserControls');
@@ -182,20 +186,7 @@ warnInputs.forEach(warnInput => {
     });
 });
 const sendWarning = async (dataID, warning) => {
-    const response = await fetch('/admin/warn', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            userId: dataID,
-            warning,
-        }),
-    });
-    const resJSON = await response.json();
-    if (resJSON.status != 'success') {
-        alert('An error as occured!');
-    }
+    socket.emit('warnUser', { adminID: userID, userID: dataID, warning,});
 }
 
 // Delete User

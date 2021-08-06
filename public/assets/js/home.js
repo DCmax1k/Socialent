@@ -1,3 +1,7 @@
+const socket = io();
+// Join personal room to listen for warns to user
+socket.emit('joinUserRoom', { userID });
+
 const posts = document.querySelectorAll('.post-cont');
 const likeBtns = document.querySelectorAll('.like-btn > i');
 const likeBtnsText = document.querySelectorAll('.like-btn > p');
@@ -476,9 +480,13 @@ const checkForWarnings = async () => {
   
 }
 checkForWarnings();
-setInterval(async () => {
-  await checkForWarnings(); 
-}, 3000);
+
+// Live warnings
+socket.on('warnUser', ({warning}) => {
+  console.log('getting alert');
+  currentWarnings.push({active: true, text: warning});
+  generateWarnings();
+});
 
 const generateWarnings = () => {
   warnAlerts.innerHTML = '';
@@ -492,17 +500,18 @@ const generateWarnings = () => {
       <h1>${warning.text}</h1>
       <button class='dismiss-btn' data-warning-index='${i}'>Dismiss</button>
       `;
-      giveDisEventListener(node.childNodes[5]);
+      giveDisEventListener(node.childNodes[5], node);
       warnAlerts.appendChild(node);
     }
   })
 }
 
 // Give dismiss btn event listener
-const giveDisEventListener = dismissBtn => {
+const giveDisEventListener = (dismissBtn, node) => {
   dismissBtn.addEventListener('click', async () => {
-    dismissBtn.style.display = 'none';
-    const response = await fetch('/home/dismisswarn', {
+    // dismissBtn.style.display = 'none';
+    node.style.display = 'none';
+    const response = fetch('/home/dismisswarn', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -514,12 +523,6 @@ const giveDisEventListener = dismissBtn => {
 
       }),
     });
-    const resJSON = await response.json();
-    if (resJSON.status === 'success') {
-      await checkForWarnings();
-    } else {
-      window.location.href = '/login';
-    }
   });
 };
 

@@ -11,6 +11,7 @@ const io = socketio(server);
 
 const { sendMessage, deleteMessage } = require('../routes/messages');
 const { getRoomUsers, joinRoom, leaveRoom  } = require('./messageRooms');
+const { warnUser } = require('../routes/admin');
 
 io.on('connection', (socket) => {
     console.log('user connected');
@@ -19,6 +20,9 @@ io.on('connection', (socket) => {
 
         socket.join(userID);
     });
+
+    // * MESSAGES *
+
     // Join conversation
     socket.on('joinConversation', async ({conversationID, userID, auth_token}) => {
       console.log('Joined converstaion ' + conversationID);
@@ -81,6 +85,18 @@ io.on('connection', (socket) => {
     socket.on('stoppedtyping', ({conversationID, username}) => {  
         io.to(conversationID).emit('stoppedtyping', {username});
     });
+
+    // * ADMIN *
+
+    // Warn user from admin page to home page
+    socket.on('warnUser', ({adminID, userID, warning}) => {
+        warnUser(adminID, userID, warning);
+        io.to(userID).emit('warnUser', {warning});
+    });
+
+    //
+    //
+
     socket.on('disconnecting', () => {
         console.log('user disconnected');
         // Notify users that user has left the conversation
