@@ -1,4 +1,3 @@
-
 const domain = 'https://socialentapp.com';
 
 const customAlert = document.getElementById('customAlert');

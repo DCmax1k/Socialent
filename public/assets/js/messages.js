@@ -1,6 +1,6 @@
-const socket = io();
+//const socket = io();
 // Join personal room to listen for new conversations
-socket.emit('joinUserRoom', { userID });
+// socket.emit('joinUserRoom', { userID });
 
 
 let conversations = document.querySelectorAll('.conversation');

@@ -1,6 +1,6 @@
-const socket = io();
+//const socket = io();
 // Join personal room to listen for warns to user
-socket.emit('joinUserRoom', { userID });
+// socket.emit('joinUserRoom', { userID });
 
 const posts = document.querySelectorAll('.post-cont');
 const likeBtns = document.querySelectorAll('.like-btn > i');

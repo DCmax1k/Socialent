@@ -181,6 +181,20 @@
   }
 </style>
 <script>
+  let userID = '';
+  document.cookie.split(';').forEach(el => {
+      if (el.includes('auth-token')) {
+          userID = JSON.parse(atob(el.split('=')[1].split('.')[1]))._id;
+      }
+  });
+
+  let socket;
+  if (typeof io !== 'undefined') {
+      socket = io();
+      socket.emit('joinUserRoom', { userID });
+  }
+  
+
   const logoutBtn = document.getElementById('logoutBtn');
   const conversationsBtn = document.getElementById('conversationsBtn');
   const homeBtn = document.getElementById('homeBtn');
@@ -190,50 +204,23 @@
   const sideNavBar = document.getElementById('sideNavBar');
   const messageNotiIcon = document.getElementById('messageNotiIcon');
 
-  let userID = '';
-  document.cookie.split(';').forEach(el => {
-      if (el.includes('auth-token')) {
-          userID = JSON.parse(atob(el.split('=')[1].split('.')[1]))._id;
-      }
-  });
 
-  // const checkMessageNotis = async () => {
-  //   if (!document.hidden) {
-  //     try {
-  //       const response = await fetch('/messages/checkconversations', {
-  //           method: 'POST',
-  //           headers: {
-  //               'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({
-  //               userID,
-  //           }),
-  //       });
-  //       const resJSON = await response.json();  
-  //       if (resJSON.status === 'success') {
-  //         conversationNoits = [];
-  //         resJSON.usersConversations.forEach(conversation => {
-  //           if (conversation.seen === 'unread' && conversation.seenFor === userID) {
-  //             conversationNoits.push(true);
-  //           } else {
-  //             conversationNoits.push(false);
-  //           }
-  //         });
-  //         if (conversationNoits.includes(true)) {
-  //           messageNotiIcon.style.display = 'block';
-  //         } else {
-  //           messageNotiIcon.style.display = 'none';
-  //         }
-  //       } else {
-  //         window.location.href = '/login';
-  //       }
-  //     } catch(err) {
-  //       console.error(err);
-  //     }  
-  //   }
-    
-  // }
-  // checkMessageNotis()
+  if (typeof socket !== 'undefined') {
+
+    socket.on('updateConversationsWithMessage', ({messageData, conversationID, usersIds: usersIdsInChat}) => {
+      if (messageData.sender != userID && !usersIdsInChat.includes(userID)) {
+        messageNotiIcon.style.display = 'block';
+      }
+    });
+
+    socket.on('addedConvo', () => {
+      messageNotiIcon.style.display = 'block';
+    });
+
+  } else {
+    console.error('Socket not defined in navBarFile');
+  }
+
   // setInterval(async () => {
   //     await checkMessageNotis();
   // }, 3000);

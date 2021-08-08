@@ -15,6 +15,7 @@
       integrity="sha384-HzLeBuhoNPvSl5KYnjx0BT+WB0QEEqLprO+NBkkk5gbc67FTaL7XIGa2w1L0Xbgc"
       crossorigin="anonymous"
     />
+    <script src="/socket.io/socket.io.js" ></script>
   </head>
   <body>
     <div id="background"></div>
@@ -134,6 +135,7 @@
     
 
     <% if (loggedin) { %>
+      
       <div id="editDescriptionBody" data-post-id="">
         <textarea name="editDescriptionTextarea" id="editDescriptionTextarea" cols="30" rows="10" placeholder="Description..."></textarea>
         <div class="edit-desc-btns">
@@ -141,6 +143,7 @@
           <button id="editDescSubmit">Submit</button>
         </div>
       </div>
+      
     <%- include('partials/sideNavBar') %> <% } %> <%- include('partials/footer')
     %>
 
