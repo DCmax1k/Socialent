@@ -106,13 +106,50 @@ app.use('/admin', adminRoute);
 const socketio = require('./utils/socketio');
 app.use(socketio);
 
+// Listener for successful payed transactions
+app.post('/stripe/webhook', express.raw({type: 'application/json'}), async (request, response) => {
+  const event = request.body;
+
+  // Handle the event
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+
+      const user = (await db.collection('users').where('_id', '==', paymentIntent.metadata.userID).get()).docs[0].data();
+      if (paymentIntent.metadata.product === 'tokens') {
+        let currentTokens = user.tokens;
+        if (paymentIntent.amount == 99) {
+          currentTokens = currentTokens + 8;
+        } else if (paymentIntent.amount == 499) {
+          currentTokens = currentTokens + 50;
+        } else if (paymentIntent.amount == 999) {
+          currentTokens = currentTokens + 120;
+        } else if (paymentIntent.amount == 1999) {
+          currentTokens = currentTokens + 250;
+        }
+        (await db.collection('users').where('_id', '==', paymentIntent.metadata.userID).get()).docs[0].ref.update('tokens', currentTokens);
+      }
+      
+    case 'payment_method.attached':
+      const paymentMethod = event.data.object;
+      console.log('PaymentMethod was attached to a Customer!');
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a 200 response to acknowledge receipt of the event
+  response.json({received: true});
+});
+
 // Testing purposes
 // app.get('/test', async (req, res) => {
 //   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
 //   try {
-//     (await db.collection('conversations').get()).docs.forEach( async doc => {
+//     // (await db.collection('users').get()).docs.forEach( async doc => {
 //       try {
-//         // await doc.ref.update({seenFor: [doc.data().seenFor]});
+//         await doc.ref.update({tokens: 0});
 //       } catch(err) {
 //         console.error(err);
 //       }

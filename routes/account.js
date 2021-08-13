@@ -6,6 +6,8 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const bcrypt = require('bcrypt');
 
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
+
 const sgMail = require('@sendgrid/mail')
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 // const { google } = require('googleapis');
@@ -92,6 +94,7 @@ router.get('/:username', async (req, res) => {
       if (err) return passed = false;;
       usersID = user1._id;
     });
+    // NOT LOGGED IN
     if (!passed) {
       res.render('account', {
         user: null,
@@ -108,7 +111,7 @@ router.get('/:username', async (req, res) => {
 
     const user = (await db.collection('users').where('_id', '==', usersID).get()).docs[0].data();
       
-
+      // LOGGED IN
       // Set Last Online
       const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
       return res.render('account', {
@@ -225,6 +228,30 @@ function authToken(req, res, next) {
     next();
   });
 }
+
+// Payment Intent
+router.post('/paymentintenttokens', authToken, async (req, res) => {
+  try {
+    const amount = req.body.amount;
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: 'usd',
+      // Verify your integration in this guide by including this parameter
+      metadata: {
+        integration_check: 'accept_a_payment',
+        userID: req.user._id,
+        product: 'tokens',
+      },
+    });
+    return res.json({
+      success: true,
+      client_secret: paymentIntent.client_secret,
+      amount,
+    });
+  } catch (err) {
+    console.error(err);
+  }
+});
 
 // Change Profile Img
 router.post('/changeimg', authToken, async (req, res) => {

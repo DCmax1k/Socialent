@@ -36,6 +36,7 @@ const showFollowing = document.getElementById('showFollowing');
 const followers = document.getElementById('followers');
 const following = document.getElementById('following');
 const lastOnlineDiv = document.getElementById('lastOnlineDiv');
+const openTokens = document.querySelector('#editProfileCont > .heading > h4');
 
 let showingFollowers = false;
 let showingFollowing = false;
@@ -234,6 +235,11 @@ if (editProfileBtn) {
     }
     
   })
+
+  // Open tokens sidebar
+  openTokens.addEventListener('click', () => {
+    sidebar.classList.add('active');
+  });
 
   // Delete Account
   deleteAccount.addEventListener('click', async () => {

@@ -16,6 +16,7 @@
       crossorigin="anonymous"
     />
     <script src="/socket.io/socket.io.js" ></script>
+    <script src="https://js.stripe.com/v3/"></script>
   </head>
   <body>
     <div id="background"></div>
@@ -32,10 +33,16 @@
 
     <!-- Edit Profile -->
     <% if (loggedin) { %>
+    <!-- Tokens sidebar -->
+    <%- include('partials/tokensSidebar') %>
+    <!-- Edit Profile -->
     <div id="editProfileCont">
       <i id="closeEditProfileCont" class="fas fa-times"></i>
-      <h1>Edit Profile</h1>
-      <div>
+      <div class="heading">
+        <h1>Edit Profile</h1>
+        <h4>Tokens: <%= user.tokens %></h4>
+      </div>
+      <div class="editProfileContBody">
         <div id="changeUserCont">
           <i id="selectUser" class="pencil c fas fa-pencil-alt"></i>
           <i
@@ -48,6 +55,7 @@
             class="editProfileInputBlend"
             type="text"
             value="<%= user.username %>"
+            placeholder="Username..."
           />
         </div>
         <div id="changeNameCont">
@@ -62,6 +70,7 @@
             class="editProfileInputBlend"
             type="text"
             value="<%= user.name %>"
+            placeholder="Name..."
           />
         </div>
         <div id="changeEmailCont">
@@ -77,6 +86,7 @@
               class="editProfileInputBlend"
               type="email"
               value="<%= user.emailData.email %>"
+              placeholder="Email..."
             />
           </div>
           <button class="d-back" id="verifyEmailBtn">Verify Email</button>

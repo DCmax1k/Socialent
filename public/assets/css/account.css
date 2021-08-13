@@ -326,7 +326,7 @@
   cursor: pointer;
 }
 
-#editProfileCont > h1 {
+#editProfileCont > .heading {
   width: 100%;
   text-align: center;
   text-align: center;
@@ -334,7 +334,13 @@
   margin: 20px 0;
 }
 
-#editProfileCont > div {
+#editProfileCont > .heading > h4 {
+  font-size: 15px;
+  color: rgb(226, 199, 77);
+  cursor: pointer;
+}
+
+#editProfileCont > .editProfileContBody {
   width: 100%;
   padding: 20px 0;
 }

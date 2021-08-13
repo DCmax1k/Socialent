@@ -1,0 +1,242 @@
+<div id="tokensSidebar" class="b-back">
+    <div class="heading">
+        <h1>Tokens</h1>
+    </div>
+
+    <div id="closeTokensSidebar">
+        <i class="fas fa-times"></i>
+    </div>
+
+    <div id="buyOptions">
+        <div class="option d-back" data-amount="99">
+            <span>Buy 8 tokens</span>
+            <span>$0.99</span>
+        </div>
+        <div class="option d-back" data-amount="499">
+            <span>Buy 50 tokens</span>
+            <span>$4.99</span>
+        </div>
+        <div class="option d-back" data-amount="999">
+            <span>Buy 120 tokens</span>
+            <span>$9.99</span>
+        </div>
+        <div class="option d-back" data-amount="1999">
+            <span>Buy 250 tokens</span>
+            <span>$19.99</span>
+        </div>
+    </div>
+
+    <hr />
+
+    <form id="payment-form">
+
+        <div id="confirmationCost">
+
+        </div>
+
+        <div id="card-element">
+          <!-- Elements will create input elements here -->
+        </div>
+      
+        <!-- We'll put the error messages in this element -->
+        <div id="card-errors" role="alert"></div>
+      
+        <button id="submit">Confirm Payment</button>
+    </form>
+    
+    <div class="hintText">Use tokens to change your prefix, or get verified!</div>
+</div>
+
+<script>
+    const sidebar = document.getElementById('tokensSidebar');
+    const buyOptions = document.querySelectorAll('#buyOptions > .option');
+    const closeTokensSidebar = document.getElementById('closeTokensSidebar');
+    const form = document.getElementById('payment-form');
+    const confirmationCost = document.getElementById('confirmationCost');
+    const submit = document.getElementById('submit');
+
+    const closeSidebar = () => {
+        sidebar.classList.remove('active');
+        form.style.display = 'none';
+        form.setAttribute('data-client-secret', '');
+        card.clear();
+        submit.innerText = 'Confirm Payment';
+    }
+
+    const stripe = Stripe('pk_test_51JNNTwI0w5rwUHM9LwnoDpM48J4XbdJexDUx5GQdURjf5POroACcFfJ0sAkUE0tagU1ziuT5pR83t9hVKg86IN3P00UWTGXnlj');
+    const elements = stripe.elements();   
+
+    var style = {
+      base: {
+        color: "#ffffff",
+        fontFamily: 'Arial, sans-serif',
+        fontSmoothing: "antialiased",
+        fontSize: "16px",
+        "::placeholder": {
+          color: "#ffffff"
+        }
+      },
+      invalid: {
+        fontFamily: 'Arial, sans-serif',
+        color: "#fa755a",
+        iconColor: "#fa755a"
+      }
+    };
+
+    const card = elements.create("card", { style: style });
+    card.mount("#card-element");
+
+    card.on('change', ({error}) => {
+        let displayError = document.getElementById('card-errors');
+        if (error) {
+            displayError.textContent = error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+
+    closeTokensSidebar.addEventListener('click', () => {
+        closeSidebar();
+    });
+
+    buyOptions.forEach(option => {
+        option.addEventListener('click', async () => {
+            const amount = option.getAttribute('data-amount');
+            const response = await fetch('/account/paymentintenttokens', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount,
+                }),
+            });
+            const resJSON = await response.json();
+            if (resJSON.success) {
+                // Show payment form
+                const client_secret = resJSON.client_secret;
+                //console.log(client_secret);
+                confirmationCost.innerText = `Pay $${resJSON.amount / 100}`
+                form.setAttribute('data-client-secret', client_secret);
+                form.style.display = 'block';
+            } else {
+                myAlert('Sorry, an error has occurred. Please try again later.');
+            }
+        });
+    });
+
+    form.addEventListener('submit', function(ev) {
+        ev.preventDefault();
+        submit.innerText = 'Processing...';
+
+        const clientSecret = form.getAttribute('data-client-secret');
+        stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: card,
+                billing_details: {
+                    // name: 'Jenny Rosen'
+                },
+            },
+        }).then(function(result) {
+            if (result.error) {
+            // Show error to your customer (e.g., insufficient funds)
+            console.log(result.error.message);
+            submit.innerText = 'Confirm Payment';
+            myAlert(result.error.message);
+
+            } else {
+                // The payment has been processed!
+                if (result.paymentIntent.status === 'succeeded') {
+                    submit.innerText = 'Success!';
+
+                    card.clear();
+                }
+            }
+        });
+    });
+    
+
+</script>
+
+<style>
+    #tokensSidebar {
+        width: 500px;
+        height: 100%;
+        padding: 20px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        z-index: 12;
+        color: white;
+    }
+
+    #tokensSidebar.active {
+        transform: translateX(0);
+    }
+
+    #closeTokensSidebar {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+
+    #closeTokensSidebar > i {
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    #tokensSidebar > .heading {
+        width: 100%;
+        text-align: center;
+    }
+
+    #buyOptions > .option {
+        width: 100%;
+        height: 40px;
+        border-radius: 10px;
+        color: rgb(34, 34, 34);
+        margin: 10px 0 10px 0;
+        font-size: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #payment-form {
+        display: none;
+        margin: 20px;
+    }
+
+    #card-element {
+        margin-bottom: 5px;
+        border: 1px solid rgb(0, 174, 255);
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    #submit {
+        width: 100%;
+        height: 40px;
+        background-color: rgb(0, 174, 255);
+        color: white;
+        font-size: 20px;
+        border: none;
+        border-radius: 10px;
+        margin: 10px 0 10px 0;
+        cursor: pointer;
+
+    }
+
+    .hintText {
+        font-size: 12px;
+        color: rgb(151, 151, 151);
+        width: 100%;
+        text-align: center;
+        margin-top: 10px;
+    }
+
+</style>
