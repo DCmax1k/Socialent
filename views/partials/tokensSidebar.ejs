@@ -63,7 +63,7 @@
         submit.innerText = 'Confirm Payment';
     }
 
-    const stripe = Stripe('pk_test_51JNNTwI0w5rwUHM9LwnoDpM48J4XbdJexDUx5GQdURjf5POroACcFfJ0sAkUE0tagU1ziuT5pR83t9hVKg86IN3P00UWTGXnlj');
+    const stripe = Stripe(window.location.host == 'localhost' ? 'pk_test_51JNNTwI0w5rwUHM9LwnoDpM48J4XbdJexDUx5GQdURjf5POroACcFfJ0sAkUE0tagU1ziuT5pR83t9hVKg86IN3P00UWTGXnlj' : 'pk_live_51JNNTwI0w5rwUHM906NnCsTucM4rPT92p0hfLK7EtwJL2JvgM5PiIjFKFpScYRNQoa6ITLk8a5yrIQrGOfKjIbTu00ShTIxJ6a');
     const elements = stripe.elements();   
 
     var style = {
@@ -101,6 +101,8 @@
 
     buyOptions.forEach(option => {
         option.addEventListener('click', async () => {
+            form.style.display = 'none';
+            card.clear();
             const amount = option.getAttribute('data-amount');
             const response = await fetch('/account/paymentintenttokens', {
                 method: 'POST',
@@ -150,6 +152,26 @@
                     submit.innerText = 'Success!';
 
                     card.clear();
+
+                    // Visually update the amount
+                    let num = 0;
+                    const amount = result.paymentIntent.amount;
+                    if (amount == 99) {
+                        num = 8;
+                    } else if (amount == 499) {
+                        num = 50;
+                    } else if (amount == 999) {
+                        num = 120;
+                    } else if (amount == 1999) {
+                        num = 250;
+                    }
+
+                    const doc = document.querySelector('#editProfileCont > .heading > h4');
+                    if (doc) {
+                        const oldValue = parseInt(doc.innerText.slice(8));
+                        const newValue = oldValue + num;
+                        doc.innerText = `Tokens: ${newValue}`;
+                    }
                 }
             }
         });

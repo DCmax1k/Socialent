@@ -113,6 +113,7 @@ app.post('/stripe/webhook', express.raw({type: 'application/json'}), async (requ
   // Handle the event
   switch (event.type) {
     case 'payment_intent.succeeded':
+      console.log('payment succeeded');
       const paymentIntent = event.data.object;
 
       const user = (await db.collection('users').where('_id', '==', paymentIntent.metadata.userID).get()).docs[0].data();
