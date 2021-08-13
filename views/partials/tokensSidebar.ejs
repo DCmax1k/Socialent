@@ -187,15 +187,14 @@
         padding: 20px;
         position: fixed;
         top: 0;
-        right: 0;
-        transform: translateX(100%);
+        right: -500px;
         transition: transform 0.3s ease;
         z-index: 12;
         color: white;
     }
 
     #tokensSidebar.active {
-        transform: translateX(0);
+        transform: translateX(-100%);
     }
 
     #closeTokensSidebar {
