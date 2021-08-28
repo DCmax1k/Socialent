@@ -4,6 +4,16 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const jwt = require('jsonwebtoken');
 
+const { getStorage, ref, uploadBytes } = require('firebase/storage');
+const storage = getStorage();
+const multer = require("multer");
+const upload = multer({
+  limits: {
+    fileSize: 1024 * 1024 * 10,
+
+  },
+}).single("file");
+
 // const User = require('../models/User');
 // const Post = require('../models/Post');
 
@@ -54,11 +64,27 @@ function postAuthToken(req, res, next) {
 }
 
 // Create post
-router.post('/createpost', postAuthToken, async (req, res) => {
+router.post('/createpost', [postAuthToken, upload], async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    const newPostData = {
+
+    const usersID = user._id;
+
+    if (req.file.mimetype.includes('image') || req.file.mimetype.includes('video')) {
+      const fileType = req.file.mimetype.split('/')[0];
+
+      const uploadsRef = ref(storage, 'posts');
+      const savePath = `${usersID}/` + req.file.originalname + '-' + req.file.size;
+      const fileRef = ref(uploadsRef, savePath);
+      const metadata = {
+        contentType: req.file.mimetype,
+      };
+      await uploadBytes(fileRef, req.file.buffer, metadata);
+      console.log('Uploaded a blob or file!');
+      const url = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/posts%2F${usersID}%2F${req.file.originalname}-${req.file.size}?alt=media`;
+
+      const newPostData = {
         _id: Date.now().toString(16) + Math.random().toString(16).slice(2),
         author: {
           _id: user._id,
@@ -70,35 +96,41 @@ router.post('/createpost', postAuthToken, async (req, res) => {
             title: user.prefix.title,
           },
         },
-        url: req.body.url,
-        urlType: req.body.urlType,
-        description: req.body.description,
+        url: url,
+        urlType: fileType,
+        description: JSON.parse(JSON.stringify(req.body)).description,
         active: true,
         comments: [],
         date: Date.now(),
         likes: [],
-    };
-    const createPost = (await db.collection('posts').doc(newPostData._id).set(newPostData));
-    // const createPost = await new Post({
-    //   author: {
-    //     _id: user._id,
-    //     username: user.username,
-    //     profileImg: user.profileImg,
-    //   },
-    //   url: req.body.url,
-    //   urlType: req.body.urlType,
-    //   description: req.body.description,
-    // });
-    // const savePost = await createPost.save();
-    // Add 5 points to score
-    let usersScore = user.score;
-    usersScore += 5;
-    // const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
-    // const saveScore = await updateScore;
-    const updateScore = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('score', usersScore);
-    res.json({
-      status: 'successful',
-    });
+      };
+      await db.collection('posts').doc(newPostData._id).set(newPostData);
+      // const createPost = await new Post({
+      //   author: {
+      //     _id: user._id,
+      //     username: user.username,
+      //     profileImg: user.profileImg,
+      //   },
+      //   url: req.body.url,
+      //   urlType: req.body.urlType,
+      //   description: req.body.description,
+      // });
+      // const savePost = await createPost.save();
+      // Add 5 points to score
+      let usersScore = user.score;
+      usersScore += 5;
+      // const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
+      // const saveScore = await updateScore;
+      await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('score', usersScore);
+      res.json({
+        status: 'successful',
+      });
+    } else {
+      res.status(500).json({
+        status: 'error',
+        errors: 'File type not supported',
+      });
+    }
   } catch (err) {
     console.error(err);
   }

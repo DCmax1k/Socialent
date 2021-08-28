@@ -28,10 +28,27 @@ const serviceAccount = {
 }
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
 const db = admin.firestore();
+
+const { initializeApp } = require('firebase/app');
+const { getStorage, ref, uploadBytes } = require('firebase/storage');
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBszobI7x_nesYhVx8DiAyQLfr8u0ylLis",
+    authDomain: "socialent-f94ff.firebaseapp.com",
+    projectId: "socialent-f94ff",
+    storageBucket: "socialent-f94ff.appspot.com",
+    messagingSenderId: "428560403379",
+    appId: "1:428560403379:web:152fd51eada728a4fe99c6",
+    measurementId: "G-DREZVEN0ME"
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+const storage = getStorage(firebaseApp);
 
 
 // Models
@@ -144,34 +161,65 @@ app.post('/stripe/webhook', express.raw({type: 'application/json'}), async (requ
   response.json({received: true});
 });
 
-// Testing purposes
+// TESTING PURPOSES
 // app.get('/test', async (req, res) => {
-//   // res.sendFile(`${__dirname}/public/images/SocialentLogo.png`);
-//   try {
-//     // (await db.collection('users').get()).docs.forEach( async doc => {
-//       try {
-//         await doc.ref.update({tokens: 0});
-//       } catch(err) {
-//         console.error(err);
-//       }
+//   res.render('testing');
+//   // try {
+//   //   // (await db.collection('users').get()).docs.forEach( async doc => {
+//   //     try {
+//   //       await doc.ref.update({tokens: 0});
+//   //     } catch(err) {
+//   //       console.error(err);
+//   //     }
       
-//     });
-//     res.send('done');
+//   //   // });
+//   //   res.send('done');
 
-//   } catch(err) {
-//     console.error(err);
-//   }
+//   // } catch(err) {
+//   //   console.error(err);
+//   // }
 // });  
 
+// const multer = require("multer");
+// const upload = multer({
+//   limits: {
+//     fileSize: 1024 * 1024 * 10,
 
-// DB connection
-// mongoose.connect(
-//   process.env.DB_CONNECTION,
-//   { useNewUrlParser: true, useUnifiedTopology: true },
-//   () => {
-//     console.log('Connected to DB');
+//   },
+// }).single("file");
+
+// app.post('/test', upload, async (req, res) => {
+//     const usersID = 'dylan';
+
+//     if (req.file.mimetype.includes('image') || req.file.mimetype.includes('video')) {
+
+//     const uploadsRef = ref(storage, 'posts');
+//     const savePath = `${usersID}/` + req.file.originalname + '-' + req.file.size;
+//     const fileRef = ref(uploadsRef, savePath);
+//     const metadata = {
+//       contentType: req.file.mimetype,
+//     };
+//     await uploadBytes(fileRef, req.file.buffer, metadata).then((snapshot) => {
+//         console.log('Uploaded a blob or file!');
+//         res.status(200).json({
+//             status: 'success',
+//             snapshot,
+//             publicURL: `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/posts%2F${usersID}%2F${req.file.originalname}-${req.file.size}?alt=media`,
+//         });
+//     });
+//     if (!res.headersSent) {
+//       res.status(500).json({
+//         status: 'error',
+//         errors: err,
+//       });
+//     }
+//   } else {
+//     res.status(500).json({
+//       status: 'error',
+//       errors: 'File type not supported',
+//     });
 //   }
-// );
+// });
 
 
 // PORT
