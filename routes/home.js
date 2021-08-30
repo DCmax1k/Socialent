@@ -5,6 +5,9 @@ const db = firebase_admin.firestore();
 const publicIp = require('public-ip');
 const jwt = require('jsonwebtoken');
 
+const { getStorage, ref, deleteObject } = require('firebase/storage');
+const storage = getStorage();
+
 
 // const User = require('../models/User');
 // const Post = require('../models/Post');
@@ -191,7 +194,19 @@ router.post('/deletepost', postAuthToken, async (req, res) => {
     // const post = await Post.findById(req.body.postID);
     const post = (await db.collection('posts').where('_id', '==', req.body.postID).get()).docs[0].data();
     if (JSON.stringify(post.author._id) === JSON.stringify(user._id)) {
-      // const deletePost = await Post.deleteOne({ _id: req.body.postID });
+
+      // Delete file from storage
+      if (post.url.includes('firebase')) {
+        // Find file name
+        const splitVersion = post.url.split('%2F');
+        const fileName = splitVersion[2].slice(0, splitVersion[2].length - 10);
+        const postsRef = ref(storage, `posts/${user._id}`);
+        const imageRef = ref(postsRef, fileName);
+
+        await deleteObject(imageRef);
+      }
+
+      // Delete from db
       const deletePost = await (await db.collection('posts').where('_id', '==', post._id).get()).docs[0].ref.delete();
       res.json({
         status: 'successful',

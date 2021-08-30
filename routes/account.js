@@ -6,6 +6,16 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const bcrypt = require('bcrypt');
 
+const { getStorage, ref, deleteObject, uploadBytes } = require('firebase/storage');
+const storage = getStorage();
+const multer = require("multer");
+const upload = multer({
+  limits: {
+    fileSize: 1024 * 1024 * 10,
+
+  },
+}).single("file");
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET);
 
 const sgMail = require('@sendgrid/mail')
@@ -254,21 +264,40 @@ router.post('/paymentintenttokens', authToken, async (req, res) => {
 });
 
 // Change Profile Img
-router.post('/changeimg', authToken, async (req, res) => {
+router.post('/changeimg', [authToken, upload], async (req, res) => {
   try {
     // const user = await User.findById(req.body.userID);
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    // Delete old profile img if from firebase
+    if (user.profileImg.includes('firebase')) {
+      // Find file name
+      const splitVersion = user.profileImg.split('%2F');
+      const fileName = splitVersion[2].slice(0, splitVersion[2].length - 10);
+      const postsRef = ref(storage, `profileImgs/${user._id}`);
+      const imageRef = ref(postsRef, fileName);
 
-      // Update profile pic
-      // const updateProfileImg = await User.findByIdAndUpdate( user._id, { profileImg: req.body.imgURL, }, { useFindAndModify: false });
-      // const saveUser = await updateProfileImg.save();
-      const updateProfileImg = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('profileImg', req.body.imgURL);
+      deleteObject(imageRef);
+    }
+
+    // Update profile pic
+    if (req.file.mimetype.includes('image')) {
+
+      const uploadsRef = ref(storage, 'profileImgs');
+      const savePath = `${user._id}/` + req.file.originalname + '-' + req.file.size;
+      const fileRef = ref(uploadsRef, savePath);
+      const metadata = {
+        contentType: req.file.mimetype,
+      };
+      await uploadBytes(fileRef, req.file.buffer, metadata);
+      console.log('Uploaded a blob or file!');
+      const imgURL = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/profileImgs%2F${user._id}%2F${req.file.originalname}-${req.file.size}?alt=media`;
+
+      await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('profileImg', imgURL);
 
       // Update posts with new pic
-      // const updatePosts = await Post.updateMany( {'author._id': user._id}, {'author.profileImg': req.body.imgURL});
       const updatePosts = (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
         try {
-          const updateDoc = await doc.ref.update('author.profileImg', req.body.imgURL);
+          const updateDoc = await doc.ref.update('author.profileImg', imgURL);
         } catch(err) {
           console.error(err);
         }
@@ -276,7 +305,13 @@ router.post('/changeimg', authToken, async (req, res) => {
 
       res.json({
         status: 'success',
+        imgURL,
       });
+    } else {
+      res.json({
+        status: 'error',
+      });
+    }
 
   } catch (err) {
     console.error(err);
