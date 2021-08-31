@@ -134,77 +134,95 @@ if (editProfileBtn) {
     try {
       if (changeImgFile.value) {
         const file = changeImgFile.files[0];
-        // const reader = new FileReader();
-        // reader.readAsDataURL(file);
-        // reader.onload = (e) => {
-        //   // Lower size and qualtiy of image
-        //   const image = new Image();
-        //   image.src = e.target.result;
-        //   image.onload = async (e) => {
-        //     const canvas = document.createElement('canvas');
-        //     const MAX_SIDE_LENGTH = 200;
-        //     let scaleSize;
-        //     let ctx;
-        //     if (image.height - image.width >= 0) {
-        //       scaleSize = MAX_SIDE_LENGTH / e.target.width;
-        //       canvas.width = MAX_SIDE_LENGTH;
-        //       canvas.height = MAX_SIDE_LENGTH;
-        //       const newHeight = e.target.height * scaleSize;
-        //       ctx = canvas.getContext('2d');
-        //       ctx.drawImage(e.target, 0, canvas.height/2 - newHeight/2, canvas.width, newHeight);
-        //     } else {
-        //       scaleSize = MAX_SIDE_LENGTH / e.target.height;
-        //       canvas.width = MAX_SIDE_LENGTH;
-        //       canvas.height = MAX_SIDE_LENGTH;
-        //       const newWidth = e.target.width * scaleSize;
-        //       ctx = canvas.getContext('2d');
-        //       ctx.drawImage(e.target, canvas.width/2 - newWidth/2, 0, newWidth, canvas.height);  
-        //     }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (e) => {
+          // Lower size and qualtiy of image
+          const image = new Image();
+          image.src = e.target.result;
+          image.onload = async (e) => {
+            const canvas = document.createElement('canvas');
+            const MAX_SIDE_LENGTH = 1080;
+            let scaleSize;
+            let ctx;
+            if (image.height - image.width >= 0) {
+              scaleSize = MAX_SIDE_LENGTH / e.target.width;
+              canvas.width = MAX_SIDE_LENGTH;
+              canvas.height = MAX_SIDE_LENGTH;
+              const newHeight = e.target.height * scaleSize;
+              ctx = canvas.getContext('2d');
+              ctx.drawImage(e.target, 0, canvas.height/2 - newHeight/2, canvas.width, newHeight);
+            } else {
+              scaleSize = MAX_SIDE_LENGTH / e.target.height;
+              canvas.width = MAX_SIDE_LENGTH;
+              canvas.height = MAX_SIDE_LENGTH;
+              const newWidth = e.target.width * scaleSize;
+              ctx = canvas.getContext('2d');
+              ctx.drawImage(e.target, canvas.width/2 - newWidth/2, 0, newWidth, canvas.height);  
+            }
             
-        //     const imgURL = ctx.canvas.toDataURL('image/jpeg');
-        //     profileImg.src = imgURL;
-        //     navBarProfilePic.src = imgURL;
-        //     imgPlace.classList.add('active');
-        //     changeImgText.innerText = 'Loading...';
+            const imgURL = ctx.canvas.toDataURL('image/jpeg');
+            profileImg.src = imgURL;
+            navBarProfilePic.src = imgURL;
+            imgPlace.classList.add('active');
+            changeImgText.innerText = 'Loading...';
 
-        //     // Send url to DB
-        //     const newResponse = await fetch('/account/changeimg', {
-        //       method: 'POST',
-        //       headers: {
-        //         'Content-Type': 'application/json',
-        //       },
-        //       body: JSON.stringify({
-        //         imgURL,
-        //         userID,
-        //         device: window.navigator.userAgent,
-        //       }),
-        //     });
+            // Convert dataURI to blob
+            const byteString = atob(imgURL.split(',')[1]);
+
+            // separate out the mime component
+            const mimeString = imgURL.split(',')[0].split(':')[1].split(';')[0];
+
+            // write the bytes of the string to an ArrayBuffer
+            const ab = new ArrayBuffer(byteString.length);
+
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            // give blob file name
+            const blob =  new Blob([ab], {
+              type: mimeString,
+            });
+
+            // Send url to DB
+            let formData = new FormData()
+            formData.append('file', blob)
+
+            const options = {
+                method: 'POST',
+
+                body: formData,
+            }
+            const res = await fetch('/account/changeimg', options);
+            const newResJSON = await res.json();
     
-        //     const newResJSON = await newResponse.json();
-        //     if (newResJSON.status === 'success') {
-        //       imgPlace.classList.remove('active');
-        //       changeImgText.innerText = 'Change image';
-        //     }
-        //   }
+            if (newResJSON.status === 'success') {
+              imgPlace.classList.remove('active');
+              changeImgText.innerText = 'Change image';
+            }
+          }
           
+        }
+
+        // changeImgText.innerText = 'Loading...';
+
+        // let formData = new FormData()
+        // formData.append('file', file)
+
+        // const options = {
+        //     method: 'POST',
+
+        //     body: formData,
         // }
-        changeImgText.innerText = 'Loading...';
-
-        let formData = new FormData()
-        formData.append('file', file)
-
-        const options = {
-            method: 'POST',
-
-            body: formData,
-        }
-        const res = await fetch('/account/changeimg', options);
-        const resJSON = await res.json();
-        if (resJSON.status === 'success') {
-          profileImg.src = resJSON.imgURL;
-          navBarProfilePic.src = resJSON.imgURL;
-          changeImgText.innerText = 'Change image';
-        }
+        // const res = await fetch('/account/changeimg', options);
+        // const resJSON = await res.json();
+        // if (resJSON.status === 'success') {
+        //   profileImg.src = resJSON.imgURL;
+        //   navBarProfilePic.src = resJSON.imgURL;
+        //   changeImgText.innerText = 'Change image';
+        // }
       }
     } catch(err) {
       console.error(err);
