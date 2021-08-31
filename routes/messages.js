@@ -5,6 +5,15 @@ const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const jwt = require('jsonwebtoken');
 
+const { getStorage, ref, deleteObject, uploadBytes } = require('firebase/storage');
+const storage = getStorage();
+const multer = require("multer");
+const upload = multer({
+  limits: {
+    fileSize: 1024 * 1024 * 10,
+
+  },
+}).single("file");
 
 // GET Route
 router.get('/', authToken, async (req, res) => {
@@ -230,12 +239,12 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
     } catch(err) {
       console.error(err);
     }
-  })
+})
 
-  // Send message
-  const sendMessage = async (conversationID, message, usersIdsInChat) => {
+// Send message
+const sendMessage = async (conversationID, message, usersIdsInChat) => {
     try {
-      const user = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
+        const user = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
         const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
         const messageData = message;
 
@@ -262,15 +271,45 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
         usersScore += 1;
         // const updateScore = await User.findByIdAndUpdate(user._id, { score: usersScore }, { useFindAndModify: false });
         await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('score', usersScore);
-      
+        
     } catch(err) {
-      console.error(err);
+        console.error(err);
     }
-  }
+}
 
-  // Delete text 
+// Save image to db
+router.post('/saveimage', [postAuthToken, upload], async (req, res) => {
+    try {
+        // Update profile pic
+      if (req.file.mimetype.includes('image')) {
+        const fileName = JSON.parse(JSON.stringify(req.body)).filename
+        const uploadsRef = ref(storage, 'messageImages');
+        const savePath = `${req.user._id}/` + fileName + '-' + req.file.size;
+        const fileRef = ref(uploadsRef, savePath);
+        const metadata = {
+          contentType: req.file.mimetype,
+        };
+        await uploadBytes(fileRef, req.file.buffer, metadata);
+        console.log('Uploaded a blob or file!');
+        const imgURL = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/messageImages%2F${req.user._id}%2F${fileName}-${req.file.size}?alt=media`;
+  
+        res.json({
+          status: 'success',
+          imgURL,
+        });
+      } else {
+        res.json({
+          status: 'error',
+        });
+      }
+    } catch(err) {
+        console.error(err);
+    }
+})
 
-  const deleteMessage = async (conversationID, textDate, userID) => {
+// Delete text 
+
+const deleteMessage = async (conversationID, textDate, userID) => {
     try {
         const user = (await db.collection('users').where('_id', '==', userID).get()).docs[0].data();
         const conversation = (await db.collection('conversations').where('_id', '==', conversationID).get()).docs[0].data();
@@ -289,11 +328,22 @@ router.post('/lookupusername', postAuthToken, async (req, res) => {
             }
         });
         await (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({ messages, seenFor, });
+
+        // Delete image from db
+        if (message.type == 'img' && message.value.includes('firebase')) {
+            // Find file name
+            const splitVersion = message.value.split('%2F');
+            const fileName = splitVersion[2].slice(0, splitVersion[2].length - 10);
+            const messagesRef = ref(storage, `messageImages/${user._id}`);
+            const imageRef = ref(messagesRef, fileName);
       
+            deleteObject(imageRef);
+        }
+        
     } catch(err) {
-      console.error(err);
+        console.error(err);
     }
-  }
+}
 
 module.exports = {
     messagesRoute: router,

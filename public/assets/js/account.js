@@ -188,7 +188,8 @@ if (editProfileBtn) {
 
             // Send url to DB
             let formData = new FormData()
-            formData.append('file', blob)
+            formData.append('file', blob);
+            formData.append('filename', file.name);
 
             const options = {
                 method: 'POST',

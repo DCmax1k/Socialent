@@ -281,16 +281,16 @@ router.post('/changeimg', [authToken, upload], async (req, res) => {
 
     // Update profile pic
     if (req.file.mimetype.includes('image')) {
-
+      const fileName = JSON.parse(JSON.stringify(req.body)).filename
       const uploadsRef = ref(storage, 'profileImgs');
-      const savePath = `${user._id}/` + req.file.originalname + '-' + req.file.size;
+      const savePath = `${user._id}/` + fileName + '-' + req.file.size;
       const fileRef = ref(uploadsRef, savePath);
       const metadata = {
         contentType: req.file.mimetype,
       };
       await uploadBytes(fileRef, req.file.buffer, metadata);
       console.log('Uploaded a blob or file!');
-      const imgURL = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/profileImgs%2F${user._id}%2F${req.file.originalname}-${req.file.size}?alt=media`;
+      const imgURL = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/profileImgs%2F${user._id}%2F${fileName}-${req.file.size}?alt=media`;
 
       await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('profileImg', imgURL);
 

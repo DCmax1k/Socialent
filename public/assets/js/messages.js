@@ -733,7 +733,7 @@ sendImgFile.addEventListener('change', (e) => {
             image.src = event.target.result;
             image.onload = (ev) => {
                 const canvas = document.createElement('canvas');
-                const MAX_LENGTH = 200;
+                const MAX_LENGTH = 1080;
                 let scaleSize;
                 if (ev.target.height - ev.target.width >= 0) {
                     canvas.height = MAX_LENGTH;
@@ -748,16 +748,52 @@ sendImgFile.addEventListener('change', (e) => {
                 ctx.drawImage(ev.target, 0, 0, canvas.width, canvas.height);
                 const encodedSrc = ctx.canvas.toDataURL('image/jpeg');
                 // instantImgSend(encodedSrc);
-                sendImg(conversationLoaded, userID, encodedSrc);
+                sendImg(conversationLoaded, userID, encodedSrc, sendImgFile.files[0].name);
             }
         }
     }
 })
 
-const sendImg = async (conversationID, senderID, message) => {
-    // Actually send img
-    emitMessage(conversationID, { value: message, type: 'img', sender: senderID, date: Date.now() });
-  
+const sendImg = async (conversationID, senderID, encodedSrc, fileName) => {
+
+    // Send img to db
+    // Convert dataURI to blob
+    const byteString = atob(encodedSrc.split(',')[1]);
+
+    // separate out the mime component
+    const mimeString = encodedSrc.split(',')[0].split(':')[1].split(';')[0];
+
+    // write the bytes of the string to an ArrayBuffer
+    const ab = new ArrayBuffer(byteString.length);
+
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    // give blob file name
+    const blob =  new Blob([ab], {
+      type: mimeString,
+    });
+
+    // Send url to DB
+    let formData = new FormData()
+    formData.append('file', blob);
+    formData.append('filename', fileName);
+
+    const options = {
+        method: 'POST',
+
+        body: formData,
+    }
+    // LOADING...
+    const res = await fetch('/messages/saveimage', options);
+    const resJSON = await res.json();
+    if (resJSON.status == 'success') {
+        // Actually send img
+        emitMessage(conversationID, { value: resJSON.imgURL, type: 'img', sender: senderID, date: Date.now() });
+    } else {
+        myAlert(resJSON.status);
+    }
     
 }
 
