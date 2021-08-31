@@ -203,7 +203,7 @@ router.post('/deletepost', postAuthToken, async (req, res) => {
         const postsRef = ref(storage, `posts/${user._id}`);
         const imageRef = ref(postsRef, fileName);
 
-        await deleteObject(imageRef);
+        deleteObject(imageRef);
       }
 
       // Delete from db

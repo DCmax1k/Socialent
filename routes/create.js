@@ -73,16 +73,16 @@ router.post('/createpost', [postAuthToken, upload], async (req, res) => {
 
     if (req.file.mimetype.includes('image') || req.file.mimetype.includes('video')) {
       const fileType = req.file.mimetype.split('/')[0];
-
+      const fileName = JSON.parse(JSON.stringify(req.body)).filename;
       const uploadsRef = ref(storage, 'posts');
-      const savePath = `${usersID}/` + req.file.originalname + '-' + req.file.size;
+      const savePath = `${usersID}/` + fileName + '-' + req.file.size;
       const fileRef = ref(uploadsRef, savePath);
       const metadata = {
         contentType: req.file.mimetype,
       };
       await uploadBytes(fileRef, req.file.buffer, metadata);
       console.log('Uploaded a blob or file!');
-      const url = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/posts%2F${usersID}%2F${req.file.originalname}-${req.file.size}?alt=media`;
+      const url = `https://firebasestorage.googleapis.com/v0/b/socialent-f94ff.appspot.com/o/posts%2F${usersID}%2F${fileName}-${req.file.size}?alt=media`;
 
       const newPostData = {
         _id: Date.now().toString(16) + Math.random().toString(16).slice(2),
