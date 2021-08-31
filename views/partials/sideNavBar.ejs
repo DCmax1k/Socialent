@@ -221,9 +221,23 @@
     console.error('Socket not defined in navBarFile');
   }
 
-  // setInterval(async () => {
-  //     await checkMessageNotis();
-  // }, 3000);
+  const checkMessageNotis = async () => {
+    const response = await fetch('/messages/checkmessagenotis', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        userID,
+      }),
+    });
+    const resJSON = await response.json();
+
+    if (resJSON.noti == true) {
+      messageNotiIcon.style.display = 'block';
+    }
+  }
+  checkMessageNotis();
   
 
   openMenu.addEventListener('click', () => {

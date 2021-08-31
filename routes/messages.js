@@ -198,6 +198,24 @@ router.post('/checkconversations', postAuthToken, async (req, res) => {
     }
 });
 
+// Side nav bar checking for notifications
+router.post('/checkmessagenotis', postAuthToken, async (req, res) => {
+    try {
+
+        // const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+
+        const usersConversations = (await db.collection('conversations').where('seenFor', 'array-contains', req.user._id).get()).docs.map(doc => doc.data());
+        const noti = usersConversations.length > 0 ? true : false;
+        res.json({
+            status: 'success',
+            noti,
+        });
+
+    } catch(err) {
+        console.error(err);
+    }
+})
+
 // Lookup Username
 router.post('/lookupusername', postAuthToken, async (req, res) => {
     try {
