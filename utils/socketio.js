@@ -12,6 +12,7 @@ const io = socketio(server);
 const { sendMessage, deleteMessage } = require('../routes/messages');
 const { getRoomUsers, joinRoom, leaveRoom  } = require('./messageRooms');
 const { warnUser } = require('../routes/admin');
+const { signon, signoff, getUsersOnline } = require('./currentlyOnline');
 
 io.on('connection', (socket) => {
     console.log('user connected');
@@ -19,7 +20,14 @@ io.on('connection', (socket) => {
     socket.on('joinUserRoom', ({ userID }) => {
 
         socket.join(userID);
+
+        // * Currently Online Status *
+
+        // Signon
+        signon(userID);
+        io.emit('currentlyOnline', {usersLength: getUsersOnline().length});
     });
+
 
     // * MESSAGES *
 
@@ -97,17 +105,29 @@ io.on('connection', (socket) => {
     //
     //
 
-    socket.on('disconnecting', () => {
+    socket.on('disconnecting', async () => {
         console.log('user disconnected');
         // Notify users that user has left the conversation
         const setIter = socket.rooms.values();
         const socketID = setIter.next().value;
         const usersID = setIter.next().value;
         const convoID = setIter.next().value;
+
+        // Leave conversation
         if (convoID) {
             leaveRoom(convoID, usersID);
             io.to(convoID).emit('leaveConversation', {users: getRoomUsers(convoID)});
         }
+
+        // Remove user from currently online list
+        signoff(usersID);
+        io.emit('currentlyOnline', {usersLength: getUsersOnline().length});
+        // Set last seen in db
+        if (usersID) {
+            await (await db.collection('users').where('_id', '==', usersID).get()).docs[0].ref.update('lastOnline', Date.now());
+        }
+        
+
     });
 });
 

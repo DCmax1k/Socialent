@@ -17,6 +17,11 @@ const prefixs = document.querySelectorAll('.prefix');
 const userContss = document.querySelectorAll('.userCont');
 const searchInput = document.getElementById('searchInput');
 const verifiedBtns = document.querySelectorAll('.verifiedCont');
+const actualNumberOnline = document.getElementById('actualNumberOnline');
+
+socket.on('currentlyOnline', ({usersLength}) => {
+    actualNumberOnline.innerText = usersLength;
+})
 
 // Verify user
 verifiedBtns.forEach(btn => {

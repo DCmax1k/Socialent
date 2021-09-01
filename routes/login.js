@@ -23,7 +23,7 @@ router.post('/', async (req, res) => {
     // if (findUsername.password === req.body.password) {
       if (await bcrypt.compare(req.body.password, findUsername.password)) {
       // Set Last Online
-      const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      // const setLastOnline = await (await db.collection('users').where('_id', '==', findUsername._id).get()).docs[0].ref.update('lastOnline', Date.now());
       // Set JSON Web Token
       const accessToken = jwt.sign({_id: findUsername._id, username: findUsername.username, name: findUsername.name}, process.env.ACCESS_SECRET, { expiresIn: '1d'});
       res.cookie('auth-token', accessToken).json({

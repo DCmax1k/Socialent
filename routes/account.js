@@ -31,8 +31,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 
 
 
-// const User = require('../models/User');
-// const Post = require('../models/Post');
+const { getUsersOnline } = require('../utils/currentlyOnline');
 
 const deleteUser = require('../globalFunctions/deleteAccount');
 const { render } = require('ejs');
@@ -40,7 +39,6 @@ const { render } = require('ejs');
 // Get Route
 router.get('/:username', async (req, res) => {
   try {
-
     const account1 = (await db.collection('users').where('username', '==', req.params.username).get()).docs[0]
     if (account1 == null) return res.redirect('/');
     const account = account1.data();
@@ -60,9 +58,12 @@ router.get('/:username', async (req, res) => {
     let number;
     let parsedLastOnline = '';
     const lastOnlineNumber = account.lastOnline;
-    
+    // * IF USER ONLINE JSUT SEND USER ONLINE TEXT *
+    const currentlyOnline = getUsersOnline();
     const currentTime = Date.now();
-    if (currentTime - lastOnlineNumber >  31536000000) {
+    if (currentlyOnline.includes(account._id)) {
+      parsedLastOnline = 'Currently Online!';
+    } else if (currentTime - lastOnlineNumber >  31536000000) {
       number = (((currentTime - lastOnlineNumber)/1000/60/60/24/365).toString().split('.')[0])
       parsedLastOnline = number + ` year${number == 1 ? '' : 's'} ago`;
     } else if (currentTime - lastOnlineNumber >  2628000000) {
@@ -123,7 +124,12 @@ router.get('/:username', async (req, res) => {
       
       // LOGGED IN
       // Set Last Online
-      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      // const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+
+      if (user._id == account._id) {
+        parsedLastOnline = 'Currently Online!';
+      }
+
       return res.render('account', {
         user,
         account,

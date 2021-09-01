@@ -17,7 +17,7 @@ router.get('/', authToken, async (req, res) => {
   try {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      // const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
       const currentIP = await publicIp.v4();
       if (!user.ips ) {
         await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [currentIP]);
@@ -46,7 +46,7 @@ router.post('/getfromapp', postAuthToken, async (req, res) => {
   try {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-      const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
+      // const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
       const currentIP = await publicIp.v4();
       if (!user.ips ) {
         await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [currentIP]);

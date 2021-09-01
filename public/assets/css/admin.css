@@ -22,6 +22,18 @@
     z-index: -1;
 }
 
+#numberOnline {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 25px;
+    color: white;
+}
+#numberOnline > p > i {
+    color: rgb(153, 245, 153);
+    font-size: 15px;
+}
+
 .prefix {
     font-size: 18px;
 }

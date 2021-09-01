@@ -133,7 +133,7 @@
             type="file"
           />
           <% } %> <% } %>
-          <p id="lastOnline"><span id="lastOnlineDiv"> <%= parsedLastOnline %></span></p>
+          <p id="lastOnline"><span class="<%= parsedLastOnline == 'Currently Online!' ? 'currently' : '' %>" id="lastOnlineDiv"> <%= parsedLastOnline %></span></p>
         </div>
 
         <div id="profileInfo">

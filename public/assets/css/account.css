@@ -95,6 +95,9 @@
   width: fit-content;
   height: fit-content;
 }
+#lastOnline > .currently {
+  color: rgb(4, 110, 4);
+}
 
 #profileInfo {
   display: flex;
