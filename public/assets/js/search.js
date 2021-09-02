@@ -16,7 +16,10 @@ searchBarLogo.addEventListener('click', () => {
 
 const saveToSavedResults = (results) => {
   const tempResults = [ ...savedSearchResults, ...results ];
-  savedSearchResults = [ ...new Set(tempResults) ];
+  savedSearchResults = Array.from(new Set(tempResults.map(a => a.username)))
+  .map(username => {
+    return tempResults.find(a => a.username === username)
+  })
 };
 
 const renderSearchResults = (results, query) => {
