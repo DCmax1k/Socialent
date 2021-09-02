@@ -54,32 +54,30 @@ function postAuthToken(req, res, next) {
 // Searching for account route
 router.post('/', postAuthToken, async (req, res) => {
   try {
-    // const user = await User.findById(req.body.userID);
-    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-      // Search for account by username
-      const dupeDataUsernames = [];
-      const searchUsername = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).filter((account) => {
-        if (
-          account.username.toLowerCase().includes(req.body.value.toLowerCase())
-        ) {
-          dupeDataUsernames.push(account.username);
-          return account;
-        }
-      });
-      // Search for account by name
-      const searchName = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).filter((account) => {
-        if (account.name.toLowerCase().includes(req.body.value.toLowerCase()) && !dupeDataUsernames.includes(account.username)) {
-          return account;
-        }
-      });
 
-      const usersFound = [...searchUsername, ...searchName];
-      usersFound.sort((a, b) => {
+      const searchUsers = (await db.collection('users').get()).docs.map(userDoc => userDoc.data()).map((account) => {
+        if (
+          account.username.toLowerCase().includes(req.body.value.toLowerCase()) || account.name.toLowerCase().includes(req.body.value.toLowerCase())
+        ) {
+          return {
+            username: account.username,
+            name: account.name,
+            profileImg: account.profileImg,
+            verified: account.verified,
+            prefix: account.prefix,
+            score: account.score,
+            rank: account.rank,
+          };
+        } else {
+          return null;
+        }
+      }).filter(user => user !== null);
+      searchUsers.sort((a, b) => {
         return a.score - b.score;
       });
       
       res.json({
-        searchedAccounts: usersFound,
+        searchedAccounts: searchUsers,
         status: 'success',
       });
 
