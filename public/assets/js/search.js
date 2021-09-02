@@ -15,7 +15,7 @@ searchBarLogo.addEventListener('click', () => {
 });
 
 const saveToSavedResults = (results) => {
-  const tempResults = [ savedSearchResults, ...results ];
+  const tempResults = [ ...savedSearchResults, ...results ];
   savedSearchResults = [ ...new Set(tempResults) ];
 };
 
