@@ -67,7 +67,7 @@ app.set('view engine', 'ejs');
 
 // Index Route
 app.get('/', authHomeToken, async (req, res) => {
-  const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+  // const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
   res.redirect(`/home`);
 });
 
@@ -84,6 +84,16 @@ function authHomeToken(req, res, next) {
     req.user = user;
     next();
   })
+}
+
+function authToken(req, res, next) {
+  const token = req.cookies['auth-token'] || req.body.auth_token;
+  if (token == null) return res.redirect('/');
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+    if (err) return res.redirect('/');
+    req.user = user;
+    next();
+  });
 }
 
 // Import Routes
@@ -159,6 +169,10 @@ app.post('/stripe/webhook', express.raw({type: 'application/json'}), async (requ
 
   // Return a 200 response to acknowledge receipt of the event
   response.json({received: true});
+});
+
+app.get('/downloadimage', authToken, async (req, res) => {
+  res.render('downloadimage');
 });
 
 // TESTING PURPOSES

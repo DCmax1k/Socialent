@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Image</title>
+</head>
+<body>
+    <section>
+        <h1>Paste form Clipboard (Ctr + v)</h1>
+        <h3>or paste url link below...</h3>
+        <div>
+            <input type="text" id="input">
+            <button id="submit">Submit</button>
+        </div>
+        <div style="display: none; flex-direction: column; justify-content: center; align-items: center;" id="image">
+            <img style="max-height: 200px; max-width: 200px; margin: 50px 0;" src="" alt="Image">
+            <button>Download</button>
+        </div>
+    </section>
+    <style>
+        section {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <script>
+        const input = document.getElementById('input');
+        const submit = document.getElementById('submit');
+        const imageBox = document.getElementById('image');
+        const image = document.querySelector('#image > img');
+        const download = document.querySelector('#image > button');
+
+        async function downloadImage(imageSrc) {
+            const image = await fetch(imageSrc);
+            const imageBlog = await image.blob();
+            const imageURL = URL.createObjectURL(imageBlog);
+
+            const link = document.createElement('a');
+            link.href = imageURL;
+            link.download = 'downloadedImage';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // window.addEventListener('paste', ... or
+        window.addEventListener('paste', (event) => {
+
+            // use event.originalEvent.clipboard for newer chrome versions
+            var items = event.clipboardData.items;
+            console.log(items);
+            console.log(JSON.stringify(items)); // will give you the mime types
+            // find pasted image among pasted items
+            var blob = null;
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf("image") === 0) {
+                blob = items[i].getAsFile();
+                }
+            }
+            // load image if there is a pasted image
+            if (blob !== null) {
+                var reader = new FileReader();
+                reader.onload = function(event) {
+                    console.log(event.target.result);
+                    image.src = event.target.result;
+                    imageBox.style.display = 'flex';
+                };
+                reader.readAsDataURL(blob);
+            }
+        });
+
+        submit.addEventListener('click', () => {
+            downloadImage(input.value);
+        });
+
+        download.addEventListener('click', () => {
+            downloadImage(image.src);
+        });
+
+    </script>
+</body>
+</html>
