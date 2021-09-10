@@ -25,7 +25,7 @@ const deleteUser = async id => {
             const deleteIdFromFollowing = await doc.ref.update('following', followingArray);
           });
 
-          // Deleting associated conversations
+          // Deleting associated conversations if only two people in convo
           // const allConversations = await Conversation.find();
           // const conversations = allConversations.map(conversation => {
           //     if (conversation.people.includes(user._id)) {
@@ -37,9 +37,13 @@ const deleteUser = async id => {
           //       var deleteConversation = await Conversation.deleteOne({ _id: conversation._id});
           //     }
           // });
-          const allConversationsIncludingUser = (await db.collection('conversations').where('people', 'array-contains', user._id).get()).docs.forEach(async doc => {
+          (await db.collection('conversations').where('people', 'array-contains', user._id).get()).docs.forEach(async doc => {
             try {
-              const deleteConversation = await doc.ref.delete();
+              if (doc.data().people.length === 2) {
+
+                doc.ref.delete();
+                
+              }
             } catch(err) {
               console.error(err);
             }

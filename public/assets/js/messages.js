@@ -334,15 +334,6 @@ const checkConversations = async () => {
                                         // Set header user
                                         messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
 
-                                        // let person = '';
-                                        //     if (JSON.stringify(conversation.people[0]) === JSON.stringify(userID)) {
-                                        //         person = usersFromDB[conversation.people[1]].username;
-                                        //     } else {
-                                        //         person = usersFromDB[conversation.people[0]].username;
-                                        //     }
-                                        // messagingHeaderUser.addEventListener('click', () => {
-                                        //     window.location.href = `/account/${person}?k=${userID}`;
-                                        // });
                                     }
                                 }); 
                                 const previousHTML = internalMessages.innerHTML;
@@ -456,15 +447,21 @@ const checkConversations = async () => {
     
     
 }
-// setInterval(async () => {
-//     if (!checkConversationsLoading) {
-//         checkConversationsLoading = true;
-//         await checkConversations();  
-//         checkConversationsLoading = false;
-//     }
 
-// }, 3000);
-
+// Make name of conversation clickable
+messagingHeaderUser.addEventListener('click', () => {
+    const names = messagingHeaderUser.children[0].innerText.split(' ');
+    const usernamesSaved = Object.values(usersFromDB);;
+    const filtered = names.map(name => {
+        const query = usernamesSaved.find((obj) => {
+            return obj.username == name;
+        });
+        return query;
+    }).filter(user => user !== undefined);
+    if (filtered.length == 1) {
+        window.location.href = '/account/' + filtered[0].username;
+    }
+})
 
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversation) => {
