@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const publicIp = require('public-ip');
 const bcrypt = require('bcrypt');
+const { SitemapStream, streamToPromise } = require('sitemap');
 
 const admin = require("firebase-admin");
 
@@ -64,6 +65,45 @@ app.use(cookieParser());
 
 // View Engine
 app.set('view engine', 'ejs');
+
+let sitemap;
+app.get('/sitemap.xml', async (req, res) => {
+    res.header('Content-Type', 'application/xml');
+    res.header('Content-Encoding', 'gzip');
+
+    if (sitemap) {
+        res.send(sitemap);
+        return;
+    }
+
+    try {
+      const allUsers = (await db.collection('users').get()).docs.map(doc => { return doc.data(); });
+      const users = allUsers.map( user => `/account/${user.username}`);
+
+      const smStream = new SitemapStream({ hostname: 'https://www.socialentapp.com/' });
+      const pipeline = smStream.pipe(createGzip());
+
+      smStream.write({ url: '/login'});
+      smStream.write({ url: '/signup'});
+
+      // Add each article URL to the stream
+      users.forEach((item) => {
+          // Update as required
+          smStream.write({ url: item });
+      });
+
+      // cache the response
+      streamToPromise(pipeline).then(sm => sitemap = sm);
+      
+      smStream.end();
+
+      // Show errors and response
+      pipeline.pipe(res).on('error', (e) => {throw e});
+    } catch (e) {
+        console.log(e);
+    }
+});
+
 
 // Index Route
 app.get('/', authHomeToken, async (req, res) => {

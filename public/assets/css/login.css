@@ -24,6 +24,20 @@ body {
   top: 50px;
 }
 
+#backToIndex {
+  position: absolute;
+  top: 20px;
+  left: 10px;
+}
+#backToIndex > a {
+  padding: 5px 10px;
+  border: 2px solid white;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.514);
+  color: white;
+  text-decoration: none;
+}
+
 #formCont {
   display: flex;
   flex-direction: column;
