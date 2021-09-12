@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 const publicIp = require('public-ip');
 const bcrypt = require('bcrypt');
 const { SitemapStream, streamToPromise } = require('sitemap');
+const { createGzip } = require('zlib');
 
 const admin = require("firebase-admin");
 
@@ -85,6 +86,9 @@ app.get('/sitemap.xml', async (req, res) => {
 
       smStream.write({ url: '/login'});
       smStream.write({ url: '/signup'});
+      smStream.write({ url: '/agreements/termsofuse'});
+      smStream.write({ url: '/agreements/privacypolicy'});
+      smStream.write({ url: '/forgotpassword'});
 
       // Add each article URL to the stream
       users.forEach((item) => {
