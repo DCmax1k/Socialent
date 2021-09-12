@@ -1,110 +1,169 @@
-#leftBody {
-  width: 50%;
+body {
+  background-image: url('../../images/indexBackground.svg');
+  background-size: cover;
+  background-position: center;
   height: 100vh;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  left: 0;
+  min-height: 800px;
+  width: 100%;
 }
 
-#rightBody {
-  width: 50%;
-  height: 100vh;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-#leftBodyImg {
-  height: 500px;
-  position: absolute;
-  bottom: -30px;
-  right: 0;
-}
-
-#joinTitle {
-  font-size: 100px;
-  font-weight: normal;
-  position: absolute;
-  left: 100px;
-  top: 75px;
-}
-
-#rightBodyTitle {
+#text {
   position: absolute;
   top: 150px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  text-align: center;
+  left: 100px;
 }
-#rightBodyLinks {
+
+#title {
+  font-size: 80px;
+  letter-spacing: 8px;
+  margin-bottom: -40px;
+}
+#title > h1 {
+  position: relative;
+}
+#IDecoration {
   position: absolute;
-  top: 250px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 60px;
+  left: 226px;
+  height: 28px;
+  width: 28px;
 }
-.button {
-  text-decoration: none;
-  text-align: center;
-  font-size: 20px;
+
+#description > p {
+  color: #484848;
+  font-size: 40px;
+  letter-spacing: 2px;
+  padding-right: 100px;
+}
+
+#buttons {
+  position: absolute;
+  top: 450px;
+  left: 100px;
+  height: 300px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: center;
+}
+#buttons > .buttonDiv {
+  width: 450px;
+  height: 70px;
+  border-radius: 10px;
+  position: relative;
+}
+#loginDiv {
+  border: 5px solid #3282b8;
+}
+#buttons > .buttonDiv > a.button {
   height: 100%;
   width: 100%;
+  text-decoration: none;
+  font-size: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.buttonDiv {
-  border-radius: 99999999px;
-  width: 350px;
-  height: 40px;
-  border: 1px solid #3282b8;
-
-  margin: 20px;
+#buttons > #circleBehind {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+#buttons > #circleBehind > img {
+  height: 100%;
+  width: 100%;
 }
 
 @media screen and (max-width: 1000px) {
-  #rightBody {
+  #text {
+    top: 50px;
+    left: 0;
     width: 100%;
-    height: 500px;
+    padding: 0 50px;
   }
-  #leftBody {
+  #title {
     width: 100%;
-    top: 500px;
+    font-size: 50px;
+    text-align: center;
+    margin-bottom: -30px;
+  }
+  #IDecoration {
+    top: 35px;
+    left: 50%;
+    height: 20px;
+    width: 20px;
+    transform: translateX(-54px);
+
+  }
+  #description  {
+    width: 100%;
+  }
+  #description > p {
+    text-align: center;
+    font-size: 30px;
+    padding-right: 0;
+  }
+  #buttons {
+    top: 350px;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }
 
-@media screen and (max-width: 500px) {
-  #rightBodyTitle {
-    font-size: 25px;
+@media screen and (max-width: 600px) {
+  #text {
+    padding: 0 20px;
   }
-  #joinTitle {
-    left: 20px;
+  #title {
+    font-size: 30px;
+    margin-bottom: -20px;
+  }
+  #IDecoration {
+    top: 23px;
+    left: 50%;
+    height: 10px;
+    width: 10px;
+    transform: translateX(-36px);
+  }
+  #buttons {
+    height: 200px;
+    width: 260px;
+  }
+  #buttons > .buttonDiv {
+    width: 350px;
+    height: 50px;
+    border-radius: 10px;
+    position: relative;
   }
 }
 
 @media screen and (max-width: 375px) {
-  #joinTitle {
-    font-size: 70px;
-  }
-  #rightBodyLinks > a {
-    width: 90%;
-  }
-  #rightBodyLinks {
+  #buttons {
     width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
   }
-  .buttonDiv {
-    width: 95%;
+  #buttons > .buttonDiv {
+    width: calc(100% - 20px);
+    height: 50px;
+    border-radius: 10px;
+    position: relative;
   }
 }
-
-@media screen and (max-width: 275px) {
-  #joinTitle {
-    font-size: 50px;
+@media screen and (max-width: 320px) {
+  #text {
+    padding: 0 5px;
+  }
+  #title {
+    font-size: 30px;
+    margin-bottom: -20px;
+  }
+  #IDecoration {
+    top: 23px;
+    left: 50%;
+    height: 10px;
+    width: 10px;
+    transform: translateX(-36px);
   }
 }

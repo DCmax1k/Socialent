@@ -323,19 +323,19 @@ const checkConversations = async () => {
                             if (conversationLoaded === conversation._id) {
                                 // Make the conversation background darker to show it is selected
                                 // First remove other conversation darkened backgrounds
-                                let tempConversations = document.querySelectorAll('.conversation');
-                                tempConversations.forEach(conversation => {
-                                    conversation.classList.remove('active');
-                                });
-                                tempConversations.forEach(conversation1 => {
-                                    if (conversation1.getAttribute('data-conversation-id') == conversation._id) {
-                                        conversation1.classList.add('active');
+                                // let tempConversations = document.querySelectorAll('.conversation');
+                                // tempConversations.forEach(conversation => {
+                                //     conversation.classList.remove('active');
+                                // });
+                                // tempConversations.forEach(conversation1 => {
+                                //     if (conversation1.getAttribute('data-conversation-id') == conversation._id) {
+                                //         conversation1.classList.add('active');
                     
-                                        // Set header user
-                                        messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
+                                //         // Set header user
+                                //         messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
 
-                                    }
-                                }); 
+                                //     }
+                                // }); 
                                 const previousHTML = internalMessages.innerHTML;
                                 // Removes previous html
                                 internalMessages.innerHTML = '';

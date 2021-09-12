@@ -5,34 +5,38 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="google-site-verification" content="m5FBDKYhr6d4Vezlus5In-BKrnZ0Yq61zkdK0T3SihM" />
-    <meta name="description" content="See what's happenning on Socialent! Join Socialent Today!">
     <title>Socialent</title>
+    <meta name="description" content="Socialent, the social media app with a user-constructed experience! Sign up · Log in. Made by, Dylan Caldwell">
     <link rel="icon" href="/images/SocialentLogo.svg" type="image/icon">
     <link rel="canonical" href="https://www.socialentapp.com">
 
     <link rel="stylesheet" href="/assets/css/main.css" />
     <link rel="stylesheet" href="/assets/css/index.css" />
 
-    <!-- <script src="https://cdn.socket.io/4.1.2/socket.io.min.js" integrity="sha384-toS6mmwu70G0fw54EGlWWeA4z3dyJ+dlXBtSURSKN4vyRFOcxd3Bzjj/AoOwY+Rg" crossorigin="anonymous"></script> -->
     <script src="/socket.io/socket.io.js" ></script>
   </head>
   <body>
-
-    <div id="leftBody" class="d-back">
-      <img src="/images/grouplogo.svg" id="leftBodyImg" />
-      <h1 id="joinTitle">Join<br />Socialent<br />Today</h1>
+    <div id="text">
+      <div id="title">
+        <h1 class="b">Socialent<img id="IDecoration" src="/images/socialentLogo.svg" alt="Lowercase i Decoration"></h1>
+      </div>
+      <div id="description">
+        <p>The social media app with a user-constructed experience</p>
+      </div> 
     </div>
-    <div id="rightBody">
-      <h1 id="rightBodyTitle">See what's happenning on Socialent!</h1>
-      <div id="rightBodyLinks">
-        <div id="signupDiv" class="buttonDiv c-back">
-          <a id="signupLink" class="d button" href="/signup">Sign up</a>
-        </div>
-        <div id="loginDiv" class="buttonDiv">
-          <a id="loginLink" class="c button" href="/login">Log in</a>
-        </div>
+    
+    <div id="buttons">
+      <div id="circleBehind">
+        <img src="/images/behindIndexBtns.svg" alt="">
+      </div>
+      <div id="signupDiv" class="buttonDiv c-back">
+        <a id="signupLink" class="d button" href="/signup">Sign up</a>
+      </div>
+      <div id="loginDiv" class="buttonDiv d-back">
+        <a id="loginLink" class="c button" href="/login">Log in</a>
       </div>
     </div>
+    
     <%- include('./partials/footer.ejs') %>
     <script src="/assets/js/main.js"></script>
     
