@@ -31,9 +31,9 @@ body {
 #buttons {
   position: absolute;
   top: 50%;
-  left: 150px;
-  height: 20%;
-  width: 30%;
+  left: 5%;
+  height: 30vh;
+  width: 50vh;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
