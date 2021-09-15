@@ -41,6 +41,3 @@ const lookupUsername = async (receiverID) => {
 if (location.host.includes('heroku')) {
     location.host = 'www.socialentapp.com';
 }
-
-// Change all @'s to links
-// document.body.innerHTML = document.body.innerHTML.replace(/\b@*\b/g, `<a href="/account/USERNAME?k=${userID}" >@USERNAME</a>`);

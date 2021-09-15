@@ -354,7 +354,8 @@
 
 .message-date{
     position: absolute;
-    font-size: 15px;
+    font-size: 12px;
+    font-weight: bold;
     color: rgb(197, 197, 197);
     top: -25px;
     width: 100%;

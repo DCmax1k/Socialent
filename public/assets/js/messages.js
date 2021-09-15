@@ -94,7 +94,7 @@ socket.on('message', ({message}) => {
 
     const node = document.createElement('div');
     if (messageDateHTML !== '') {
-        node.style.marginTop = '50px';
+        node.style.marginTop = '40px';
     } else if (messageUserOriginHtml !== '') {
         node.style.marginTop = '15px';
     }
@@ -383,7 +383,7 @@ const checkConversations = async () => {
 
 
                                     if (messageDateHTML !== '') {
-                                        node.style.marginTop = '50px';
+                                        node.style.marginTop = '40px';
                                     } else if (messageUserOriginHtml !== '') {
                                         node.style.marginTop = '15px';
                                     }
