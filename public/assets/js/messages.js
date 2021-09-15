@@ -34,6 +34,7 @@ let checkConversationsLoading = false;
 let lastSentMessages = [];
 let lastSentMessageIndex = -1;
 let pastUserOrigin = '';
+let pastMessageDate = 0;
 let usersInChat = [];
 let usersIdsInChat = [];
 
@@ -65,6 +66,8 @@ const formatUsersVerified = (receiver) => {
 // Listen for new message
 socket.on('message', ({message}) => {
     // // Show text on screen
+
+    // Show users username in group
     let messageUserOriginHtml = '';
     if (message.sender !== userID) {
         if (pastUserOrigin != usersFromDB[message.sender].username) {
@@ -75,8 +78,26 @@ socket.on('message', ({message}) => {
         pastUserOrigin = '';
     }
 
+    // Show message date if longer than an hour ago
+    let messageDateHTML = '';
+    if (message.date - pastMessageDate >= 3600000) {
+        const timeStringFirst = new Date(message.date).toLocaleTimeString();
+        const dateSplit = timeStringFirst.split('');
+        dateSplit.splice(dateSplit.length - 6, 3);
+        const timeOfMessage = dateSplit.join('');
+        const dateOfMessageFirst = new Date(message.date).toDateString();
+
+        const dateOfMessage = dateOfMessageFirst + ', ' + timeOfMessage;
+        messageDateHTML = `<div class="message-date">${dateOfMessage}</div>`;
+        pastMessageDate = message.date;
+    }
+
     const node = document.createElement('div');
-    messageUserOriginHtml !== '' ? node.style.marginTop = '15px' : null;
+    if (messageDateHTML !== '') {
+        node.style.marginTop = '50px';
+    } else if (messageUserOriginHtml !== '') {
+        node.style.marginTop = '15px';
+    }
     node.classList.add('text-box');
     node.setAttribute('data-text-date', message.date)
     if (message.sender === userID) {
@@ -89,6 +110,7 @@ socket.on('message', ({message}) => {
         <img src="${message.value}" class="text img" />
         <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
         ${messageUserOriginHtml}
+        ${messageDateHTML}
         `;
     } else {
         const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
@@ -98,6 +120,7 @@ socket.on('message', ({message}) => {
             <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
         </div>
         ${messageUserOriginHtml}
+        ${messageDateHTML}
         `;
         
     }
@@ -321,25 +344,14 @@ const checkConversations = async () => {
                         //
                         if (conversationLoaded) {
                             if (conversationLoaded === conversation._id) {
-                                // Make the conversation background darker to show it is selected
-                                // First remove other conversation darkened backgrounds
-                                // let tempConversations = document.querySelectorAll('.conversation');
-                                // tempConversations.forEach(conversation => {
-                                //     conversation.classList.remove('active');
-                                // });
-                                // tempConversations.forEach(conversation1 => {
-                                //     if (conversation1.getAttribute('data-conversation-id') == conversation._id) {
-                                //         conversation1.classList.add('active');
-                    
-                                //         // Set header user
-                                //         messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
 
-                                //     }
-                                // }); 
                                 const previousHTML = internalMessages.innerHTML;
                                 // Removes previous html
                                 internalMessages.innerHTML = '';
                                 // Loops through messages generating html
+                                // Reset saved variables
+                                pastMessageDate = 0;
+                                pastUserOrigin = '';
                                 conversation.messages.forEach((message, i) => {
                                     let messageUserOriginHtml = '';
                                     if (message.sender !== userID) {
@@ -351,8 +363,30 @@ const checkConversations = async () => {
                                         pastUserOrigin = '';
                                     }
 
+
+
+                                    let messageDateHTML = '';
+                                    if (message.date - pastMessageDate >= 3600000) {
+                                        const timeStringFirst = new Date(message.date).toLocaleTimeString();
+                                        const dateSplit = timeStringFirst.split('');
+                                        dateSplit.splice(dateSplit.length - 6, 3);
+                                        const timeOfMessage = dateSplit.join('');
+                                        const dateOfMessageFirst = new Date(message.date).toDateString();
+
+                                        const dateOfMessage = dateOfMessageFirst + ', ' + timeOfMessage;
+                                        messageDateHTML = `<div class="message-date">${dateOfMessage}</div>`;
+                                        pastMessageDate = message.date;
+                                    }
+
+
                                     const node = document.createElement('div');
-                                    messageUserOriginHtml !== '' ? node.style.marginTop = '15px' : null;
+
+
+                                    if (messageDateHTML !== '') {
+                                        node.style.marginTop = '50px';
+                                    } else if (messageUserOriginHtml !== '') {
+                                        node.style.marginTop = '15px';
+                                    }
                                     node.classList.add('text-box');
                                     node.setAttribute('data-text-date', message.date)
                                     if (message.sender === userID) {
@@ -365,6 +399,7 @@ const checkConversations = async () => {
                                         <img src="${message.value}" class="text img" />
                                         <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
                                         ${messageUserOriginHtml}
+                                        ${messageDateHTML}
                                         `;
                                     } else {
                                         const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
@@ -374,6 +409,7 @@ const checkConversations = async () => {
                                             <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
                                         </div>
                                         ${messageUserOriginHtml}
+                                        ${messageDateHTML}
                                         `;
                                         
                                     }

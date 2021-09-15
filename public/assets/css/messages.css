@@ -352,6 +352,14 @@
     left: 8px;
 }
 
+.message-date{
+    position: absolute;
+    font-size: 15px;
+    color: rgb(197, 197, 197);
+    top: -25px;
+    width: 100%;
+    text-align: center;
+}
 
 .delete-btn {
     display: none !important;
