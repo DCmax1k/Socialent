@@ -178,18 +178,33 @@ router.post('/addconversation', postAuthToken, async (req, res) => {
     }
 });
 
+router.post('/seeconversation', postAuthToken, async (req, res) => {
+    try {
+        const conversation = req.body.conversation;
+        const user = req.user;
+        if (conversation.seenFor.includes(user._id)) {
+            (await db.collection('conversations').where('_id', '==', conversation._id).get()).docs[0].ref.update({'seenFor': firebase_admin.firestore.FieldValue.arrayRemove(user._id)});
+        }
+        res.json({
+            status: 'success',
+        });
+    } catch(err) {
+        console.error(err);
+    }
+});
+
 // Check for conversations
 router.post('/checkconversations', postAuthToken, async (req, res) => {
     try {
         // const user = await User.findById(req.body.userID);
-        const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-        let conversation;
-        if (req.body.conversationLoaded) {
-            conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
-            if (conversation.data().seenFor.includes(user._id)) {
-                await (await db.collection('conversations').where('_id', '==', conversation.data()._id).get()).docs[0].ref.update({'seenFor': firebase_admin.firestore.FieldValue.arrayRemove(user._id)});
-            }
-        }
+        const user = req.user;// (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+        // let conversation;
+        // if (req.body.conversationLoaded) {
+        //     conversation = (await db.collection('conversations').where('_id', '==', req.body.conversationLoaded).get()).docs[0];
+        //     if (conversation.data().seenFor.includes(user._id)) {
+        //         await (await db.collection('conversations').where('_id', '==', conversation.data()._id).get()).docs[0].ref.update({'seenFor': firebase_admin.firestore.FieldValue.arrayRemove(user._id)});
+        //     }
+        // }
         // const usersConversations = await Conversation.find({people: user._id});
         const usersConversations = (await db.collection('conversations').where('people', 'array-contains', user._id).get()).docs.map(doc => doc.data());
         usersConversations.sort((a,b) => {
@@ -199,7 +214,7 @@ router.post('/checkconversations', postAuthToken, async (req, res) => {
             status: 'success',
             usersConversations,
             userID: user._id,
-            conversation: conversation ? conversation.data() : {},
+            //conversation: conversation ? conversation.data() : {},
         });
 
     } catch(err) {

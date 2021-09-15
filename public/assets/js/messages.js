@@ -27,6 +27,7 @@ const usernameTyping = document.getElementById('usernameTyping');
 const currentUsersInChat = document.getElementById('currentUsersInChat');
 
 let conversationLoaded = '';
+let allConversations = [];
 let conversation = {};
 let editMode = false;
 let conversationLoading = false;
@@ -37,6 +38,7 @@ let pastUserOrigin = '';
 let pastMessageDate = 0;
 let usersInChat = [];
 let usersIdsInChat = [];
+
 
 const usersFromDB = {};
 
@@ -153,6 +155,11 @@ socket.on('updateConversationsWithMessage', ({messageData: message, conversation
     if (showNoti) {
         conversationNode.children[2].classList.add('active');
     }
+
+    // Update conversation object with new message
+    // Find conversation
+    const currentConversation = allConversations.find(conversation => conversation._id === conversationID);
+    currentConversation.messages.push(message);
 });
 
 socket.on('deleteMessage', textDate => {
@@ -247,6 +254,7 @@ function emitMessage(conversationID, message) {
     socket.emit('message', {conversationID, message, usersIdsInChat});
 
     // to update conversations list for those not currently in conversation
+    // const currentConversation = allConversations.find(conversation => conversation._id === conversationID);
     conversation.people.forEach(person => {
         socket.emit('updateConversationsWithMessage', {person, messageData: message, conversationID, usersIdsInChat});
     });
@@ -268,240 +276,239 @@ const pushIdsToUsers = async (ids) => {
     }));
 }
 
+const renderTexts = (conversationIdLoading) => {
+        const previousHTML = internalMessages.innerHTML;
+        // Removes previous html
+        internalMessages.innerHTML = '';
+        // Loops through messages generating html
+        // Reset saved variables
+        pastMessageDate = 0;
+        pastUserOrigin = '';
+        const currentConversation = allConversations.find(conversation => conversation._id == conversationIdLoading);
+        currentConversation.messages.forEach((message, i) => {
+            let messageUserOriginHtml = '';
+            if (message.sender !== userID) {
+                if (pastUserOrigin != usersFromDB[message.sender].username) {
+                    messageUserOriginHtml = currentConversation.people.length > 2 ? message.sender !== userID ? `<div class="who-sent-message">${usersFromDB[message.sender].username}</div>` : '' : '';
+                    pastUserOrigin = usersFromDB[message.sender].username;
+                }
+            } else {
+                pastUserOrigin = '';
+            }
+
+
+
+            let messageDateHTML = '';
+            if (message.date - pastMessageDate >= 3600000) {
+                const timeStringFirst = new Date(message.date).toLocaleTimeString();
+                const dateSplit = timeStringFirst.split('');
+                dateSplit.splice(dateSplit.length - 6, 3);
+                const timeOfMessage = dateSplit.join('');
+                const dateOfMessageFirst = new Date(message.date).toDateString();
+
+                const dateOfMessage = dateOfMessageFirst + ', ' + timeOfMessage;
+                messageDateHTML = `<div class="message-date">${dateOfMessage}</div>`;
+                pastMessageDate = message.date;
+            }
+
+
+            const node = document.createElement('div');
+
+
+            if (messageDateHTML !== '') {
+                node.style.marginTop = '40px';
+            } else if (messageUserOriginHtml !== '') {
+                node.style.marginTop = '15px';
+            }
+            node.classList.add('text-box');
+            node.setAttribute('data-text-date', message.date)
+            if (message.sender === userID) {
+                node.classList.add('sent-text');
+            } else {
+                node.classList.add('received-text');
+            }
+            if (message.type === 'img') {
+                node.innerHTML = `
+                <img src="${message.value}" class="text img" />
+                <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
+                ${messageUserOriginHtml}
+                ${messageDateHTML}
+                `;
+            } else {
+                const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
+                node.innerHTML = `
+                <div class="text">
+                    ${newMessageValue}
+                    <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
+                </div>
+                ${messageUserOriginHtml}
+                ${messageDateHTML}
+                `;
+                
+            }
+            
+            // Add event listener to delete buttons
+            const deleteBtn = node.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', (e) => {
+                deleteText(e.target.getAttribute('data-text-date'));
+            })
+
+            // Load html
+            internalMessages.appendChild(node);
+        });
+        const newHTML = internalMessages.innerHTML;
+        // Scroll to bottom
+        if (previousHTML !== newHTML && !editMode) {
+            internalMessages.scrollTop = internalMessages.scrollHeight;
+            document.querySelectorAll('.text.img').forEach( img => {
+                img.onload = () => {
+                    internalMessages.scrollTop = internalMessages.scrollHeight;
+                };
+            });    
+        }
+
+        // currently in chat users
+        currentUsersInChat.innerHTML = '';
+        const receiversInChat = currentConversation.people.filter(user => user != userID);
+        receiversInChat.forEach(user => {
+            const userNode = document.createElement('div');
+            userNode.classList.add('user-box');
+            userNode.setAttribute('data-username', usersFromDB[user].username);
+            userNode.innerText = usersFromDB[user].username;
+            if (usersInChat.includes(usersFromDB[user].username)) {
+                userNode.style.color = 'lightgreen';
+                userNode.style.border = '1px solid lightgreen';
+            } else {
+                userNode.style.color = 'rgb(138, 138, 138)';
+                userNode.style.border = '1px solid rgb(138, 138, 138)';
+            }
+
+            currentUsersInChat.appendChild(userNode);
+        });
+
+}
+
 // Check for Conversations *Right when page loads*
 const checkConversations = async () => {
-        try {
-                // checkConversationsLoading = true;
-                conversationLoader.classList.add('active');
-                const response = await fetch('/messages/checkconversations', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        userID,
-                        conversationLoaded,
-                    }),
+    try {
+        // checkConversationsLoading = true;
+        conversationLoader.classList.add('active');
+        const response = await fetch('/messages/checkconversations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                userID,
+                //conversationLoaded,
+            }),
+        });
+        const resJSON = await response.json();
+        if (resJSON.status === 'success') {
+
+            // Generate html for each conversation
+            messagesList.innerHTML = '';
+            allConversations = resJSON.usersConversations;
+            resJSON.usersConversations.forEach(async (conversation, i) => {
+                let receiversID = [];
+                conversation.people.forEach(person => {
+                    if (person != userID) {
+                        receiversID.push(person);
+                    }
                 });
-                const resJSON = await response.json();
-                if (resJSON.status === 'success') {
-                    if (resJSON.conversation) conversation = resJSON.conversation;
 
-                    // Generate html for each conversation
-                    messagesList.innerHTML = '';
-                    resJSON.usersConversations.forEach(async (conversation, i) => {
-                        let receiversID = [];
-                        conversation.people.forEach(person => {
-                            if (person != userID) {
-                                receiversID.push(person);
-                            }
-                        });
-
-                        const receiversUser = await pushIdsToUsers(receiversID);
+                const receiversUser = await pushIdsToUsers(receiversID);
 
 
-                        const node = document.createElement('div');
-                        node.classList.add('conversation');
-                        if (conversation._id === conversationLoaded) {
-                            node.classList.add('active');
-                        }
-                        node.setAttribute('data-conversation-id', conversation._id);
-                        node.setAttribute('data-conversation-date-active', conversation.dateActive);
-                        // let prefixHTML = ``;
-                        // if (receiverUser.prefix.title) {
-                        //     if (receiverUser.rank === 'owner') {
-                        //     prefixHTML = `<p class="prefix owner">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                        //     } else if (receiverUser.rank === 'admin') {
-                        //     prefixHTML = `<p class="prefix admin">[${receiverUser.prefix.title.split('')[0]}]</p>`
-                        //     } else {
-                        //     prefixHTML = `<p class="prefix">[${receiverUser.prefix.title.split('')[0]}]</p>`;
-                        //     }
-                        // }
-                        const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ formatUsersPrefix(receiver) + receiver.username + formatUsersVerified(receiver)).join(', ')}`;
-                        node.innerHTML = 
-                        `
-                            <h2>${titleHTML}</h2>
-                            <h4>${conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;') : 'Start Messaging!'}</h4>
-                            <i class="fas fa-circle notification ${conversation.seenFor.includes(userID) == true ? 'active' : ''}"></i>
-                        `;
-
-                        node.addEventListener('click', () => { clickedConversation(node) });
-                        
-                        // Load html
-                        // if (messagesList.children[i]) {
-                        //     messagesList.removeChild(messagesList.children[i]);
-                        //     messagesList.insertBefore(node, messagesList.children[i]);
-                        // } else {
-                        //     messagesList.append(node);
-                        // }
-                        messagesList.append(node);
-
-                        // Sort the conversations based on data-conversation-date-active
-                        [...messagesList.children].sort((a, b) => b.getAttribute('data-conversation-date-active') - a.getAttribute('data-conversation-date-active')).forEach(node => messagesList.append(node));
-
-                        //
-                        // LOADING CONVERSATION HERE INSTEAD OF SEPERATE FUNCTION
-                        //
-                        if (conversationLoaded) {
-                            if (conversationLoaded === conversation._id) {
-
-                                const previousHTML = internalMessages.innerHTML;
-                                // Removes previous html
-                                internalMessages.innerHTML = '';
-                                // Loops through messages generating html
-                                // Reset saved variables
-                                pastMessageDate = 0;
-                                pastUserOrigin = '';
-                                conversation.messages.forEach((message, i) => {
-                                    let messageUserOriginHtml = '';
-                                    if (message.sender !== userID) {
-                                        if (pastUserOrigin != usersFromDB[message.sender].username) {
-                                            messageUserOriginHtml = conversation.people.length > 2 ? message.sender !== userID ? `<div class="who-sent-message">${usersFromDB[message.sender].username}</div>` : '' : '';
-                                            pastUserOrigin = usersFromDB[message.sender].username;
-                                        }
-                                    } else {
-                                        pastUserOrigin = '';
-                                    }
-
-
-
-                                    let messageDateHTML = '';
-                                    if (message.date - pastMessageDate >= 3600000) {
-                                        const timeStringFirst = new Date(message.date).toLocaleTimeString();
-                                        const dateSplit = timeStringFirst.split('');
-                                        dateSplit.splice(dateSplit.length - 6, 3);
-                                        const timeOfMessage = dateSplit.join('');
-                                        const dateOfMessageFirst = new Date(message.date).toDateString();
-
-                                        const dateOfMessage = dateOfMessageFirst + ', ' + timeOfMessage;
-                                        messageDateHTML = `<div class="message-date">${dateOfMessage}</div>`;
-                                        pastMessageDate = message.date;
-                                    }
-
-
-                                    const node = document.createElement('div');
-
-
-                                    if (messageDateHTML !== '') {
-                                        node.style.marginTop = '40px';
-                                    } else if (messageUserOriginHtml !== '') {
-                                        node.style.marginTop = '15px';
-                                    }
-                                    node.classList.add('text-box');
-                                    node.setAttribute('data-text-date', message.date)
-                                    if (message.sender === userID) {
-                                        node.classList.add('sent-text');
-                                    } else {
-                                        node.classList.add('received-text');
-                                    }
-                                    if (message.type === 'img') {
-                                        node.innerHTML = `
-                                        <img src="${message.value}" class="text img" />
-                                        <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
-                                        ${messageUserOriginHtml}
-                                        ${messageDateHTML}
-                                        `;
-                                    } else {
-                                        const newMessageValue = message.value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;');
-                                        node.innerHTML = `
-                                        <div class="text">
-                                            ${newMessageValue}
-                                            <i class="fas fa-minus-circle delete-btn ${editMode ? 'active' : ''}" data-text-date="${message.date}" data-text-type="${message.type}"></i>
-                                        </div>
-                                        ${messageUserOriginHtml}
-                                        ${messageDateHTML}
-                                        `;
-                                        
-                                    }
-                                    
-                                    // Add event listener to delete buttons
-                                    const deleteBtn = node.querySelector('.delete-btn');
-                                    deleteBtn.addEventListener('click', (e) => {
-                                        deleteText(e.target.getAttribute('data-text-date'));
-                                    })
-        
-                                    // Load html
-                                    internalMessages.appendChild(node);
-                                });
-                                const newHTML = internalMessages.innerHTML;
-                                // Scroll to bottom
-                                if (previousHTML !== newHTML && !editMode) {
-                                    internalMessages.scrollTop = internalMessages.scrollHeight;
-                                    document.querySelectorAll('.text.img').forEach( img => {
-                                        img.onload = () => {
-                                            internalMessages.scrollTop = internalMessages.scrollHeight;
-                                        };
-                                    });    
-                                }
-
-                                // currently in chat users
-                                currentUsersInChat.innerHTML = '';
-                                const receiversInChat = conversation.people.filter(user => user != userID);
-                                receiversInChat.forEach(user => {
-                                    const userNode = document.createElement('div');
-                                    userNode.classList.add('user-box');
-                                    userNode.setAttribute('data-username', usersFromDB[user].username);
-                                    userNode.innerText = usersFromDB[user].username;
-                                    if (usersInChat.includes(usersFromDB[user].username)) {
-                                        userNode.style.color = 'lightgreen';
-                                        userNode.style.border = '1px solid lightgreen';
-                                    } else {
-                                        userNode.style.color = 'rgb(138, 138, 138)';
-                                        userNode.style.border = '1px solid rgb(138, 138, 138)';
-                                    }
-
-                                    currentUsersInChat.appendChild(userNode);
-                                });
-                                
-                            }
-                        } else {
-                            internalMessages.innerHTML = '';
-                            conversationLoaded = '';
-                            // Make the conversation background light to show it is no longer selected
-                            conversations = document.querySelectorAll('.conversation');
-                            conversations.forEach(conversation => {
-                                conversation.classList.remove('active');
-                            });
-                        }  
-                        
-                        
-                    });
-                } else {
-                    window.location.href = '/login';
+                const node = document.createElement('div');
+                node.classList.add('conversation');
+                if (conversation._id === conversationLoaded) {
+                    node.classList.add('active');
                 }
-                conversationLoader.classList.remove('active');    
-                checkConversationsLoading = false;
-            // } else {
-            //     setTimeout(async () => {
-            //         await checkConversations();
-            //     }, 500);
-            // }
-            
-        } catch(err) {
-            console.error(err);
-        }    
+                node.setAttribute('data-conversation-id', conversation._id);
+                node.setAttribute('data-conversation-date-active', conversation.dateActive);
+
+                const titleHTML = `${receiversUser.map(receiver => /* ADD USERS PREFIX HERE */ formatUsersPrefix(receiver) + receiver.username + formatUsersVerified(receiver)).join(', ')}`;
+                node.innerHTML = 
+                `
+                    <h2>${titleHTML}</h2>
+                    <h4>${conversation.messages[0] ? conversation.messages[conversation.messages.length - 1].type === 'img' ? 'Image' : conversation.messages[conversation.messages.length - 1].value.replace(/</ig, '&lt;').replace(/>/ig, '&gt;').replace(/\//ig, '&#47;') : 'Start Messaging!'}</h4>
+                    <i class="fas fa-circle notification ${conversation.seenFor.includes(userID) == true ? 'active' : ''}"></i>
+                `;
+
+                node.addEventListener('click', () => { clickedConversation(node) });
+                
+
+                messagesList.append(node);
+
+                // Sort the conversations based on data-conversation-date-active
+                [...messagesList.children].sort((a, b) => b.getAttribute('data-conversation-date-active') - a.getAttribute('data-conversation-date-active')).forEach(node => messagesList.append(node));
+
+
+                if (conversationLoaded) {
+                    renderTexts(conversationLoaded);
+                } else {
+                    internalMessages.innerHTML = '';
+                    conversationLoaded = '';
+                    // Make the conversation background light to show it is no longer selected
+                    conversations = document.querySelectorAll('.conversation');
+                    conversations.forEach(conversation => {
+                        conversation.classList.remove('active');
+                    });
+                }  
+                
+                
+            });
+        } else {
+            window.location.href = '/login';
+        }
+        conversationLoader.classList.remove('active');    
+        checkConversationsLoading = false;
+        
+    } catch(err) {
+        console.error(err);
+    }    
     
     
 }
 
 // Make name of conversation clickable
 messagingHeaderUser.addEventListener('click', () => {
-    const names = messagingHeaderUser.children[0].innerText.split(' ');
-    const usernamesSaved = Object.values(usersFromDB);;
-    const filtered = names.map(name => {
-        const query = usernamesSaved.find((obj) => {
-            return obj.username == name;
-        });
-        return query;
-    }).filter(user => user !== undefined);
-    if (filtered.length == 1) {
-        window.location.href = '/account/' + filtered[0].username;
+    // const names = messagingHeaderUser.children[0].innerText.split(' ');
+    // const usernamesSaved = Object.values(usersFromDB);;
+    // const filtered = names.map(name => {
+    //     const query = usernamesSaved.find((obj) => {
+    //         return obj.username == name;
+    //     });
+    //     return query;
+    // }).filter(user => user !== undefined);
+    // if (filtered.length == 1) {
+    //     window.location.href = '/account/' + filtered[0].username;
+    // }
+    if (conversation.people.length == 2) {
+        const othersUsername = usersFromDB[conversation.people.find(person => person != userID)].username;
+        window.location.href = '/account/' + othersUsername;
     }
-})
+});
+
+const seeConversation = (conversationObj) => {
+    fetch('/messages/seeconversation', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            conversation: {
+                _id: conversationObj._id,
+                seenFor: conversationObj.seenFor,
+            },
+        }),
+    });
+}
 
 // Function for click on conversation - Listener added when the element is created
-const clickedConversation = (conversation) => {
-    const conversationID = conversation.getAttribute('data-conversation-id');
+const clickedConversation = (conversationNode) => {
+    const conversationID = conversationNode.getAttribute('data-conversation-id');
         if (conversationLoaded === conversationID) {
             messageInput.style.visibility = 'hidden';
             sendMessageBtn.style.visibility = 'hidden';
@@ -511,13 +518,17 @@ const clickedConversation = (conversation) => {
             socket.emit('leaveConversation', { conversationID, userID });
             conversationLoaded = '';
             let tempConversations = document.querySelectorAll('.conversation');
-            tempConversations.forEach(conversation => {
-                conversation.classList.remove('active');
+            tempConversations.forEach(conversation2 => {
+                conversation2.classList.remove('active');
             });
             internalMessages.innerHTML = '';
-            // loadConversation();
-            checkConversations();
+
+            // checkConversations();
+            // renderTexts(conversationID);
         } else {
+            conversation = allConversations.find(conversation => conversation._id === conversationID);
+            seeConversation(conversation);
+            conversationNode.children[2].classList.remove('active');
             messageInput.style.visibility = 'visible';
             sendMessageBtn.style.visibility = 'visible';
             sendImgBtn.style.visibility = 'visible';
@@ -528,8 +539,8 @@ const clickedConversation = (conversation) => {
             conversationLoaded = conversationID;
 
             let tempConversations = document.querySelectorAll('.conversation');
-            tempConversations.forEach(conversation => {
-                conversation.classList.remove('active');
+            tempConversations.forEach(conversation2 => {
+                conversation2.classList.remove('active');
             });
             tempConversations.forEach(conversation1 => {
                 if (conversation1.getAttribute('data-conversation-id') == conversationID) {
@@ -539,7 +550,8 @@ const clickedConversation = (conversation) => {
                     messagingHeaderUser.innerHTML = conversation1.children[0].outerHTML;
                 }
             }); 
-            checkConversations();
+            // checkConversations();
+            renderTexts(conversationID);
         }
 }
 

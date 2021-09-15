@@ -231,6 +231,9 @@
     cursor: pointer;
     overflow-x: scroll;
 }
+#messagingHeader > div > h2 {
+    white-space: nowrap;
+}
 #editMessages {
     position: absolute;
     top: 50%;
@@ -355,7 +358,6 @@
 .message-date{
     position: absolute;
     font-size: 12px;
-    font-weight: bold;
     color: rgb(197, 197, 197);
     top: -25px;
     width: 100%;
