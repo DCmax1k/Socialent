@@ -20,11 +20,12 @@ const sendImgBtn = document.getElementById('sendImgBtn');
 const sendImgIcon = document.getElementById('sendImgIcon');
 const sendImgFile = document.getElementById('sendImgFile');
 const messagingHeader = document.getElementById('messagingHeader');
-const messagingHeaderUser = document.querySelector('#messagingHeader > div');
+const messagingHeaderUser = document.querySelector('#messagingHeader > #messagingHeaderInnerDiv');
 const editMessages = document.getElementById('editMessages');
 const userIsTyping = document.getElementById('userIsTyping');
 const usernameTyping = document.getElementById('usernameTyping');
 const currentUsersInChat = document.getElementById('currentUsersInChat');
+const dropdownHeaderUsers = document.getElementById('dropdownHeaderUsers');
 
 let conversationLoaded = '';
 let allConversations = [];
@@ -38,6 +39,7 @@ let pastUserOrigin = '';
 let pastMessageDate = 0;
 let usersInChat = [];
 let usersIdsInChat = [];
+let droppeddown = false;
 
 
 const usersFromDB = {};
@@ -473,21 +475,42 @@ const checkConversations = async () => {
 }
 
 // Make name of conversation clickable
+const dropdownUsers = users => {
+    if (users) {
+        dropdownHeaderUsers.innerHTML = '';
+        users.forEach(user => {
+            const userNode = document.createElement('a');
+            userNode.classList.add('name-link');
+            userNode.href = '/account/' + user.username;
+            const prefixHTML = user.prefix.title ? `<span class="prefix ${user.rank}" style="font-size: 20px;">[${user.prefix.title[0]}]</span> ` : '';
+            const verifiedHTML = user.verified ? ' <img class="verified" src="/images//verified.svg" alt="Verified Logo">' : '';
+            const usernameHTML = `<span style="text-decoration: underline;">${user.username}</span>`;
+            userNode.innerHTML = prefixHTML + usernameHTML + verifiedHTML;
+            dropdownHeaderUsers.appendChild(userNode);
+        });
+        if (droppeddown) {
+            dropdownHeaderUsers.classList.remove('active');
+            droppeddown = false;
+            dropdownHeaderUsers.innerHTML = '';
+        } else {
+            dropdownHeaderUsers.classList.add('active');
+            droppeddown = true;
+        }
+    } else {
+        dropdownHeaderUsers.classList.remove('active');
+        droppeddown = false;
+        dropdownHeaderUsers.innerHTML = '';
+    }
+    
+}
+
 messagingHeaderUser.addEventListener('click', () => {
-    // const names = messagingHeaderUser.children[0].innerText.split(' ');
-    // const usernamesSaved = Object.values(usersFromDB);;
-    // const filtered = names.map(name => {
-    //     const query = usernamesSaved.find((obj) => {
-    //         return obj.username == name;
-    //     });
-    //     return query;
-    // }).filter(user => user !== undefined);
-    // if (filtered.length == 1) {
-    //     window.location.href = '/account/' + filtered[0].username;
-    // }
     if (conversation.people.length == 2) {
         const othersUsername = usersFromDB[conversation.people.find(person => person != userID)].username;
         window.location.href = '/account/' + othersUsername;
+    } else {
+        const otherUsersInChat = conversation.people.filter(person => person != userID).map(person => usersFromDB[person]);
+        dropdownUsers(otherUsersInChat);
     }
 });
 
@@ -509,6 +532,7 @@ const seeConversation = (conversationObj) => {
 // Function for click on conversation - Listener added when the element is created
 const clickedConversation = (conversationNode) => {
     const conversationID = conversationNode.getAttribute('data-conversation-id');
+    droppeddown == true ? dropdownUsers() : '';
         if (conversationLoaded === conversationID) {
             messageInput.style.visibility = 'hidden';
             sendMessageBtn.style.visibility = 'hidden';
