@@ -71,6 +71,9 @@ io.on('connection', (socket) => {
     socket.on('updateConversationsWithMessage', ({person, messageData, conversationID, usersIdsInChat}) => {
         io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID, usersIds: usersIdsInChat});
     });
+    socket.on('updateConversationsWithDeletedMessage', ({person, messageData, conversationID}) => {
+        io.to(person).emit('updateConversationsWithDeletedMessage', {messageData, conversationID});
+    })
 
     // Get delete message request, delete message from DB, and send info to chat room
     socket.on('deleteMessage', ({conversationID, textDate, userID}) => {

@@ -164,6 +164,14 @@ socket.on('updateConversationsWithMessage', ({messageData: message, conversation
     currentConversation.messages.push(message);
 });
 
+socket.on('updateConversationsWithDeletedMessage', ({messageData: textDate, conversationID}) => {
+    // Update conversation object with deleted message
+    // Find conversation
+    const currentConversation = allConversations.find(conversation => conversation._id === conversationID);
+    // Remove message with same message.date
+    currentConversation.messages = currentConversation.messages.filter(convoMessage => convoMessage.date != textDate);
+});
+
 socket.on('deleteMessage', textDate => {
     // Visually instant delete
     const allTexts = document.querySelectorAll('i');
@@ -877,6 +885,11 @@ editMessages.addEventListener('click', () => {
 const deleteText = (textDate) => {
 
     socket.emit('deleteMessage', {conversationID: conversationLoaded, textDate, userID});
+
+    // Delete the messages event when the users are not in the chat
+    conversation.people.forEach(person => {
+        socket.emit('updateConversationsWithDeletedMessage', {person, messageData: textDate, conversationID: conversationLoaded});
+    });
 
 }
 
