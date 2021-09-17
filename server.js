@@ -178,6 +178,9 @@ app.use('/forgotpassword', forgotpasswordRoute);
 const { adminRoute } = require('./routes/admin');
 app.use('/admin', adminRoute);
 
+const kahootRoute = require('./routes/kahoot');
+app.use('/kahoot', kahootRoute);
+
 const socketio = require('./utils/socketio');
 app.use(socketio);
 
