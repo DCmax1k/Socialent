@@ -50,8 +50,9 @@ router.post('/joingame', async (req, res) => {
         fetchKahootData(req.body.uuid);
       }
     }
-    var pin = req.body.pin;
-    var bots = req.body.bots;
+    let pin = req.body.pin;
+    let bots = parseInt(req.body.bots);
+    if (bots > 100) bots = 100;
     if (bots == 1) {
       const client = new kahoot();
       client.uuid = uuid;
@@ -107,7 +108,7 @@ router.post('/joingame', async (req, res) => {
       });
     }
     res.json({
-      status: 'JOINED!',
+      status: 'DONE!',
     });
   } catch(err) {
     console.error(err);

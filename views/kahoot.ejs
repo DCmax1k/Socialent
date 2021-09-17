@@ -60,6 +60,9 @@
             }
             alreadyClicked = true;
             submitBtn.style.cursor = 'not-allowed';
+            if (parseInt(bots.value) > 100) {
+                alert('For Socialents\' server\'s, we only sent 100 bots... You wouldn\'t want to break Socialent now, would you?');
+            }
             const response = await fetch('/kahoot/joingame', {
                 method: 'POST',
                 headers: {
@@ -74,7 +77,7 @@
             });
             const data = await response.json();
             alert(data.status);
-            if (data.status != 'JOINED!') {
+            if (data.status != 'DONE!') {
                 alreadyClicked = false;
                 submitBtn.style.cursor = 'pointer';
                 alert('An error occurred...')
