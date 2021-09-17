@@ -6,6 +6,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Kahoot!</title>
     <style>
+        body {
+            overflow-x: hidden;
+        }
         #inputs {
             width: 100%;
             height: 100%;
@@ -23,14 +26,94 @@
             padding: 10px;
             font-size: 20px;
         }
+        #inputs > #uuid {
+            color: rgb(0, 179, 24);
+        }
         #inputs > img {
             width: 600px;
         }
-        #inputs > p {
+        #inputs > p.bottom {
             margin-bottom: 100px;
             font-weight: bold;
             font-size: 15px;
         }
+        #search {
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            transition: transform 0.3s ease;
+        }
+        #search.active {
+            transform: translateX(-100%);
+
+        }
+        #search > input {
+            width: 90%;
+            height: 50px;
+            margin: 10px;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 20px;
+
+        }
+        #searchResults {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        #search > #searchResults > .card {
+            width: 90%;
+            border: 2px solid black;
+            border-radius: 10px;
+            margin: 10px;
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+        }
+        #search > #searchResults > .card:hover {
+            background-color: #f2f2f2;
+            box-shadow: 0px 2px 10px #000000;
+            transform: translateY(-5px);
+        }
+        .card > .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+
+        }
+        .card > .card-desc {
+            font-size: 15px;
+            width: 100%;
+            text-align: center;
+        }
+        .card > .card-uuid {
+            font-size: 15px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+        .card > .card-cover {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+        }
+        #openSearch, #goBack {
+            color: blue;
+            font-size: 20px;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
         @media screen and (max-width: 650px) {
             #inputs > input, #inputs > button, #inputs > img {
                 width: 95%;
@@ -47,8 +130,25 @@
         <input id="bots" type="number" placeholder="# of bots">
         <input id="uuid" type="text" placeholder="QuizID (optional) ex. 4cdd8eb5-ce35-4368-a43b-a3c1d15b7430">
         <img src="/images/kahootQuizIdPreview.png" alt="quizIdPreview">
-        <p>The quiz ID is optional, but it is NEEDED if you want the bot(s) to pick the CORRECT answers!</p>
+        <p id="openSearch">Don't want to type it out? Click here to search for it!</p>
+        <p class="bottom">The quiz ID is optional, but it is NEEDED if you want the bot(s) to pick the CORRECT answers!</p>
         <button style="cursor: pointer;" id="submitBtn">Submit</button>
+    </div>
+
+    <div id="search">
+        <input id="searchInput" type="search" placeholder="Search for kahoot...">
+        <p id="goBack">Go back</p>
+        <div id="searchResults">
+            <!-- Example card -->
+            <!-- <div class="card">
+                <div class="card-title">This is the Title</div>
+                <div class="card-desc">This is the longer slightly description</div>
+                <div class="card-uuid">UUID: 1321321-3-12-321-32-13-21-321</div>
+                <img class="card-img" src=>
+
+            </div> -->
+
+        </div>
     </div>
 
   <script>
@@ -58,6 +158,11 @@
     const uuid = document.getElementById('uuid');
     const inputs = document.getElementById('inputs');
     const submit = document.getElementById('submitBtn');
+    const openSearch = document.getElementById('openSearch');
+    const goBack = document.getElementById('goBack');
+    const search = document.getElementById('search');
+    const searchInput = document.getElementById('searchInput');
+
     let alreadyClicked = false;
     submitBtn.addEventListener('click', async () => {
         if (code.value && name.value && bots.value) {
@@ -91,7 +196,51 @@
         } else {
             alert('Please fill out all required fields!');
         }
-    })
+    });
+
+    openSearch.addEventListener('click', () => {
+        search.classList.add('active');
+    });
+    goBack.addEventListener('click', () => {
+        search.classList.remove('active');
+    });
+
+    const clickedCard = (givenuuid) => {
+        search.classList.remove('active');
+        uuid.value = givenuuid;
+    }
+
+    searchInput.addEventListener('keyup', async (e) => {
+        if (e.key == 'Enter') {
+            const response = await fetch('/kahoot/searchuuid', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: searchInput.value,
+                }),
+            });
+            const data = await response.json();
+            if (data.status == 'success') {
+                searchResults.innerHTML = '';
+                data.kahoots.forEach(result => {
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.addEventListener('click', () => {clickedCard(result.uuid)});
+                    card.innerHTML = `
+                        <div class="card-title">${result.title}</div>
+                        <div class="card-desc">${result.description}</div>
+                        <div class="card-uuid">UUID: ${result.uuid}</div>
+                        <img class="card-cover" src="${result.cover}">
+                    `;
+                    searchResults.appendChild(card);
+                });
+            } else {
+                alert('An error occurred...');
+            }
+        }
+    });
 
 
   </script>

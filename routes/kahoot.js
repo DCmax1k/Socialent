@@ -53,29 +53,7 @@ router.post('/joingame', async (req, res) => {
     let pin = req.body.pin;
     let bots = parseInt(req.body.bots);
     if (bots > 100) bots = 100;
-    if (bots == 1) {
-      const client = new kahoot();
-      client.uuid = uuid;
-      client.on("Joined", () => {
-        // console.log("I joined the Kahoot!");
-      });
-      client.on("QuizStart", () => {
-        // console.log("The quiz has started!");
-      });
-      client.on("QuestionStart", question => {
-        if (savedKahootData[client.uuid]) {
-          const currectAnswerIndex = savedKahootData[client.uuid].questions[question.questionIndex].indexCorrect;
-          // console.log('currectAnswerIndex, ', currectAnswerIndex);
-          question.answer(currectAnswerIndex);
-        } else {
-          question.answer(0);
-        }
-      });
-      client.on("QuizEnd", () => {
-        // console.log("The quiz has ended.");
-      });
-      await client.join(pin, req.body.name); 
-    } else if (bots > 1) {
+    if (bots > 0) {
       for (var i = 1; i <= req.body.bots; i++) {
         const client = new kahoot();
         client.uuid = uuid;
@@ -109,6 +87,33 @@ router.post('/joingame', async (req, res) => {
     }
     res.json({
       status: 'DONE!',
+    });
+  } catch(err) {
+    console.error(err);
+  }
+});
+
+router.post('/searchuuid', async (req, res) => {
+  // https://create.kahoot.it/rest/kahoots/?query=sports
+  try {
+    const query = req.body.query;
+    request(`https://create.kahoot.it/rest/kahoots/?query=${query}`, (error, response, html) => {
+      if (!error && response.statusCode == 200) {
+        const body = JSON.parse(html);
+        const kahoots = body.entities.map(kahoot => {
+          return {
+            uuid: kahoot.card.uuid,
+            title: kahoot.card.title,
+            description: kahoot.card.description,
+            numberOfQuestions: kahoot.card.number_of_questions,
+            cover: kahoot.card.cover,
+          };
+        });
+        res.json({
+          kahoots,
+          status: 'success',
+        });
+      }
     });
   } catch(err) {
     console.error(err);
