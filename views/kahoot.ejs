@@ -18,7 +18,8 @@
             align-items: center;
         }
         #inputs > input,
-        button {
+        button,
+        #inputs > #delay {
             height: 50px;
             width: 500px;
             margin: 10px;
@@ -107,6 +108,19 @@
             height: 100px;
             object-fit: contain;
         }
+        .card > .card-number-questions {
+            font-size: 15px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+        .card > .card-author {
+            font-size: 15px;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+
+        }
         #openSearch, #goBack {
             color: blue;
             font-size: 20px;
@@ -115,7 +129,7 @@
         }
 
         @media screen and (max-width: 650px) {
-            #inputs > input, #inputs > button, #inputs > img {
+            #inputs > input, #inputs > button, #inputs > img, #inputs > #delay {
                 width: 95%;
                 font-size: 15px;
             }
@@ -128,6 +142,7 @@
         <input id="code" type="text" placeholder="PIN ex. 123456">
         <input id="name" type="text" placeholder="NAME ex. DCmax1k">
         <input id="bots" type="number" placeholder="# of bots">
+        <input id="delay" type="number" placeholder="ex. 3 (Max delay in seconds) Prevents cheat detection">
         <input id="uuid" type="text" placeholder="QuizID (optional) ex. 4cdd8eb5-ce35-4368-a43b-a3c1d15b7430">
         <img src="/images/kahootQuizIdPreview.png" alt="quizIdPreview">
         <p id="openSearch">Don't want to type it out? Click here to search for it!</p>
@@ -139,14 +154,7 @@
         <input id="searchInput" type="search" placeholder="Search for kahoot...">
         <p id="goBack">Go back</p>
         <div id="searchResults">
-            <!-- Example card -->
-            <!-- <div class="card">
-                <div class="card-title">This is the Title</div>
-                <div class="card-desc">This is the longer slightly description</div>
-                <div class="card-uuid">UUID: 1321321-3-12-321-32-13-21-321</div>
-                <img class="card-img" src=>
 
-            </div> -->
 
         </div>
     </div>
@@ -156,6 +164,7 @@
     const name = document.getElementById('name');
     const bots = document.getElementById('bots');
     const uuid = document.getElementById('uuid');
+    const delay = document.getElementById('delay');
     const inputs = document.getElementById('inputs');
     const submit = document.getElementById('submitBtn');
     const openSearch = document.getElementById('openSearch');
@@ -180,10 +189,11 @@
                 'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                pin: code.value,
-                name: name.value,
-                bots: bots.value,
-                uuid: uuid.value,
+                    pin: code.value,
+                    name: name.value,
+                    bots: bots.value,
+                    uuid: uuid.value,
+                    delay: delay.value ? delay.value : 0,
                 }),
             });
             const data = await response.json();
@@ -230,9 +240,11 @@
                     card.addEventListener('click', () => {clickedCard(result.uuid)});
                     card.innerHTML = `
                         <div class="card-title">${result.title}</div>
+                        <div class="card-number-questions">${result.numberOfQuestions} Questions</div>
                         <div class="card-desc">${result.description}</div>
                         <div class="card-uuid">UUID: ${result.uuid}</div>
                         <img class="card-cover" src="${result.cover}">
+                        <div class="card-author">Made by, ${result.author}</div>
                     `;
                     searchResults.appendChild(card);
                 });

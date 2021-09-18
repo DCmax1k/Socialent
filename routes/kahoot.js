@@ -50,6 +50,7 @@ router.post('/joingame', async (req, res) => {
         fetchKahootData(req.body.uuid);
       }
     }
+    const delay = parseInt(req.body.delay);
     let pin = req.body.pin;
     let bots = parseInt(req.body.bots);
     if (bots > 100) bots = 100;
@@ -68,11 +69,19 @@ router.post('/joingame', async (req, res) => {
         client.on("QuestionStart", question => {
           if (savedKahootData[client.uuid]) {
             const currectAnswerIndex = savedKahootData[client.uuid].questions[question.questionIndex].indexCorrect;
-            // console.log('currectAnswerIndex, ', currectAnswerIndex);
-            question.answer(currectAnswerIndex);
+            console.log('QUESTION, ', question);
+            // Wait for delay
+            setTimeout(() => {
+              question.answer(currectAnswerIndex);
+            }, (Math.random() * delay) * 1000);
           } else {
+            const amountOfQuestions = question.numberOfChoices;
+            // Wait for delay
+            setTimeout(() => {
+              question.answer(question.answer(Math.floor(Math.random() * amountOfQuestions)));
+            }, (Math.random() * delay) * 1000);
             // console.log('No saved Data');
-            question.answer(0);
+            
           }
         });
         client.on("QuizEnd", () => {
@@ -101,12 +110,14 @@ router.post('/searchuuid', async (req, res) => {
       if (!error && response.statusCode == 200) {
         const body = JSON.parse(html);
         const kahoots = body.entities.map(kahoot => {
+          //console.log(kahoot);
           return {
             uuid: kahoot.card.uuid,
             title: kahoot.card.title,
             description: kahoot.card.description,
             numberOfQuestions: kahoot.card.number_of_questions,
             cover: kahoot.card.cover,
+            author: kahoot.card.creator_username,
           };
         });
         res.json({
