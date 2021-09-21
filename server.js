@@ -181,6 +181,9 @@ app.use('/admin', adminRoute);
 const kahootRoute = require('./routes/kahoot');
 app.use('/kahoot', kahootRoute);
 
+const edpuzzleRoute = require('./routes/edpuzzle');
+app.use('/edpuzzle', edpuzzleRoute);
+
 const socketio = require('./utils/socketio');
 app.use(socketio);
 

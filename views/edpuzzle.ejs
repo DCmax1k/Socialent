@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Edpuzzle</title>
+    <style>
+        body {
+            background-color: #fafafa;
+            overflow-x: hidden;
+        }
+        #inputs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding-top: 100px;
+        }
+        input{
+            height: 50px;
+            width: 95%;
+            margin: 10px;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 20px;
+        }
+        #data {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding-top: 100px;
+        }
+        #data.active {
+            display: flex;
+        }
+        .questionNumber {
+            font-size: 30px;
+            font-weight: bold;
+
+        }
+        #questions {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            
+        }
+        .question {
+            width: 95%;
+            border: 2px solid black;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .magicalTitle {
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .magicalTitle > p {
+            text-align: center;
+        }
+
+        .choice {
+            margin-bottom: 10px;
+        }
+        .choiceTitle {
+            font-size: 35px;
+            font-weight: bold;
+
+        }
+        b.correct {
+            color: green;
+        }
+        b.incorrect {
+            color: red;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div id="inputs">
+        <label for="url">When on Edpuzzle video assignment, copy the url and paste it here...</label>
+        <input id="url" type="text" placeholder="https://edpuzzle.com/assignments/61491a6c5f8f5b41641bc37c/watch">
+        <button id="submit">GET ANSWERS</button>
+        <div id="data">
+            <h1 id="title"></h1>
+            <img id="thumbnail" src="" alt="Edpuzzle Thumbnail">
+            <p>QUESTIONS:</p>
+            <div id="questions">
+
+            </div>
+        </div>
+    </div>
+    
+  <script>
+      const submit = document.getElementById('submit');
+      const url = document.getElementById('url');
+      const title = document.getElementById('title');
+      const thumbnail = document.getElementById('thumbnail');
+      const questions = document.getElementById('questions');
+      const dataHTML = document.getElementById('data');
+      let loading = false;
+
+      // Converts text includesint html char codes back to regualr text
+      const decodeEntities = (s) => {
+            var str, temp= document.createElement('p');
+            temp.innerHTML= s;
+            str= temp.textContent || temp.innerText;
+            temp=null;
+            return str;
+    }
+
+      submit.addEventListener('click', async () => {
+          if (url.value.length == 0) return; 
+          if (loading) return alert('Already loading...');
+          submit.innerText = 'Accessing Edpuzzle\'s database...';
+          loading = true;
+          title.innerHTML = '';
+          thumbnail.src = '';
+          questions.innerHTML = '';
+          dataHTML.classList.remove('active');
+          const id = url.value.split('/')[url.value.split('/').length - 2];
+          const response = await fetch('/edpuzzle/getdata', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id,
+                }),
+          });
+          const data = await response.json();
+          submit.innerText = 'GET ANSWERS';
+          loading = false;
+          if (data.success) {
+            dataHTML.classList.add('active');
+            console.log(data.data);
+            title.innerText = data.data.title;
+            thumbnail.src = data.data.img;
+            data.data.questions.forEach((question, qi) => {
+                const node = document.createElement('div');
+                node.classList.add('question');
+                const questionTitleHTML = decodeEntities(question.body[0].html)
+                if (question.type == 'open-ended') {
+                    node.innerHTML = `
+                    <p class="questionNumber">Question ${qi + 1}</p>
+                    <p class="questionTitle">Question: <div class="magicalTitle"></div></p>
+                    <b>OPEN ENDED - Teacher corrected - No exact solution</b>
+                    `;
+                    node.children[2].innerHTML = questionTitleHTML;
+                } else if (question.type == 'multiple-choice') {
+                    node.innerHTML = `
+                    <p class="questionNumber">Question ${qi + 1}</p>
+                    <p class="questionTitle">Question: <div class="magicalTitle"></div></p>
+                    <p>Choices:</p>
+                    `;
+                    node.children[2].innerHTML = questionTitleHTML;
+                    question.choices.forEach(choice => {
+                        const choiceNode = document.createElement('div');
+                        choiceNode.classList.add('choice');
+                        const choiceTitleHTML = decodeEntities(choice.body[0].html);
+                        choiceNode.innerHTML = `
+                        
+                        <p class="choiceTitle">${choiceTitleHTML}</p>
+                        <b class="${choice.isCorrect ? 'correct' : 'incorrect'}"">${choice.isCorrect ? 'Correct' : 'Incorrect'}</b>
+
+                        `;
+                        node.appendChild(choiceNode);
+                    });
+                }
+                questions.appendChild(node);
+            });
+          }
+      })
+
+  </script>
+
+</body>
+
+</html>
