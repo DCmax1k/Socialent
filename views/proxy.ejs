@@ -42,8 +42,13 @@
                         arr.unshift('http://');
                         newURL = arr.join('');
                     }
-                    const extWindow = window.open(`http://soc3-proxy.herokuapp.com/prox/?url=${btoa(newURL)}`, 'Loading...', 'top=50, left=50, height=600, width=800');
-                    extWindow.document.title = 'Starting Unblocker v2.0...';
+                    const extWindow = window.open(`about:blank`, 'Proxy', 'top=50, left=50, height=600, width=800');
+                    const iFrameHTML = `<iframe src='https://soc3-proxy.herokuapp.com/prox/?url=${btoa(newURL)}' style='width: 100%; height: 100%; border: none;'></iframe>`;
+                    extWindow.document.title = 'Socialent';
+                    extWindow.document.write(iFrameHTML);
+                        
+
+                    
                 }
         } else {alert('Securly Page not detected!')}})()"><img style="height: 50px; width: 50px;" src="/images/SocialentLogo.png" alt="Planner - ProgressBook"></a>
     </div>
