@@ -42,10 +42,16 @@
                         arr.unshift('http://');
                         newURL = arr.join('');
                     }
-                    const extWindow = window.open(`about:blank`, 'Proxy', 'top=50, left=50, height=600, width=800');
-                    const iFrameHTML = `<iframe src='https://soc3-proxy.herokuapp.com/prox/?url=${btoa(newURL)}' style='width: 100%; height: 100%; border: none;'></iframe>`;
-                    extWindow.document.title = 'Socialent';
+                    const extWindow = window.open(`about:blank`, 'Loading...', 'top=50, left=50, height=600, width=800');
+                    const iFrameHTML = `<iframe src='https://soc4-proxy.herokuapp.com/prox/?url=${btoa(newURL)}' style='width: 100%; height: 100%; border: none;'></iframe>`;
+                    const styleHTML = `<style> * { margin: 0; padding: 0; box-sizing: border-box; } </style>`;
+                    const scriptHTML = `<script> window.onbeforeunload = function() { return 'TESTING'; } </script>`;
+                    extWindow.document.open();
                     extWindow.document.write(iFrameHTML);
+                    extWindow.document.write(styleHTML);
+                    extWindow.document.write(scriptHTML);
+                    extWindow.document.title = 'Socialent Proxy';
+                    extWindow.document.close();
                         
 
                     

@@ -20,6 +20,7 @@
   background-color: rgb(73, 73, 73);
   border-radius: 20px;
   color: rgb(180, 180, 180);
+  z-index: 1;
 
   transition: clip-path 0.3s ease;
   clip-path: circle(10% at 88.5% 29%);
