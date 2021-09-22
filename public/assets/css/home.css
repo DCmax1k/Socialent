@@ -40,7 +40,7 @@
 
 #bookmarkIcons {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -51,6 +51,12 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-left: 5px;
+}
+
+#bookmarkIcons > a > img {
+  height: 20px;
+  width: 20px;
 }
 
 
