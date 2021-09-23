@@ -48,11 +48,11 @@ function authToken(req, res, next) {
   });
 }
 
-router.get('/', (req, res) => {
+router.get('/', authToken, (req, res) => {
   res.render('kahoot');
 });
 
-router.post('/joingame', async (req, res) => {
+router.post('/joingame', authToken, async (req, res) => {
   try {
     let uuid = '';
     if (req.body.uuid) {
@@ -113,7 +113,7 @@ router.post('/joingame', async (req, res) => {
   }
 });
 
-router.post('/searchuuid', async (req, res) => {
+router.post('/searchuuid', authToken, async (req, res) => {
   // https://create.kahoot.it/rest/kahoots/?query=sports
   try {
     const query = req.body.query;
