@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
 const request = require('request');
 
@@ -37,11 +38,21 @@ const fetchKahootData = async (uuid) => {
   });
 };
 
-router.get('/', (req, res) => {
+function authToken(req, res, next) {
+  const token = req.cookies['auth-token'] || req.body.auth_token;
+  if (token == null) return res.redirect('/login?rd=kahoot');
+  jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+      if (err) return res.redirect('/login?rd=kahoot');
+      req.user = user;
+      next();
+  });
+}
+
+router.get('/', authToken, (req, res) => {
   res.render('kahoot');
 });
 
-router.post('/joingame', async (req, res) => {
+router.post('/joingame', authToken, async (req, res) => {
   try {
     let uuid = '';
     if (req.body.uuid) {
@@ -102,7 +113,7 @@ router.post('/joingame', async (req, res) => {
   }
 });
 
-router.post('/searchuuid', async (req, res) => {
+router.post('/searchuuid', authToken, async (req, res) => {
   // https://create.kahoot.it/rest/kahoots/?query=sports
   try {
     const query = req.body.query;

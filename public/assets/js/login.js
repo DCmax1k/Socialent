@@ -72,6 +72,8 @@ submit.addEventListener('click', async () => {
         alertCont.classList.add('active');
         password.value = '';
       } else if (resJSON.response === 'logged in') {
+        if (window.location.href.includes('rd=kahoot')) return window.location.href = '/kahoot';
+        if (window.location.href.includes('rd=edpuzzle')) return window.location.href = '/edpuzzle';
         window.location.href = `/home`;
         console.log('logged in');
       }

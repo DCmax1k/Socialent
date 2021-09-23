@@ -1,8 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const puppeteer = require('puppeteer');
+const jwt = require('jsonwebtoken');
 
-router.get('/', (req, res) => {
+function authToken(req, res, next) {
+    const token = req.cookies['auth-token'] || req.body.auth_token;
+    if (token == null) return res.redirect('/login?rd=edpuzzle');
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+        if (err) return res.redirect('/login?rd=edpuzzle');
+        req.user = user;
+        next();
+    });
+}
+
+router.get('/', authToken, (req, res) => {
     res.render('edpuzzle');
 });
 
@@ -64,7 +75,7 @@ const scrapeDataFrom = async (scrapeID) => {
 }
 
 
-router.post('/getdata', async (req, res) => {
+router.post('/getdata', authToken, async (req, res) => {
     try {
         const data = await scrapeDataFrom(req.body.id);
         res.json({
