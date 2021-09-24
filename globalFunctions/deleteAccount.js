@@ -13,7 +13,7 @@ const deleteUser = async id => {
           (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(post => {
             if (post.data().url.includes('firebase')) {
               // Find file name
-              const splitVersion = post.url.split('%2F');
+              const splitVersion = post.data().url.split('%2F');
               const fileName = splitVersion[2].slice(0, splitVersion[2].length - 10);
               const postsRef = ref(storage, `posts/${user._id}`);
               const imageRef = ref(postsRef, fileName);
@@ -67,16 +67,16 @@ const deleteUser = async id => {
 
           // Delete user
           // First delete users profile image in storage
-          if (user.profileImage.includes('firebase')) {
+          if (user.profileImg.includes('firebase')) {
             // Find file name
-            const splitVersion = post.url.split('%2F');
+            const splitVersion = user.profileImg.split('%2F');
             const fileName = splitVersion[2].slice(0, splitVersion[2].length - 10);
             const postsRef = ref(storage, `profileImgs/${user._id}`);
             const imageRef = ref(postsRef, fileName);
     
             deleteObject(imageRef);
           }
-          const deleteUser = await ( await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.delete();
+          await ( await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.delete();
           return 'success';
       } catch (err) {
         console.error(err);
