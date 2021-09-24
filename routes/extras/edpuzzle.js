@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const puppeteer = require('puppeteer');
 const jwt = require('jsonwebtoken');
+const firebase_admin = require('firebase-admin');
+const db = firebase_admin.firestore();
 
 function authToken(req, res, next) {
     const token = req.cookies['auth-token'] || req.body.auth_token;
@@ -13,8 +15,13 @@ function authToken(req, res, next) {
     });
 }
 
-router.get('/', authToken, (req, res) => {
-    res.render('edpuzzle');
+router.get('/', authToken, async (req, res) => {
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.verified) {
+        res.render('extras/edpuzzle');
+    } else {
+        res.render('extras/needVerify');
+    }
 });
 
 

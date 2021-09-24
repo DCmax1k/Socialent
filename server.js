@@ -115,12 +115,17 @@ app.get('/', authHomeToken, async (req, res) => {
   res.redirect(`/home`);
 });
 
-app.get('/proxy', authToken, (req, res) => {
-  res.render('proxy', { user: req.user });
+app.get('/proxy', authToken, async (req, res) => {
+  const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (user.verified) {
+        res.render('extras/proxy', { user: req.user });
+    } else {
+        res.render('extras/needVerify');
+    }
 });
 
 app.get('/downloadimage', authToken, async (req, res) => {
-  res.render('downloadimage');
+  res.render('extras/downloadimage');
 });
 
 function authHomeToken(req, res, next) {
@@ -178,10 +183,10 @@ app.use('/forgotpassword', forgotpasswordRoute);
 const { adminRoute } = require('./routes/admin');
 app.use('/admin', adminRoute);
 
-const kahootRoute = require('./routes/kahoot');
+const kahootRoute = require('./routes/extras/kahoot');
 app.use('/kahoot', kahootRoute);
 
-const edpuzzleRoute = require('./routes/edpuzzle');
+const edpuzzleRoute = require('./routes/extras/edpuzzle');
 app.use('/edpuzzle', edpuzzleRoute);
 
 const socketio = require('./utils/socketio');

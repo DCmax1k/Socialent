@@ -187,7 +187,7 @@ socket.on('deleteMessage', textDate => {
     })
 });
 
-socket.on('addedConvo', ({senders, conversationID}) => {
+socket.on('addedConvo', async ({senders, conversationID}) => {
     // Generate conversation html
     const receiversUser = senders;
     const node = document.createElement('div');
@@ -213,6 +213,12 @@ socket.on('addedConvo', ({senders, conversationID}) => {
 
     node.addEventListener('click', () => { clickedConversation(node) });
     messagesList.insertBefore(node, messagesList.children[0]);
+
+    // Add conversation to allConversations
+    const receiversIDs = receiversUser.map(receiver => receiver._id);
+    allConversations.push({_id: conversationID, messages: [], people: [userID, receiversIDs], seenFor: receiversIDs, dateActive: Date.now()});
+    await pushIdsToUsers(receiversIDs);
+
 });
 
 socket.on('istyping', username => {
@@ -417,8 +423,8 @@ const checkConversations = async () => {
         if (resJSON.status === 'success') {
 
             // Generate html for each conversation
-            messagesList.innerHTML = '';
             allConversations = resJSON.usersConversations;
+            if (allConversations.length > 0) messagesList.innerHTML = ''; 
             resJSON.usersConversations.forEach(async (conversation, i) => {
                 let receiversID = [];
                 conversation.people.forEach(person => {
@@ -648,6 +654,9 @@ const addConversationSubmitFunction = async () => {
         }
         if (resJSON.status === 'success') {
             // Generate conversation html
+            const receiversIDs = resJSON.receivers.map(receiver => receiver._id);
+            allConversations.push({_id: resJSON.conversationID, messages: [], people: [userID, receiversIDs], seenFor: receiversIDs, dateActive: Date.now()});
+            await pushIdsToUsers(receiversIDs);
             const receiversUser = resJSON.receivers;
             const node = document.createElement('div');
             node.classList.add('conversation');
