@@ -249,26 +249,29 @@ app.get('/test', async (req, res) => {
   //   console.error(err);
   // }
 });
-// app.post('/test', async (req, res) => {
-//   try {
-//     const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] });
-//     const page = await browser.newPage();
+/* app.post('/test', async (req, res) => {
+   try {
+     const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] });
+     const page = await browser.newPage();
   
-//     await page.goto('https://patrickhlauke.github.io/recaptcha/');
+     await page.goto('https://gmail.com');
+
+   } catch(err) {
+     console.error(err);
+   }
+ }); */
+/*
+ (async function() {
+    try {
+      const browser = await puppeteer.launch({headless: false, args: ['--no-sandbox'] });
+      const page = await browser.newPage();
   
-//     await page.waitForNavigation('networkidle2');
-//     // wait a couple seconds
-//     await new Promise(resolve => setTimeout(resolve, 10000));
+      await page.goto('https://gmail.com');
 
-//     console.log('clicking');
-//     await page.evaluate(() => {
-//       document.getElementById('rc-anchor-container').click();
-//     });
-
-//   } catch(err) {
-//     console.error(err);
-//   }
-// })
+    } catch(err) {
+      console.error(err);
+    }
+ })(); */
 
 
 

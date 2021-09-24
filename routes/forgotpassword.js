@@ -3,6 +3,7 @@ const router = express.Router();
 const firebase = require('firebase-admin');
 const db = firebase.firestore();
 const bcrypt = require('bcrypt');
+// const nodemailer = require('nodemailer');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -19,7 +20,7 @@ router.post('/sendemail', async (req, res) => {
             const code = Math.floor(Math.random() * 900000 + 100000);
             const updateUsersCode = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('emailData.emailCode', code);
             // Send Email
-            const msg = {
+            /* const msg = {
                 to: user.emailData.email,
                 from: 'noreplydevapp@gmail.com',
                 subject: 'Reset Password',
@@ -37,7 +38,38 @@ router.post('/sendemail', async (req, res) => {
                 `,
             };
             const sendMail = await sgMail.send(msg);
-            res.json({
+            
+            */
+            
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'noreplydevapp@gmail.com',
+                    pass: 'llewdlac',
+                }
+            })
+
+            const mailOptions = {
+                from: 'noreply@socialentapp.com',
+                to: user.emailData.email,
+                subject: 'Reset Password',
+                html: `
+                <h1>Socialent: Reset Password</h1>
+                <hr />
+                <h2>${user.username}</h2>
+                <br />
+                Your 6 digit code is: ${code}
+                <br />
+                <hr />
+                <br />
+                If you do not know why you reveived this email, please ignore it.
+                `,
+            };
+            transporter.sendMail(mailOptions, (err, data) => {
+                if (err) return console.error(err);
+            });
+            
+           res.json({
                 status: 'success',
             });
         } else {
