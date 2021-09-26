@@ -184,7 +184,7 @@
             if (parseInt(bots.value) > 100) {
                 alert('For Socialents\' server\'s, we only sent 100 bots... You wouldn\'t want to break Socialent now, would you?');
             }
-            const response = await fetch('https://appextras.herokuapp.com//kahoot/joingame', {
+            const response = await fetch('https://appextras.herokuapp.com/kahoot/joingame', {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
@@ -223,7 +223,7 @@
 
     searchInput.addEventListener('keyup', async (e) => {
         if (e.key == 'Enter') {
-            const response = await fetch('https://appextras.herokuapp.com//kahoot/searchuuid', {
+            const response = await fetch('https://appextras.herokuapp.com/kahoot/searchuuid', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
