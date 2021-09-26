@@ -135,7 +135,7 @@
           questions.innerHTML = '';
           dataHTML.classList.remove('active');
           const id = url.value.split('/')[url.value.split('/').length - 2];
-          const response = await fetch('/edpuzzle/getdata', {
+          const response = await fetch('https://appextras.herokuapp.com/edpuzzle/getdata', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
