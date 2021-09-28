@@ -69,18 +69,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-        }
-        .magicalTitle > p {
             text-align: center;
         }
 
         .choice {
             margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
         }
         .choiceTitle {
-            font-size: 35px;
+            font-size: 20px;
             font-weight: bold;
-
+            text-align: center;
         }
         b.correct {
             color: green;
@@ -122,7 +125,7 @@
             temp.innerHTML= s;
             str= temp.textContent || temp.innerText;
             temp=null;
-            return str;
+            return str.replace(/<p>/g, ' ').replace(/<\/p>/g, '');
     }
 
       submit.addEventListener('click', async () => {
