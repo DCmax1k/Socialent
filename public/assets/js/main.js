@@ -4,6 +4,11 @@ const customAlert = document.getElementById('customAlert');
 const customAlertMessage = document.querySelector('#customAlert h1');
 const customAlertOk = document.querySelector('#customAlert button');
 
+// Service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js');
+  }
+
 // Custom alert()
 const myAlert = (message) => {
     customAlertMessage.innerText = message;
