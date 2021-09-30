@@ -97,8 +97,8 @@
 
 <body>
     <div id="inputs">
-        <label for="url">When on Edpuzzle video assignment, copy the url and paste it here...</label>
-        <input id="url" type="text" placeholder="https://edpuzzle.com/assignments/61491a6c5f8f5b41641bc37c/watch">
+        <!-- <label for="url">When on Edpuzzle video assignment, copy the url and paste it here...</label>
+        <input id="url" type="text" placeholder="https://edpuzzle.com/assignments/61491a6c5f8f5b41641bc37c/watch"> -->
         <button id="submit">GET ANSWERS</button>
         <div id="data">
             <h1 id="title"></h1>
@@ -129,21 +129,22 @@
     }
 
       submit.addEventListener('click', async () => {
-          if (url.value.length == 0) return; 
+          //if (url.value.length == 0) return; 
           if (loading) return alert('Already loading...');
-          submit.innerText = 'Getting assignment media ID...';
+          // submit.innerText = 'Getting assignment media ID...';
           loading = true;
           title.innerHTML = '';
           thumbnail.src = '';
           questions.innerHTML = '';
           dataHTML.classList.remove('active');
-          const id = url.value.split('/')[url.value.split('/').length - 2];
+          // const id = url.value.split('/')[url.value.split('/').length - 2];
+          const mediaID = window.location.href.split('=')[window.location.href.split('=').length - 1];
 
 
           // First get media ID, have to fetch from Edpuzzles domain
-          const initRes = await fetch(`https://edpuzzle.com/api/v3/assignments/${id}/attempt`);
-          const initData = await initRes.json();
-          const mediaID = initData.mediaID;
+        //   const initRes = await fetch(`https://edpuzzle.com/api/v3/assignments/${id}/attempt`);
+        //   const initData = await initRes.json();
+        //   const mediaID = initData.mediaID;
 
           submit.innerText = 'Accessing Edpuzzle\'s database...';
 
