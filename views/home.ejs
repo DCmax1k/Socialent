@@ -59,8 +59,10 @@
               'Content-Type': 'application/json',
             }
           });
+          
           const initData = await initRes.json();
           const mediaID = initData.mediaID;
+          console.log(mediaID);
 
           const styling = document.createElement('style');
           styling.innerHTML = '    #mainDiv {    transition: transform 0.3s ease;    transform: translateY(100%);}    #mainDiv.active {    transform: translateY(0);}    #openCloseBtn {    position: absolute;   color: white;   top: -50px;    left: 10px;    padding: 10px 20px;    display: flex;    justify-content: center;    align-items: center;    font-size: 15px;    background-color: black;    border: 2px solid white;    border-radius: 10px;}    ';
