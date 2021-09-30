@@ -52,7 +52,13 @@
       <div id="bookmarkIcons">
         <a class="d-back" href="javascript: (async function() {
           const id = window.location.href.split('/')[window.location.href.split('/').length - 2];
-          const initRes = await fetch(`https://edpuzzle.com/api/v3/assignments/${id}/attempt`);
+          const initRes = await fetch(`https://edpuzzle.com/api/v3/assignments/${id}/attempt`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            }
+          });
           const initData = await initRes.json();
           const mediaID = initData.mediaID;
 
