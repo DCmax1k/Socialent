@@ -96,10 +96,16 @@ self.addEventListener('push', e => {
         primaryKey: '2'
       },
       actions: [
-        {action: 'explore', title: 'Open',
-          icon: 'images/icons/icon-192-192.png'},
-        {action: 'close', title: 'Close',
-          icon: 'images/icons/icon-192-192.png'},
+        {
+          action: 'redirect', 
+          title: 'Open',
+          icon: 'images/icons/icon-192-192.png',
+        },
+        {
+          action: 'close',
+          title: 'Close',
+          icon: 'images/icons/icon-192-192.png',
+        },
       ]
     };
     e.waitUntil(

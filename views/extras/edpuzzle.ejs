@@ -131,20 +131,29 @@
       submit.addEventListener('click', async () => {
           if (url.value.length == 0) return; 
           if (loading) return alert('Already loading...');
-          submit.innerText = 'Accessing Edpuzzle\'s database...';
+          submit.innerText = 'Getting assignment media ID...';
           loading = true;
           title.innerHTML = '';
           thumbnail.src = '';
           questions.innerHTML = '';
           dataHTML.classList.remove('active');
           const id = url.value.split('/')[url.value.split('/').length - 2];
+
+
+          // First get media ID, have to fetch from Edpuzzles domain
+          const initRes = await fetch(`https://edpuzzle.com/api/v3/assignments/${id}/attempt`);
+          const initData = await initRes.json();
+          const mediaID = initData.mediaID;
+
+          submit.innerText = 'Accessing Edpuzzle\'s database...';
+
           const response = await fetch('https://appextras.herokuapp.com/edpuzzle/getdata', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    id,
+                    mediaID,
                 }),
           });
           const data = await response.json();
