@@ -9,7 +9,7 @@ const server = require('../server');
 const socketio = require('socket.io');
 const io = socketio(server);
 
-const { sendMessage, deleteMessage } = require('../routes/messages');
+const { sendMessage, deleteMessage, pushMessage } = require('../routes/messages');
 const { getRoomUsers, joinRoom, leaveRoom  } = require('./messageRooms');
 const { warnUser } = require('../routes/admin');
 const { signon, signoff, getUsersOnline } = require('./currentlyOnline');
@@ -70,6 +70,10 @@ io.on('connection', (socket) => {
     });
     socket.on('updateConversationsWithMessage', ({person, messageData, conversationID, usersIdsInChat}) => {
         io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID, usersIds: usersIdsInChat});
+        const usersOnline = getUsersOnline();
+        if (!usersOnline.includes(person)) {
+            pushMessage(person, messageData);
+        }
     });
     socket.on('updateConversationsWithDeletedMessage', ({person, messageData, conversationID}) => {
         io.to(person).emit('updateConversationsWithDeletedMessage', {messageData, conversationID});

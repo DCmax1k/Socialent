@@ -4,6 +4,11 @@ const router = express.Router();
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
 const jwt = require('jsonwebtoken');
+const push = require('web-push');
+const webPushPublicKey = 'BMYNc0LpoUTcG2Qwg9tHgXDDrPGqYovkmEKDcHeJ_CQZA5X7P_UE5jZrYBsEDK_JgrMMCvE0RhjDvQPzKN-JPI0';
+const webPushPrivateKey = process.env.WEB_PUSH_PRIVATE_KEY;
+
+push.setVapidDetails('mailto:help@socialentapp.com', webPushPublicKey, webPushPrivateKey);
 
 const { getStorage, ref, deleteObject, uploadBytes } = require('firebase/storage');
 const storage = getStorage();
@@ -292,6 +297,20 @@ const sendMessage = async (conversationID, message, usersIdsInChat) => {
     }
 }
 
+// Push message to notifications
+const pushMessage = async (person, message) => {
+    try {
+        const user = (await db.collection('users').where('_id', '==', person).get()).docs[0].data();
+        const messageData = message;
+        if (user.subscription) {
+            const sender = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
+            push.sendNotification(user.subscription, `From ${sender.username}: ${messageData.value}`);
+        }
+    } catch(err) {
+        console.error(err);
+    }
+}
+
 // Save image to db
 router.post('/saveimage', [postAuthToken, upload], async (req, res) => {
     try {
@@ -364,4 +383,5 @@ module.exports = {
     messagesRoute: router,
     sendMessage,
     deleteMessage,
+    pushMessage,
 };

@@ -26,6 +26,9 @@ const userIsTyping = document.getElementById('userIsTyping');
 const usernameTyping = document.getElementById('usernameTyping');
 const currentUsersInChat = document.getElementById('currentUsersInChat');
 const dropdownHeaderUsers = document.getElementById('dropdownHeaderUsers');
+const hideNotiReminder = document.getElementById('hideNotiReminder');
+const notificationReminder = document.getElementById('notificationReminder');
+const subBtn = document.getElementById('subBtn');
 
 let conversationLoaded = '';
 let allConversations = [];
@@ -940,3 +943,19 @@ const animateDots = async () => {
 animateDots();
 
 checkConversations();
+
+subBtn.addEventListener('click', async () => {
+    const res = await subscribe();
+    if (res == 'denied') {
+        notificationReminder.classList.remove('active');
+    } else if (res == 'error') {
+        myAlert('An error occured...');
+    } else if (res == 'success') {
+        notificationReminder.classList.remove('active');
+        myAlert('Notifications are now enabled');
+    }
+})
+
+hideNotiReminder.addEventListener('click', () => {
+    notificationReminder.classList.remove('active');
+});

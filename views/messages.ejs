@@ -34,6 +34,13 @@
         </div>
     </div>
 
+    <!-- Notification reminder -->
+    <div id="notificationReminder">
+        <p>Missing messages? Enable desktop notifications to be notified of new messages!</p>
+        <button id="subBtn">Enable</button>
+        <i id="hideNotiReminder" class="fas fa-times"></i>
+    </div>
+
     <!-- Messages Divider -->
     <div id="messages">
         <i id="conversationLoader" class="fas fa-spinner"></i>
@@ -100,9 +107,12 @@
     </div>
 
 
-
     <%- include('partials/sideNavBar') %> <%- include('partials/footer') %>
-
+    <script>
+        if (Notification.permission == 'default') {
+            document.getElementById('notificationReminder').classList.add('active');
+        }
+    </script>
     <script src="/assets/js/main.js"></script>
     <script src="/assets/js/messages.js"></script>
     

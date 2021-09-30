@@ -85,3 +85,24 @@ workbox.routing.registerRoute(
 //       return cached;
 //     }
 //   }
+
+self.addEventListener('push', e => {
+    var options = {
+      body: e.data.text(),
+      icon: 'images/icons/icon-512-512.png',
+      vibrate: [100, 50, 100],
+      data: {
+        dateOfArrival: Date.now(),
+        primaryKey: '2'
+      },
+      actions: [
+        {action: 'explore', title: 'Open',
+          icon: 'images/icons/icon-192-192.png'},
+        {action: 'close', title: 'Close',
+          icon: 'images/icons/icon-192-192.png'},
+      ]
+    };
+    e.waitUntil(
+      self.registration.showNotification('SOCIALENT MESSAGE!', options)
+    );
+  });

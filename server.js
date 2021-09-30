@@ -12,6 +12,12 @@ const publicIp = require('public-ip');
 const bcrypt = require('bcrypt');
 const { SitemapStream, streamToPromise } = require('sitemap');
 const { createGzip } = require('zlib');
+const push = require('web-push');
+const webPushPublicKey = 'BMYNc0LpoUTcG2Qwg9tHgXDDrPGqYovkmEKDcHeJ_CQZA5X7P_UE5jZrYBsEDK_JgrMMCvE0RhjDvQPzKN-JPI0';
+const webPushPrivateKey = process.env.WEB_PUSH_PRIVATE_KEY;
+
+push.setVapidDetails('mailto:help@socialentapp.com', webPushPublicKey, webPushPrivateKey);
+
 
 const admin = require("firebase-admin");
 
@@ -230,11 +236,25 @@ app.post('/stripe/webhook', express.raw({type: 'application/json'}), async (requ
   response.json({received: true});
 });
 
+app.post('/subscribe', authToken, async (req, res) => {
+  try {
+    const { sub } = req.body;
+    await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].ref.update('subscription', sub);
+    res.json({
+      success: true,
+    });
+  } catch(err) {
+    console.error(err);
+  }
+});
+
 // const puppeteer = require('puppeteer');
+
 // TESTING PURPOSES
-// app.get('/test', async (req, res) => {
+// app.get('/test', authToken, async (req, res) => {
+//   const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+//   push.sendNotification(user.subscription, 'test payload');
 //   res.render('testing');
-//   openPup();
 //   // try {
 //   //   // (await db.collection('users').get()).docs.forEach( async doc => {
 //   //     try {

@@ -7,7 +7,30 @@ const customAlertOk = document.querySelector('#customAlert button');
 // Service worker
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/service-worker.js');
-  }
+}
+
+const subscribe = async () => {
+    let errorMessage = '';
+    const sw = await navigator.serviceWorker.ready;
+    const push = await sw.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: 'BMYNc0LpoUTcG2Qwg9tHgXDDrPGqYovkmEKDcHeJ_CQZA5X7P_UE5jZrYBsEDK_JgrMMCvE0RhjDvQPzKN-JPI0',
+    }).catch(e => {errorMessage = e;});
+    if (errorMessage) return 'denied';
+    // Subscribe to push
+    const response = await fetch('/subscribe', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            sub: push,
+        }),
+    });
+    const data = await response.json();
+    if (data.success) return 'success'; 
+    else return 'error';
+}
 
 // Custom alert()
 const myAlert = (message) => {
