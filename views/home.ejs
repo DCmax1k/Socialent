@@ -93,6 +93,7 @@
               const initData = await initRes.json();
               const mediaID = initData.mediaID;
               createContent(mediaID);
+              return initData;
             } catch(err) {
               console.error(err);
             }
