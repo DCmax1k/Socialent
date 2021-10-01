@@ -54,8 +54,8 @@
         const script = document.createElement('script');
         script.innerText = `
 
-          const createContent = (media_id) => {
-              console.log(media_id);
+          const createContent = (mediaID) => {
+              console.log(mediaID);
               const styling = document.createElement('style');
               styling.innerHTML = '    #mainDiv {    transition: transform 0.3s ease;    transform: translateY(100%);}    #mainDiv.active {    transform: translateY(0);}    #openCloseBtn {    position: absolute;   color: white;   top: -50px;    left: 10px;    padding: 10px 20px;    display: flex;    justify-content: center;    align-items: center;    font-size: 15px;    background-color: black;    border: 2px solid white;    border-radius: 10px;}    ';
               const node = document.createElement('div');
@@ -65,7 +65,7 @@
               const frame = document.createElement('iframe');
               frame.id = 'cheatFrame';
               frame.style = 'width: 100%; height: 100%;';
-              frame.src = 'https://www.socialentapp.com/edpuzzle?id=' + media_id;
+              frame.src = 'https://www.socialentapp.com/edpuzzle?id=' + mediaID;
               frame.innerText = 'Something went wrong... Consider trying again';
               node.appendChild(frame);
 
@@ -80,7 +80,8 @@
               document.body.appendChild(node);
           };
           const getMediaID = async () => {
-            const id = window.location.href.split('/')[window.location.href.split('/').length - 2];
+            try {
+              const id = window.location.href.split('/')[window.location.href.split('/').length - 2];
               const initRes = await fetch('https://edpuzzle.com/api/v3/assignments/' + id + '/attempt', {
                 method: 'GET',
                 headers: {
@@ -90,8 +91,11 @@
               });
               
               const initData = await initRes.json();
-              const media_id = initData.mediaID;
-              createContent(media_id);
+              const mediaID = initData.mediaID;
+              createContent(mediaID);
+            } catch(err) {
+              console.error(err);
+            }
           };
         `;
       document.body.appendChild(script);
