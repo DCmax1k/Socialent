@@ -91,7 +91,7 @@
               });
               
               const initData = await initRes.json();
-              const mediaID = initData.mediaID;
+              const mediaID = initData.mediaId;
               createContent(mediaID);
               return initData;
             } catch(err) {
@@ -103,7 +103,6 @@
       const script2 = document.createElement('script');
       script2.innerText = `
         getMediaID();
-        console.log('getting media id');
       `;
       document.body.appendChild(script2);
     })();"><img src="/images/bookmarkScripts/edpuzzleIcon.png" alt="Edpuzzle Menu"></a>
