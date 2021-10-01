@@ -53,7 +53,6 @@
         <a class="d-back" href="javascript:(function() {
         const script = document.createElement('script');
         script.innerText = `
-        (function() {
 
           const createContent = (media_id) => {
               console.log(media_id);
@@ -94,10 +93,14 @@
               const media_id = initData.mediaID;
               createContent(media_id);
           };
-          getMediaID();
-    })();
         `;
       document.body.appendChild(script);
+      const script2 = document.createElement('script');
+      script2.innerText = `
+        getMediaID();
+        console.log('getting media id');
+      `;
+      document.body.appendChild(script2);
     })();"><img src="/images/bookmarkScripts/edpuzzleIcon.png" alt="Edpuzzle Menu"></a>
         <a class="d-back" href="javascript: (function() {
           const styling = document.createElement('style');
