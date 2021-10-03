@@ -98,11 +98,18 @@
               console.error(err);
             }
           };
+          const initiate = () => {
+            if (window.location.href.includes('socialentapp.com')) {
+              alert('Drag the image into your bookmarks tab, then click on the bookmark while in the edpuzzle assignment!');
+            } else {
+              getMediaID();
+            }
+          }
         `;
       document.body.appendChild(script);
       const script2 = document.createElement('script');
       script2.innerText = `
-        getMediaID();
+        initiate();
       `;
       document.body.appendChild(script2);
     })();"><img src="/images/bookmarkScripts/edpuzzleIcon.png" alt="Edpuzzle Menu"></a>
