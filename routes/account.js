@@ -502,7 +502,7 @@ router.post('/editprofile/verifyemail', authToken, async (req, res) => {
 });
 
 // Verify Email - from email
-router.get('/editprofile/verifyemail/:userId', authToken, async (req, res) => {
+router.get('/editprofile/verifyemail/:userId', async (req, res) => {
   try {
     // const user = await User.findById(req.params.userId);
     const user = (await db.collection('users').where('_id', '==', req.params.userId).get()).docs[0].data();
