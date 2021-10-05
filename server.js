@@ -116,9 +116,10 @@ app.get('/sitemap.xml', async (req, res) => {
 
 
 // Index Route
-app.get('/', authHomeToken, async (req, res) => {
+app.get('/', /*authHomeToken,*/ async (req, res) => {
   // const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-  res.redirect(`/home`);
+  // res.redirect(`/home`);
+  res.render('index');
 });
 
 app.get('/proxy', authToken, async (req, res) => {

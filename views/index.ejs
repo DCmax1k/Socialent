@@ -43,6 +43,13 @@
     
     <%- include('./partials/footer.ejs') %>
     <script src="/assets/js/main.js"></script>
+    <script>
+      // refirect to home if cookis includes auth-token
+      if (document.cookie.includes('auth-token')) {
+        window.location.href = '/';
+      }
+
+    </script>
     
   </body>
 </html>

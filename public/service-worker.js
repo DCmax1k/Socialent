@@ -48,7 +48,7 @@ self.addEventListener('install', async e => {
 self.addEventListener('fetch', async e => {
   e.respondWith(
     caches.match(e.request).then(cacheRes => {
-      return fetch(e.request) || cacheRes;
+      return cacheRes || fetch(e.request);
     })
   );
 });
