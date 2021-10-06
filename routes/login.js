@@ -10,8 +10,8 @@ const bcrypt = require('bcrypt');
 
 // Login page
 router.get('/', authLoginToken, async (req, res) => {
-  const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-  res.redirect(`/home?k=${user._id}`);
+  // const user = await (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+  res.redirect(`/home`);
 });
 
 // Login request

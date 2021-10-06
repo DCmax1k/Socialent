@@ -9,12 +9,10 @@ const cacheName = 'sclnt-cache';
 const staticAssets = [
     '/',
     '/assets/js/forgotpassword.js',
-    '/assets/js/login.js',
     '/assets/js/main.js',
     '/assets/js/signup.js',
     '/assets/css/forgotpassword.css',
     '/assets/css/index.css',
-    '/assets/css/login.css',
     '/assets/css/signup.css',
     '/assets/css/main.css',
     '/images/SocialentTitle.svg',
@@ -27,9 +25,8 @@ const staticAssets = [
     '/agreements/termsofuse',
     '/agreements/privacypolicy',
     '/forgotpassword',
-    '/login',
     '/signup',
-    'socket.io/socket.io.js',
+    '/socket.io/socket.io.js',
 ]
 
 self.addEventListener('install', async e => {
