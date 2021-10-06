@@ -227,9 +227,6 @@ h1 {
 
     transition: opacity 0.3s ease, color 0.3s ease;
 }
-.verifiedCont:hover, .addon:hover  {
-    opacity: 1;
-}
 .verifiedCont.active, .addon.active {
     opacity: 1;
 }
@@ -237,7 +234,7 @@ h1 {
     color: #0f4c75;;
 }
 .addon:hover {
-    color: red;
+    opacity: 1;
 }
 .addon.active {
     color: red;

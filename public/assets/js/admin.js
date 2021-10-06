@@ -51,7 +51,7 @@ verifiedBtns.forEach(btn => {
 addonsBtns.forEach(btn => {
     btn.addEventListener('click', async () => {
         const user = btn.getAttribute('data-user-id');
-        const granted = btn.classList.contains('active') ? 'granted' : 'ungranted';
+        const granted = btn.classList.contains('active') ? true : false;
         btn.classList.toggle('active');
         const response = await fetch('/admin/grantaddons', {
             method: 'POST',
