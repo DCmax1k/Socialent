@@ -1,6 +1,7 @@
 //const socket = io();
 // Join personal room to listen for new conversations
 // socket.emit('joinUserRoom', { userID });
+// done by main.js file now
 
 
 let conversations = document.querySelectorAll('.conversation');
@@ -11,6 +12,7 @@ const addConversationSubmit = document.getElementById('addConversationSubmit');
 const addConversationCancel = document.getElementById('addConversationCancel');
 const addConversationInput = document.getElementById('addConversationInput');
 const messagesList = document.getElementById('messagesList');
+const expandMessagesList = document.getElementById('expandMessagesList');
 const internalMessages = document.getElementById('internalMessages');
 const messageInput = document.querySelector('#messaging > input');
 const sendMessageBtn = document.getElementById('sendMessageBtn');
@@ -47,8 +49,6 @@ let droppeddown = false;
 
 const usersFromDB = {};
 
-// ** NEW CODE **
-
 const formatUsersPrefix = (receiver) => {
     let prefix = '';
     if (receiver.prefix.title) {
@@ -69,6 +69,22 @@ const formatUsersVerified = (receiver) => {
     }
     return verified;
 }
+
+const expandConversations = () => {
+    messagesList.classList.add('expanded');
+    expandMessagesList.classList.add('expanded');
+};
+const unexpandConversations = () => {
+    messagesList.classList.remove('expanded');
+    expandMessagesList.classList.remove('expanded');
+};
+expandMessagesList.addEventListener('click', () => {
+    if (messagesList.classList.contains('expanded')) {
+        unexpandConversations();
+    } else {
+        expandConversations();
+    }
+});
 
 // Listen for new message
 socket.on('message', ({message}) => {
@@ -551,6 +567,7 @@ const clickedConversation = (conversationNode) => {
     const conversationID = conversationNode.getAttribute('data-conversation-id');
     droppeddown == true ? dropdownUsers() : '';
         if (conversationLoaded === conversationID) {
+            expandConversations();
             messageInput.style.visibility = 'hidden';
             sendMessageBtn.style.visibility = 'hidden';
             sendImgBtn.style.visibility = 'hidden';
@@ -567,6 +584,7 @@ const clickedConversation = (conversationNode) => {
             // checkConversations();
             // renderTexts(conversationID);
         } else {
+            unexpandConversations();
             conversation = allConversations.find(conversation => conversation._id === conversationID);
             seeConversation(conversation);
             conversationNode.children[2].classList.remove('active');

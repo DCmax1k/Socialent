@@ -18,7 +18,7 @@ function authToken(req, res, next) {
 
 router.get('/', authToken, async (req, res) => {
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.verified) {
+    if (user.addons.includes('edpuzzle')) {
         res.render('extras/edpuzzle');
     } else {
         res.render('extras/needVerify');

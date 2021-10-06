@@ -76,6 +76,7 @@
             <div class="closeUserControlsUsername"><%= subUser.username %></div>
           </div>
         </div>
+
         <div class="user">
           <div class="profileImgCont">
             <img src="<% if (subUser.profileImg == 'none') { %>/images/profilePlaceholder.svg<% } else { %><%= subUser.profileImg %><% } %>" alt="">
@@ -88,7 +89,10 @@
                 <%= subUser.username %>
               </a>
               <span class="verifiedCont<%= subUser.verified == true ? ' active' : '' %>" data-user-id="<%= subUser._id %>">
-                <img class="verified" src="/images//verified.svg" alt="Verified Logo">
+                <img class="verified" src="/images/verified.svg" alt="Verified Logo">
+              </span>
+              <span class="addon<%= subUser.addons.length !== 0 ? ' active' : '' %>" data-user-id="<%= subUser._id %>">
+                <i class="fab fa-wolf-pack-battalion"></i>
               </span>
             </div>
             

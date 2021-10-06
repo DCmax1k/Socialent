@@ -221,19 +221,27 @@ h1 {
     text-decoration-color: white;
 }
 
-.verifiedCont {
+.verifiedCont, .addon {
     cursor: pointer;
     opacity: 0.1;
 
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, color 0.3s ease;
 }
-.verifiedCont:hover {
+.verifiedCont:hover, .addon:hover  {
     opacity: 1;
 }
-.verifiedCont.active {
+.verifiedCont.active, .addon.active {
     opacity: 1;
 }
-
+.addon {
+    color: #0f4c75;;
+}
+.addon:hover {
+    color: red;
+}
+.addon.active {
+    color: red;
+}
 
 .userNames > .name {
     margin-top: -20px;

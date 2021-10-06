@@ -124,7 +124,7 @@ app.get('/', authHomeToken, async (req, res) => {
 
 app.get('/proxy', authToken, async (req, res) => {
   const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-    if (user.verified) {
+    if (user.addons.includes('proxy')) {
         res.render('extras/proxy', { user: req.user });
     } else {
         res.render('extras/needVerify');
@@ -253,23 +253,23 @@ app.post('/subscribe', authToken, async (req, res) => {
 
 // TESTING PURPOSES
 // app.get('/test', authToken, async (req, res) => {
-//   const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
-//   push.sendNotification(user.subscription, 'test payload');
-//   res.render('testing');
-//   // try {
-//   //   // (await db.collection('users').get()).docs.forEach( async doc => {
-//   //     try {
-//   //       await doc.ref.update({tokens: 0});
-//   //     } catch(err) {
-//   //       console.error(err);
-//   //     }
+//   // const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+//   // push.sendNotification(user.subscription, 'test payload');
+//   // res.render('testing');
+//   try {
+//     (await db.collection('users').get()).docs.forEach( async doc => {
+//       try {
+//         await doc.ref.update({addons: []});
+//       } catch(err) {
+//         console.error(err);
+//       }
       
-//   //   // });
-//   //   res.send('done');
+//     });
+//     res.send('done');
 
-//   // } catch(err) {
-//   //   console.error(err);
-//   // }
+//   } catch(err) {
+//     console.error(err);
+//   }
 // });
 
 

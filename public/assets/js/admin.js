@@ -17,6 +17,7 @@ const prefixs = document.querySelectorAll('.prefix');
 const userContss = document.querySelectorAll('.userCont');
 const searchInput = document.getElementById('searchInput');
 const verifiedBtns = document.querySelectorAll('.verifiedCont');
+const addonsBtns = document.querySelectorAll('.addon');
 const actualNumberOnline = document.getElementById('actualNumberOnline');
 
 socket.on('currentlyOnline', ({usersLength}) => {
@@ -37,6 +38,29 @@ verifiedBtns.forEach(btn => {
             body: JSON.stringify({
                 user: user,
                 verifyOrUnverify,
+            }),
+        });
+        const resJSON = await response.json();
+        if (resJSON.status !== 'success') {
+            myAlert(resJSON.message);
+        }
+    });
+});
+
+// Grant addons
+addonsBtns.forEach(btn => {
+    btn.addEventListener('click', async () => {
+        const user = btn.getAttribute('data-user-id');
+        const granted = btn.classList.contains('active') ? 'granted' : 'ungranted';
+        btn.classList.toggle('active');
+        const response = await fetch('/admin/grantaddons', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user: user,
+                granted,
             }),
         });
         const resJSON = await response.json();

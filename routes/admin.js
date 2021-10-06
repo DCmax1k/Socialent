@@ -65,6 +65,25 @@ router.post('/verify', postAuthToken, async (req, res) => {
   }
 });
 
+// Give addons
+router.post('/grantaddons', postAuthToken, async (req, res) => {
+  try {
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (admin.rank != 'admin' && admin.rank != 'owner') return res.json({status: 'error', message: 'Not ADMIN!'});
+    const user = (await db.collection('users').where('_id', '==', req.body.user).get()).docs[0].data();
+    if (req.body.granted == true) {
+      // Ungrant user
+      await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update({addons: []});
+    } else {
+      // Grant user
+      await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update({addons: ['proxy', 'edpuzzle', 'kahoot']});
+    }
+    res.json({status: 'success', message: 'User verified!'});
+  } catch(err) {
+    console.error(err);
+  }
+});
+
 //Delete user from admin
 const deleteUser = require('../globalFunctions/deleteAccount');
 router.post('/deleteuser', postAuthToken, async (req, res) => {
