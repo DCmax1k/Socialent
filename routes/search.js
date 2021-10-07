@@ -32,7 +32,7 @@ router.post('/getfromapp', postAuthToken, async (req, res) => {
 
 function authToken(req, res, next) {
   const token = req.cookies['auth-token'];
-  if (token == null) return res.redirect('/login');
+  if (token == null) return res.redirect('/login?rd=search');
   jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
       if (err) return res.redirect('/login');
       req.user = user;

@@ -27,7 +27,8 @@ router.post('/getfromapp', postAuthToken, async (req, res) => {
 
 function authToken(req, res, next) {
     const token = req.cookies['auth-token'];
-    if (token == null) return res.sendStatus(401);
+    // if (token == null) return res.sendStatus(401);
+    if (token == null) return res.redirect('/login?rd=admin');
     jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
         if (err) return res.sendStatus(403);
         req.user = user;
