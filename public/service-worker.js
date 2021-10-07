@@ -5,7 +5,7 @@
 //     new workbox.strategies.NetworkFirst() 
 // );
 
-const cacheName = 'sclnt-cache';
+const cacheName = 'sclnt';
 const staticAssets = [
     '/',
     '/assets/js/forgotpassword.js',
@@ -30,6 +30,10 @@ const staticAssets = [
 ]
 
 self.addEventListener('install', async e => {
+
+  caches.delete('news-v1')
+  caches.delete('sclnt-cache');
+
   e.waitUntil(
     caches.open(cacheName).then(cache => {
       return cache.addAll(staticAssets);
