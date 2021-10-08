@@ -69,3 +69,54 @@ const lookupUsername = async (receiverID) => {
 if (location.host.includes('heroku')) {
     location.host = 'www.socialentapp.com';
 }
+
+// Custom install PWA prompt
+let deferredPrompt;
+
+const installApp = () => {
+    hideInstallPromotion();
+    deferredPrompt.prompt();
+    const { outcome } = deferredPrompt.userChoice;
+    console.log(outcome);
+    deferredPrompt = null;
+}
+
+const showInstallPromotion = () => {
+    const node = document.createElement('div');
+    node.id = 'installPromotion';
+    node.classList.add('swipe-up');
+    node.classList.add('b-back');
+    node.addEventListener('click', installApp);
+    node.style = `
+        position: fixed;
+        bottom: -40px;
+        left: 10px;
+        width: fit-content;
+        height: 30px;
+        z-index: 9999;
+        border-radius: 9999px;
+        padding: 6px 10px;
+        font-family: sans-serif;
+        font-size: 15px;
+        color: white;
+        cursor: pointer;
+    `;
+    node.innerHTML = `
+        Install App
+    `;
+    document.body.appendChild(node);
+}
+
+hideInstallPromotion = () => {
+    const node = document.getElementById('installPromotion');
+    node.style = '-100px';
+    setTimeout(() => {
+        node.remove();
+    }, 300);
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showInstallPromotion();
+});

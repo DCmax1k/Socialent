@@ -143,6 +143,19 @@
   width: 13px;
 }
 
+/* animation to swipe down from top */
+.swipe-up {
+  animation: promotionAnimation 0.3s ease forwards 0.5s;
+}
+@keyframes promotionAnimation {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(0, -45px);
+  }
+}
+
 @media screen and (max-width: 430px) {
   .alert {
     width: 95%;
