@@ -72,7 +72,9 @@ io.on('connection', (socket) => {
         io.to(person).emit('updateConversationsWithMessage', {messageData, conversationID, usersIds: usersIdsInChat});
         const usersOnline = getUsersOnline();
         if (!usersOnline.includes(person)) {
-            pushMessage(person, messageData);
+            if (messageData.sender != person) {
+                pushMessage(person, messageData);
+            }
         }
     });
     socket.on('updateConversationsWithDeletedMessage', ({person, messageData, conversationID}) => {

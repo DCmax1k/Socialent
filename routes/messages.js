@@ -302,9 +302,12 @@ const pushMessage = async (person, message) => {
     try {
         const user = (await db.collection('users').where('_id', '==', person).get()).docs[0].data();
         const messageData = message;
-        if (user.subscription) {
-            const sender = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
-            push.sendNotification(user.subscription, `From ${sender.username}: ${messageData.value}`);
+        const sender = (await db.collection('users').where('_id', '==', message.sender).get()).docs[0].data();
+        if (user.subscriptions.length != 0) {
+            user.subscriptions.forEach(sub => {
+                push.sendNotification(sub, `From ${sender.username}: ${messageData.value}`);
+            });
+            
         }
     } catch(err) {
         console.error(err);

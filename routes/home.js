@@ -18,12 +18,12 @@ router.get('/', authToken, async (req, res) => {
       // const user = await User.findById(req.query.k);
       const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
       // const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
-      const currentIP = await publicIp.v4();
-      if (!user.ips ) {
-        await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [currentIP]);
-      } else if (!user.ips.includes(currentIP)) {
-        await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [...user.ips, currentIP]);
-      }
+      // const currentIP = await publicIp.v4();
+      // if (!user.ips ) {
+      //   await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [currentIP]);
+      // } else if (!user.ips.includes(currentIP)) {
+      //   await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('ips', [...user.ips, currentIP]);
+      // }
       // const posts = await Post.find({active: true});
       const posts = (await db.collection('posts').where('active', '==', true).get()).docs.map(doc => doc.data());
       const postsFollowing = [];

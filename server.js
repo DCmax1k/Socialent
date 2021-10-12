@@ -252,14 +252,14 @@ app.post('/subscribe', authToken, async (req, res) => {
 // const puppeteer = require('puppeteer');
 
 // TESTING PURPOSES
-// app.get('/test', authToken, async (req, res) => {
+// app.get('/test', async (req, res) => {
 //   // const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
 //   // push.sendNotification(user.subscription, 'test payload');
 //   // res.render('testing');
 //   try {
 //     (await db.collection('users').get()).docs.forEach( async doc => {
 //       try {
-//         await doc.ref.update({addons: []});
+//         await doc.ref.update('status', admin.firestore.FieldValue.delete());
 //       } catch(err) {
 //         console.error(err);
 //       }
