@@ -16,7 +16,7 @@
       crossorigin="anonymous"
     />
 
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/images/icons/icon-192-192.png">
     <meta name="theme-color" content="#000000"/>
 
@@ -73,7 +73,7 @@
         <div class="open-delete-post-menu">
           <i class="fas fa-ellipsis-h"></i>
         </div>
-        <div data-post-id="<%= post._id %>" class="delete-post-menu">
+        <div data-post-id="<%= post._id %>" class="delete-post-menu" tabindex="-1">
           <div data-post-id="<%= post._id %>" class="edit-post post-menu-item">
             Edit
           </div>
@@ -123,7 +123,7 @@
         </div>
         <% } else { %>
         <a
-          href="/login"
+          href="/login?rd=post/<%= post._id %>"
           style="
             color: #0f4c75;
             position: absolute;

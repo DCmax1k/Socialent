@@ -154,7 +154,7 @@
                 >Follower<%= accountsFollowers.length === 1 ? '' : 's' %></span
               >
 
-              <div id="showFollowers">
+              <div id="showFollowers" tabindex="-1">
                 <% accountsFollowers.forEach(acc => { %>
                   <a class="seeAccountsAcc" href="/account/<%= acc.username %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
                 <% }) %>
@@ -165,7 +165,7 @@
               <%= accountsFollowing.length %>
               <span>Following</span>
 
-              <div id="showFollowing">
+              <div id="showFollowing" tabindex="-1">
                 <% accountsFollowing.forEach(acc => { %>
                   <a class="seeAccountsAcc" href="/account/<%= acc.username %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
                 <% }) %>

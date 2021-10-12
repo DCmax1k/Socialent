@@ -11,7 +11,7 @@ const jwt = require('jsonwebtoken');
 router.get('/:post', async (req, res) => {
   try {
     // const post = await Post.findById(req.params.post);
-    const post = (await db.collection('posts').where('_id', '==', req.params.post).get()).docs[0].data();
+    let post = (await db.collection('posts').where('_id', '==', req.params.post).get()).docs[0].data();
     if (post.active) {
       // const account = await Post.findById(post.author._id);
       const account = (await db.collection('users').where('_id', '==', post.author._id).get()).docs[0].data();

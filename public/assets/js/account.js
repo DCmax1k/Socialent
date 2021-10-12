@@ -38,31 +38,13 @@ const following = document.getElementById('following');
 const lastOnlineDiv = document.getElementById('lastOnlineDiv');
 const openTokens = document.querySelector('#editProfileCont > .heading > h4');
 
-let showingFollowers = false;
-let showingFollowing = false;
 
 followers.addEventListener('click', () => {
-  if (showingFollowers) {
-    showFollowers.classList.remove('active');
-    showingFollowers = false;
-  } else {
-    showFollowers.classList.add('active');
-    showingFollowers = true;
-    showFollowing.classList.remove('active');
-    showingFollowing = false;
-  }
+  showFollowers.focus();
   
 });
 following.addEventListener('click', () => {
-  if (showingFollowing) {
-    showFollowing.classList.remove('active');
-    showingFollowing = false;
-  } else {
-    showFollowing.classList.add('active');
-    showingFollowing = true;
-    showFollowers.classList.remove('active');
-    showingFollowers = false;
-  }
+  showFollowing.focus();
 });
 
 // Follow

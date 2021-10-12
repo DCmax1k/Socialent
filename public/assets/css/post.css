@@ -123,6 +123,7 @@
   border-radius: 5px;
   border: 1px solid rgb(192, 192, 192);
   z-index: 6;
+  outline: none;
 
   pointer-events: none;
   opacity: 0;
@@ -131,7 +132,7 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.delete-post-menu.active {
+.delete-post-menu:focus {
   pointer-events: all;
   opacity: 1;
   transform: translateY(0);

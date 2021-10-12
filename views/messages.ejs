@@ -16,7 +16,7 @@
       crossorigin="anonymous"
     />
 
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <link rel="apple-touch-icon" href="/images/icons/icon-192-192.png">
     <meta name="theme-color" content="#000000"/>
 
@@ -44,14 +44,14 @@
     <!-- Messages Divider -->
     <div id="messages">
         <i id="conversationLoader" class="fas fa-spinner"></i>
-        <div id="addConversationDiv" class="c-back">
+        <div id="addConversationDiv" class="c-back" tabindex="-1">
             <i id="addConversation" class="fas fa-plus"></i> 
             <div id="addConversationInputs">
-            <input placeholder="Username1, Username2..." type="text" id="addConversationInput">
-            <div id="addConversationButtons">
-                <button id="addConversationCancel" class="d-back">Cancel</button> <button id="addConversationSubmit" class="d-back" >Add</button> 
-            </div>   
-           </div>
+                <input placeholder="Username1, Username2..." type="text" id="addConversationInput">
+                <div id="addConversationButtons">
+                    <button id="addConversationCancel" class="d-back">Cancel</button> <button id="addConversationSubmit" class="d-back" >Add</button> 
+                </div>   
+            </div>
 
            <div id="addConversationSuggestions">
                <!-- <div data-username="DCmax1k" class="suggestion">Dcmax1k - Dylan Caldwell</div> -->

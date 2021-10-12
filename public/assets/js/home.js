@@ -34,10 +34,6 @@ const editDescSubmit = document.getElementById('editDescSubmit');
 const bookmarkScripts = document.getElementById('bookmarkScripts');
 const bookmarkScriptsIcon = document.getElementById('bookmarkScriptsIcon');
 
-bookmarkScriptsIcon.addEventListener('click', () => {
-  bookmarkScripts.classList.toggle('active');
-});
-
 // Admin delete post
 
 // Function
@@ -117,7 +113,8 @@ openDeleteMenus.forEach((openDeleteMenu) => {
     const postID = openDeleteMenu.getAttribute('data-post-id');
     deletePostMenus.forEach((deletePostMenu) => {
       if (deletePostMenu.getAttribute('data-post-id') === postID) {
-        deletePostMenu.classList.toggle('active');
+        // deletePostMenu.classList.toggle('active');
+        deletePostMenu.focus();
       }
     });
   });
@@ -344,7 +341,8 @@ viewCommentsBtns.forEach((viewCommentsBtn) => {
     const postID = viewCommentsBtn.getAttribute('data-post-id');
     allCommentsConts.forEach((allCommentsCont) => {
       if (allCommentsCont.getAttribute('data-post-id') === postID) {
-        allCommentsCont.classList.toggle('active');
+        // allCommentsCont.classList.toggle('active');
+        allCommentsCont.focus();
       }
     });
   });

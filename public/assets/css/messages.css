@@ -105,7 +105,7 @@
     min-height: fit-content;
 }
 
-#addConversationDiv.active {
+#addConversationDiv:focus {
     clip-path: circle(75%);
 }
 
@@ -123,7 +123,10 @@
     margin: 5px;
     padding: 5px;
     border: none;
-    display: none;
+    pointer-events: none;
+}
+#addConversationDiv:focus #addConversationInput {
+    pointer-events: all;
 }
 
 #addConversationButtons {

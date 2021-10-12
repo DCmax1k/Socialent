@@ -620,12 +620,14 @@ const clickedConversation = (conversationNode) => {
 const clearString = (string) => string.replace(/,/ig, ' ').replace(/\s+/g, ' ').trim();
 
 addConversation.addEventListener('click', () => {
-    addConversationDiv.classList.toggle('active');
-    addConversationInput.style.display = 'block';
+    // addConversationDiv.classList.toggle('active');
+    // addConversationInput.style.display = 'block';
+    addConversationDiv.focus();
 });
 addConversationCancel.addEventListener('click', () => {
-    addConversationDiv.classList.remove('active');
+    // addConversationDiv.classList.remove('active');
     addConversationInput.value = '';
+    addConversationDiv.blur();
 });
 
 addConversationSubmit.addEventListener('click', async () => {

@@ -1,8 +1,3 @@
-let loggedIn = false;
-if (window.location.href.split('=').length !== 1) {
-  loggedIn = true;
-}
-
 const commentsCont = document.getElementById('commentsCont');
 const shareBtn = document.querySelector('#shareBtn > i');
 const postID = shareBtn.getAttribute('data-post-id');
@@ -79,7 +74,7 @@ shareBtn.addEventListener('click', () => {
 });
 
 // If logged in
-if (loggedIn) {
+if (userID) {
   const likeBtn = document.querySelector('#likeBtn > i');
   const likeBtnText = document.querySelector('#likeBtn > p');
   const commentInput = document.getElementById('commentInput');
@@ -132,7 +127,7 @@ if (loggedIn) {
 
   // Like/unlike post
   likeBtn.addEventListener('click', async () => {
-    if (loggedIn) {
+    if (userID) {
       if (likeBtn.getAttribute('data-post-liked') == 'false') {
         const response = await fetch('/post/likepost', {
           method: 'POST',
@@ -183,8 +178,7 @@ if (loggedIn) {
 }
 
 // If logged in and post is the authors 
-if (loggedIn && userID === document.getElementById('username').getAttribute('data-author-id')) {
-
+if (userID === document.getElementById('username').getAttribute('data-author-id')) {
   const openDeleteMenu = document.querySelector('.open-delete-post-menu');
   const deletePostMenu = document.querySelector('.delete-post-menu');
   const deletePost = document.querySelector('.delete-post');
@@ -197,7 +191,7 @@ if (loggedIn && userID === document.getElementById('username').getAttribute('dat
 
     // Delete post
     openDeleteMenu.addEventListener('click', () => {
-      deletePostMenu.classList.toggle('active');
+      deletePostMenu.focus();
     });
 
     deletePost.addEventListener('click', async () => {
