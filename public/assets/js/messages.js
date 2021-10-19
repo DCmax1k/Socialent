@@ -53,11 +53,11 @@ const formatUsersPrefix = (receiver) => {
     let prefix = '';
     if (receiver.prefix.title) {
         if (receiver.rank === 'owner') {
-            prefix = `<p class="prefix owner" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `
+            prefix = `<p class="prefix owner" style="font-size: 15px;">[${receiver.prefix.title}]</p> `
         } else if (receiver.rank === 'admin') {
-            prefix = `<p class="prefix admin" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `
+            prefix = `<p class="prefix admin" style="font-size: 15px;">[${receiver.prefix.title}]</p> `
         } else {
-            prefix = `<p class="prefix ${receiver.prefix.color}" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `;
+            prefix = `<p class="prefix ${receiver.prefix.color}" style="font-size: 15px;">[${receiver.prefix.title}]</p> `;
         }
     }
     return prefix;
@@ -515,7 +515,7 @@ const dropdownUsers = users => {
             const userNode = document.createElement('a');
             userNode.classList.add('name-link');
             userNode.href = '/account/' + user.username;
-            const prefixHTML = user.prefix.title ? `<span class="prefix ${user.rank} ${user.prefix.color}" style="font-size: 20px;">[${user.prefix.title[0]}]</span> ` : '';
+            const prefixHTML = user.prefix.title ? `<span class="prefix ${user.rank} ${user.prefix.color}" style="font-size: 20px;">[${user.prefix.title}]</span> ` : '';
             const verifiedHTML = user.verified ? ' <img class="verified" src="/images//verified.svg" alt="Verified Logo">' : '';
             const usernameHTML = `<span style="text-decoration: underline;">${user.username}</span>`;
             userNode.innerHTML = prefixHTML + usernameHTML + verifiedHTML;
@@ -753,11 +753,11 @@ addConversationInput.addEventListener('input', async (e) => {
             let prefixHTML = ``;
               if (account.prefix.title) {
                   if (account.rank === 'owner') {
-                    prefixHTML = `<p class="prefix owner">[${account.prefix.title.split('')[0]}]</p>`
+                    prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
                   } else if (account.rank === 'admin') {
-                    prefixHTML = `<p class="prefix admin">[${account.prefix.title.split('')[0]}]</p>`
+                    prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
                   } else {
-                    prefixHTML = `<p class="prefix ${account.prefix.color}">[${account.prefix.title.split('')[0]}]</p>`;
+                    prefixHTML = `<p class="prefix ${account.prefix.color}">[${account.prefix.title}]</p>`;
                   }
               }
             node.innerHTML = 
