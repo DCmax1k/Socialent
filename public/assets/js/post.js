@@ -7,27 +7,27 @@ const authorSpace = document.getElementById('username');
 const descText = document.querySelector('.descText');
 
 // Add prefix to username in author space at top of post
-const addPrefix = async () => {
-  const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
-  const node = document.createElement('p');
-  if (authorUser.prefix.title) {
-    if (authorUser.rank === 'owner') {
-      node.classList.add('prefix', 'owner');
-      node.style.marginLeft = '5px';
-      node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
-    } else if (authorUser.rank === 'admin') {
-      node.classList.add('prefix', 'admin');
-      node.style.marginLeft = '5px';
-      node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
-    } else {
-      node.classList.add('prefix');
-      node.style.marginLeft = '5px';
-      node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
-    }
-  }
-  authorSpace.insertBefore(node, authorSpace.children[1]);
-}
-addPrefix();
+// const addPrefix = async () => {
+//   const authorUser = await lookupUsername(authorSpace.getAttribute('data-author-id'));
+//   const node = document.createElement('p');
+//   if (authorUser.prefix.title) {
+//     if (authorUser.rank === 'owner') {
+//       node.classList.add('prefix', 'owner');
+//       node.style.marginLeft = '5px';
+//       node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
+//     } else if (authorUser.rank === 'admin') {
+//       node.classList.add('prefix', 'admin');
+//       node.style.marginLeft = '5px';
+//       node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
+//     } else {
+//       node.classList.add('prefix');
+//       node.style.marginLeft = '5px';
+//       node.innerHTML = `[${authorUser.prefix.title.split('')[0]}]`;
+//     }
+//   }
+//   authorSpace.insertBefore(node, authorSpace.children[1]);
+// }
+// addPrefix();
 
 const fixDesc = () => {
   let desc = descText.innerText;

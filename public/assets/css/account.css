@@ -142,6 +142,7 @@
   padding: 5px;
   z-index: 10;
   border-radius: 10px;
+  outline: none;
 
   transform: translateY(-5%);
   opacity: 0;
@@ -440,6 +441,42 @@
   padding: 5px;
   font-size: 17px;
   transition: border 0.3s ease;
+}
+
+#changePrefixColorCont {
+  margin-bottom: 50px !important;
+}
+#prefixColorOptions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 200px;
+  margin-top: 20px;
+}
+#prefixColorOptions > .color-option {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 2px;
+}
+#green.color-option {
+  background-color: rgb(49, 129, 85);
+}
+#orange.color-option {
+  background-color: rgb(255, 145, 0);
+}
+#yellow.color-option {
+  background-color: rgb(226, 213, 32);
+}
+#purple.color-option {
+  background-color: rgb(142, 38, 168);
+}
+#pink.color-option {
+  background-color: pink;
+}
+.color-option.selected {
+  box-shadow: 0 0 0 1px #2e2e2e, 0 0 0 3px #3282b8;
 }
 
 #deleteAccount {

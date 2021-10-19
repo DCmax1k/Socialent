@@ -37,6 +37,7 @@ const followers = document.getElementById('followers');
 const following = document.getElementById('following');
 const lastOnlineDiv = document.getElementById('lastOnlineDiv');
 const openTokens = document.querySelector('#editProfileCont > .heading > h4');
+const colorOptions = document.querySelectorAll('.color-option');
 
 
 followers.addEventListener('click', () => {
@@ -487,6 +488,56 @@ if (editProfileBtn) {
       submitEmail.style.color = 'red';
     }
   });
+
+  // Change prefix color
+  const visuallyChangePrefixColor = color => {
+    colorOptions.forEach(option => {
+      if (option.id == color) {
+        option.classList.add('selected');
+      } else {
+        option.classList.remove('selected');
+      }
+    });
+  }
+
+  colorOptions.forEach(option => {
+    option.addEventListener('click', async () => {
+      let oldColor = '';
+      colorOptions.forEach(option => {
+        if (option.classList.contains('selected')) {
+          oldColor = option.id;
+        }
+      });
+      const colorValue = option.id;
+      visuallyChangePrefixColor(colorValue);
+      try {
+        const response = await fetch('/account/prefixcolor', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            color: colorValue,
+          }),
+        });
+        const resJSON = await response.json();
+        if ((resJSON.status != 'success')) {
+          visuallyChangePrefixColor(oldColor);
+          myAlert('An error as occured');
+        } else {
+          const livePrefix = document.querySelector('#nameAndBio > h1 > p.prefix');
+          if (!livePrefix.classList.contains('admin') && !livePrefix.classList.contains('owner')) {
+            console.log(oldColor, colorValue);
+            livePrefix.classList.add(colorValue);
+            livePrefix.classList.remove(oldColor);
+          }
+        }
+      } catch(err) {
+          visuallyChangePrefixColor(oldColor);
+          myAlert('An error as occured');
+      }
+    });
+  })
 
   
 

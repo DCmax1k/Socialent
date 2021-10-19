@@ -62,7 +62,15 @@
               alt="Profile Image"
             />
           </div>
-            
+          <% if (post.author.prefix.title) {%>
+            <%if (post.author.rank === 'owner') {%>
+              <p style="margin-left: 5px; margin-right: -10px;" class="prefix owner">[<%= post.author.prefix.title %>]</p>&nbsp;
+            <%} else if (post.author.rank === 'admin') {%>
+              <p style="margin-left: 5px; margin-right: -10px;" class="prefix admin">[<%= post.author.prefix.title %>]</p>&nbsp;
+            <%} else {%>
+              <p style="margin-left: 5px; margin-right: -10px;" class="prefix <%= post.author.prefix.color %>">[<%= post.author.prefix.title %>]</p>&nbsp;
+            <%}%> 
+          <% } %>
           <h1><%= post.author.username %></h1>
           <% if (post.author.verified) { %>
             <img class="verified" style="margin-left: 5px; height: 12px; width: 12px;" src="/images/verified.svg" alt="verifiedIcon">

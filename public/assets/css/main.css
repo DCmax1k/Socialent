@@ -125,7 +125,6 @@
 } 
 
 .prefix {
-  color: rgb(49, 129, 85);
   font-family: 'Coda Caption', sans-serif !important;
   display: inline;
 }
@@ -136,6 +135,22 @@
 
 .prefix.admin {
   color: rgb(41, 97, 201) !important;
+}
+
+.prefix.green {
+  color: rgb(49, 129, 85);
+}
+.prefix.orange {
+  color: rgb(255, 145, 0);
+}
+.prefix.purple {
+  color: rgb(142, 38, 168);
+}
+.prefix.yellow {
+  color: rgb(226, 213, 32);
+}
+.prefix.pink {
+  color: pink;
 }
 
 .verified {

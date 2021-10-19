@@ -85,7 +85,7 @@
           <div class="userNames">
             <div class="username">
               <a href="/account/<%= subUser.username %>" class="usernameLink">
-                <div data-user-id="<%= subUser._id %>" class="prefix <% if (subUser.rank != 'user') {%><%= subUser.rank %><%}%>" ><% if (subUser.prefix.title) { %>[<%= subUser.prefix.title %>]<% } %></div>
+                <div data-user-id="<%= subUser._id %>" class="prefix <%= subUser.prefix.color %> <% if (subUser.rank != 'user') {%><%= subUser.rank %><%}%>" ><% if (subUser.prefix.title) { %>[<%= subUser.prefix.title %>]<% } %></div>
                 <%= subUser.username %>
               </a>
               <span class="verifiedCont<%= subUser.verified == true ? ' active' : '' %>" data-user-id="<%= subUser._id %>">

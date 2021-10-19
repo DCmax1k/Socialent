@@ -103,9 +103,10 @@
     clip-path: circle(14px at 14px 14px);
     transition: clip-path 0.3s ease;
     min-height: fit-content;
+    outline: none;
 }
 
-#addConversationDiv:focus {
+#addConversationDiv.active {
     clip-path: circle(75%);
 }
 

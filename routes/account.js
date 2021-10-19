@@ -651,4 +651,23 @@ router.post('/editprofile/updatebio', authToken, async (req, res) => {
   }
 });
 
+// Set users prefix color
+router.post('/prefixcolor', authToken, async (req, res) => {
+  try {
+
+    const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+
+      const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.color', req.body.color);
+      // Change prefix color on all posts
+      (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
+        await doc.ref.update('author.prefix.color', req.body.color);
+      })
+      res.json({
+        status: 'success',
+      });
+  } catch(err) {
+    console.error(err);
+  }
+})
+
 module.exports = router;

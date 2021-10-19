@@ -57,7 +57,7 @@ const formatUsersPrefix = (receiver) => {
         } else if (receiver.rank === 'admin') {
             prefix = `<p class="prefix admin" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `
         } else {
-            prefix = `<p class="prefix" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `;
+            prefix = `<p class="prefix ${receiver.prefix.color}" style="font-size: 15px;">[${receiver.prefix.title.split('')[0]}]</p> `;
         }
     }
     return prefix;
@@ -515,7 +515,7 @@ const dropdownUsers = users => {
             const userNode = document.createElement('a');
             userNode.classList.add('name-link');
             userNode.href = '/account/' + user.username;
-            const prefixHTML = user.prefix.title ? `<span class="prefix ${user.rank}" style="font-size: 20px;">[${user.prefix.title[0]}]</span> ` : '';
+            const prefixHTML = user.prefix.title ? `<span class="prefix ${user.rank} ${user.prefix.color}" style="font-size: 20px;">[${user.prefix.title[0]}]</span> ` : '';
             const verifiedHTML = user.verified ? ' <img class="verified" src="/images//verified.svg" alt="Verified Logo">' : '';
             const usernameHTML = `<span style="text-decoration: underline;">${user.username}</span>`;
             userNode.innerHTML = prefixHTML + usernameHTML + verifiedHTML;
@@ -622,12 +622,12 @@ const clearString = (string) => string.replace(/,/ig, ' ').replace(/\s+/g, ' ').
 addConversation.addEventListener('click', () => {
     // addConversationDiv.classList.toggle('active');
     // addConversationInput.style.display = 'block';
-    addConversationDiv.focus();
+    addConversationDiv.classList.toggle('active');
 });
 addConversationCancel.addEventListener('click', () => {
     // addConversationDiv.classList.remove('active');
     addConversationInput.value = '';
-    addConversationDiv.blur();
+    addConversationDiv.classList.remove('active');
 });
 
 addConversationSubmit.addEventListener('click', async () => {
@@ -757,7 +757,7 @@ addConversationInput.addEventListener('input', async (e) => {
                   } else if (account.rank === 'admin') {
                     prefixHTML = `<p class="prefix admin">[${account.prefix.title.split('')[0]}]</p>`
                   } else {
-                    prefixHTML = `<p class="prefix">[${account.prefix.title.split('')[0]}]</p>`;
+                    prefixHTML = `<p class="prefix ${account.prefix.color}">[${account.prefix.title.split('')[0]}]</p>`;
                   }
               }
             node.innerHTML = 

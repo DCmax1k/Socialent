@@ -49,6 +49,7 @@
         <h4>Tokens: <%= user.tokens %></h4>
       </div>
       <div class="editProfileContBody">
+
         <div id="changeUserCont">
           <i id="selectUser" class="pencil c fas fa-pencil-alt"></i>
           <i
@@ -97,6 +98,14 @@
           </div>
           <button class="d-back" id="verifyEmailBtn">Verify Email</button>
         </div>
+
+        <div id="changePrefixColorCont">
+          <h3>Change Prefix Color: <span style="color: rgb(0, 183, 255);">FREE FOR A LIMITED TIME!</span></h3>
+          <div id="prefixColorOptions">
+            <span id="green" class="color-option <%= user.prefix.color == 'green' ? 'selected' : '' %>"></span><span id="orange" class="color-option <%= user.prefix.color == 'orange' ? 'selected' : '' %>"></span><span id="yellow" class="color-option <%= user.prefix.color == 'yellow' ? 'selected' : '' %>"></span><span id="purple" class="color-option <%= user.prefix.color == 'purple' ? 'selected' : '' %>"></span><span id="pink" class="color-option <%= user.prefix.color == 'pink' ? 'selected' : '' %>"></span>
+          </div>
+        </div>
+
         <div id="bioCont">
           <h1>Bio <button class="c-back d" id="updateBio">Update</button></h1>
           <textarea id="bio"><%= JSON.stringify(user.description) %> </textarea>
@@ -156,7 +165,7 @@
 
               <div id="showFollowers" tabindex="-1">
                 <% accountsFollowers.forEach(acc => { %>
-                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%> <%= acc.prefix.color %>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
                 <% }) %>
               </div>
             </div>
@@ -167,7 +176,7 @@
 
               <div id="showFollowing" tabindex="-1">
                 <% accountsFollowing.forEach(acc => { %>
-                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
+                  <a class="seeAccountsAcc" href="/account/<%= acc.username %>"><img class="showAccountsProfileImg" src="<% if (acc.profileImg === 'none') { %>/images/profilePlaceholder.svg<% } else  {%><%= acc.profileImg %><% } %>" alt="Profile Img">&nbsp;<% if (acc.prefix.title) {%><p class="prefix <% if (acc.rank === 'owner') {%>owner<%} else if (acc.rank === 'admin') {%>admin<%}%> <%= acc.prefix.color %>">[<%= acc.prefix.title.slice(0,1) %>]</p>&nbsp;<% } %><%= acc.username %></a>
                 <% }) %>
               </div>
             </div>
@@ -181,7 +190,7 @@
                   <% } else if (account.rank === 'admin') { %>
                     <p class="prefix admin name">[<%= account.prefix.title %>]</p>
                   <% } else { %>
-                    <p class="prefix name">[<%= account.prefix.title %>]</p>
+                    <p class="prefix <%= account.prefix.color %> name">[<%= account.prefix.title %>]</p>
                   <% } %>
                 <% } %>
                 <p><%= account.name %></p>
