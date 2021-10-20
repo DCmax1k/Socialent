@@ -169,9 +169,9 @@
           </div>  
             <% if (post.author.prefix.title) {%>
               <%if (post.author.rank === 'owner') {%>
-                <p class="prefix owner">[<%= post.author.prefix.title %>]</p>&nbsp;
+                <p class="prefix <%= post.author.prefix.color %> owner">[<%= post.author.prefix.title %>]</p>&nbsp;
               <%} else if (post.author.rank === 'admin') {%>
-                <p class="prefix admin">[<%= post.author.prefix.title %>]</p>&nbsp;
+                <p class="prefix <%= post.author.prefix.color %> admin">[<%= post.author.prefix.title %>]</p>&nbsp;
               <%} else {%>
                 <p class="prefix <%= post.author.prefix.color %>">[<%= post.author.prefix.title %>]</p>&nbsp;
               <%}%> 

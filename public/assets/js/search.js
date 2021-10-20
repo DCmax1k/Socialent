@@ -48,9 +48,9 @@ const renderSearchResults = (results, query) => {
     let prefixHTML = ``;
     if (account.prefix.title) {
         if (account.rank === 'owner') {
-          prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
+          prefixHTML = `<p class="prefix ${account.prefix.color} owner">[${account.prefix.title}]</p>`
         } else if (account.rank === 'admin') {
-          prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
+          prefixHTML = `<p class="prefix ${account.prefix.color} admin">[${account.prefix.title}]</p>`
         } else {
           prefixHTML = `<p class="prefix ${account.prefix.color}">[${account.prefix.title}]</p>`;
         }

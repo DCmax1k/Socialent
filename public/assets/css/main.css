@@ -129,14 +129,20 @@
   display: inline;
 }
 
-.prefix.owner {
-  color: red !important;
-}
+/* .prefix.owner {
+  color: red;
+} */
 
-.prefix.admin {
+/* .prefix.admin {
   color: rgb(41, 97, 201) !important;
-}
+} */
 
+.prefix.red {
+  color: red;
+}
+.prefix.blue {
+  color: rgb(41, 97, 201);
+}
 .prefix.green {
   color: rgb(49, 129, 85);
 }
@@ -151,6 +157,11 @@
 }
 .prefix.pink {
   color: pink;
+}
+.prefix.rainbow {
+  background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
 .verified {

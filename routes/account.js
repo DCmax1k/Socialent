@@ -656,6 +656,8 @@ router.post('/prefixcolor', authToken, async (req, res) => {
   try {
 
     const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (req.body.color == 'rainbow' && user.rank != 'owner') return res.json({status: 'rainbow is reserved for the owner'});
+    if (req.body.color == 'blue' && user.rank != 'owner' && user.rank != 'admin') return res.json({status: 'blue is reserved for admins'});
 
       const updateUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.color', req.body.color);
       // Change prefix color on all posts

@@ -448,9 +448,6 @@
 }
 #prefixColorOptions {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 200px;
   margin-top: 20px;
 }
 #prefixColorOptions > .color-option {
@@ -459,6 +456,7 @@
   border-radius: 50%;
   cursor: pointer;
   padding: 2px;
+  margin-right: 20px;
 }
 #green.color-option {
   background-color: rgb(49, 129, 85);
@@ -474,6 +472,15 @@
 }
 #pink.color-option {
   background-color: pink;
+}
+#blue.color-option {
+  background-color: rgb(41, 97, 201);
+}
+#red.color-option {
+  background-color: red;
+}
+#rainbow.color-option {
+  background-image: linear-gradient(to right, red, orange, yellow, green, blue, indigo, violet);
 }
 .color-option.selected {
   box-shadow: 0 0 0 1px #2e2e2e, 0 0 0 3px #3282b8;

@@ -64,9 +64,9 @@
           </div>
           <% if (post.author.prefix.title) {%>
             <%if (post.author.rank === 'owner') {%>
-              <p style="margin-left: 5px; margin-right: -10px;" class="prefix owner">[<%= post.author.prefix.title %>]</p>&nbsp;
+              <p style="margin-left: 5px; margin-right: -10px;" class="prefix <%= account.prefix.color %> owner">[<%= post.author.prefix.title %>]</p>&nbsp;
             <%} else if (post.author.rank === 'admin') {%>
-              <p style="margin-left: 5px; margin-right: -10px;" class="prefix admin">[<%= post.author.prefix.title %>]</p>&nbsp;
+              <p style="margin-left: 5px; margin-right: -10px;" class="prefix <%= account.prefix.color %> admin">[<%= post.author.prefix.title %>]</p>&nbsp;
             <%} else {%>
               <p style="margin-left: 5px; margin-right: -10px;" class="prefix <%= post.author.prefix.color %>">[<%= post.author.prefix.title %>]</p>&nbsp;
             <%}%> 

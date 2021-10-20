@@ -102,7 +102,18 @@
         <div id="changePrefixColorCont">
           <h3>Change Prefix Color: <span style="color: rgb(0, 183, 255);">FREE FOR A LIMITED TIME!</span></h3>
           <div id="prefixColorOptions">
-            <span id="green" class="color-option <%= user.prefix.color == 'green' ? 'selected' : '' %>"></span><span id="orange" class="color-option <%= user.prefix.color == 'orange' ? 'selected' : '' %>"></span><span id="yellow" class="color-option <%= user.prefix.color == 'yellow' ? 'selected' : '' %>"></span><span id="purple" class="color-option <%= user.prefix.color == 'purple' ? 'selected' : '' %>"></span><span id="pink" class="color-option <%= user.prefix.color == 'pink' ? 'selected' : '' %>"></span>
+            <span id="red" class="color-option <%= user.prefix.color == 'red' ? 'selected' : '' %>"></span>
+            <span id="orange" class="color-option <%= user.prefix.color == 'orange' ? 'selected' : '' %>"></span>
+            <span id="yellow" class="color-option <%= user.prefix.color == 'yellow' ? 'selected' : '' %>"></span>
+            <span id="green" class="color-option <%= user.prefix.color == 'green' ? 'selected' : '' %>"></span>
+            <span id="purple" class="color-option <%= user.prefix.color == 'purple' ? 'selected' : '' %>"></span>
+            <span id="pink" class="color-option <%= user.prefix.color == 'pink' ? 'selected' : '' %>"></span>
+            <% if (user.rank == 'admin' || user.rank == 'owner') { %>
+              <span id="blue" class="color-option <%= user.prefix.color == 'blue' ? 'selected' : '' %>"></span>
+            <% } %>
+            <% if (user.rank == 'owner') { %>
+              <span id="rainbow" class="color-option <%= user.prefix.color == 'rainbow' ? 'selected' : '' %>"></span>
+            <% } %>
           </div>
         </div>
 
@@ -186,9 +197,9 @@
               <h1>
                 <% if (account.prefix.title) { %>
                   <% if (account.rank === 'owner') { %>
-                    <p class="prefix owner name">[<%= account.prefix.title %>]</p>
+                    <p class="prefix <%= account.prefix.color %> owner name">[<%= account.prefix.title %>]</p>
                   <% } else if (account.rank === 'admin') { %>
-                    <p class="prefix admin name">[<%= account.prefix.title %>]</p>
+                    <p class="prefix <%= account.prefix.color %> admin name">[<%= account.prefix.title %>]</p>
                   <% } else { %>
                     <p class="prefix <%= account.prefix.color %> name">[<%= account.prefix.title %>]</p>
                   <% } %>

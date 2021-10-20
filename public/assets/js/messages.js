@@ -53,9 +53,9 @@ const formatUsersPrefix = (receiver) => {
     let prefix = '';
     if (receiver.prefix.title) {
         if (receiver.rank === 'owner') {
-            prefix = `<p class="prefix owner" style="font-size: 15px;">[${receiver.prefix.title}]</p> `
+            prefix = `<p class="prefix ${receiver.prefix.color} owner" style="font-size: 15px;">[${receiver.prefix.title}]</p> `
         } else if (receiver.rank === 'admin') {
-            prefix = `<p class="prefix admin" style="font-size: 15px;">[${receiver.prefix.title}]</p> `
+            prefix = `<p class="prefix ${receiver.prefix.color} admin" style="font-size: 15px;">[${receiver.prefix.title}]</p> `
         } else {
             prefix = `<p class="prefix ${receiver.prefix.color}" style="font-size: 15px;">[${receiver.prefix.title}]</p> `;
         }
@@ -753,9 +753,9 @@ addConversationInput.addEventListener('input', async (e) => {
             let prefixHTML = ``;
               if (account.prefix.title) {
                   if (account.rank === 'owner') {
-                    prefixHTML = `<p class="prefix owner">[${account.prefix.title}]</p>`
+                    prefixHTML = `<p class="prefix ${account.prefix.color} owner">[${account.prefix.title}]</p>`
                   } else if (account.rank === 'admin') {
-                    prefixHTML = `<p class="prefix admin">[${account.prefix.title}]</p>`
+                    prefixHTML = `<p class="prefix ${account.prefix.color} admin">[${account.prefix.title}]</p>`
                   } else {
                     prefixHTML = `<p class="prefix ${account.prefix.color}">[${account.prefix.title}]</p>`;
                   }

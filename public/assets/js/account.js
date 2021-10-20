@@ -526,11 +526,8 @@ if (editProfileBtn) {
           myAlert('An error as occured');
         } else {
           const livePrefix = document.querySelector('#nameAndBio > h1 > p.prefix');
-          if (!livePrefix.classList.contains('admin') && !livePrefix.classList.contains('owner')) {
-            console.log(oldColor, colorValue);
-            livePrefix.classList.add(colorValue);
-            livePrefix.classList.remove(oldColor);
-          }
+          livePrefix.classList.add(colorValue);
+          livePrefix.classList.remove(oldColor);
         }
       } catch(err) {
           visuallyChangePrefixColor(oldColor);

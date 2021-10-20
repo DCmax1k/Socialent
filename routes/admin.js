@@ -184,9 +184,11 @@ router.post('/demo', postAuthToken, async (req, res) => {
     if ((admin.rank == 'owner' && user.rank == 'user') || (admin.rank == 'admin' && user.rank == 'user') || (admin.rank == 'owner' && user.rank == 'admin')) {
 
       const demoteUser = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('rank', 'user');
+      if (user.prefix.color == 'blue') await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.color', 'green');
       // change posts ranks
       (await db.collection('posts').where('author._id', '==', user._id).get()).docs.forEach(async doc => {
         await doc.ref.update('author.rank', 'user');
+        if (user.prefix.color == 'blue') await doc.ref.update('author.prefix.color', 'green');
       })
       if (user.prefix.title == 'Admin') {
         const setPrefix = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('prefix.title', '');  
