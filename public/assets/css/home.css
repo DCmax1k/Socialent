@@ -27,7 +27,7 @@
   outline: none;
 }
 
-#bookmarkScripts:focus {
+#bookmarkScripts.active {
   clip-path: circle(120% at 88.5% 29%);
 }
 

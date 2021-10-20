@@ -34,6 +34,10 @@ const editDescSubmit = document.getElementById('editDescSubmit');
 const bookmarkScripts = document.getElementById('bookmarkScripts');
 const bookmarkScriptsIcon = document.getElementById('bookmarkScriptsIcon');
 
+bookmarkScriptsIcon.addEventListener('click', () => {
+    bookmarkScripts.classList.toggle('active');
+});
+
 // Admin delete post
 
 // Function
