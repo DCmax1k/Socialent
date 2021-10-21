@@ -69,7 +69,7 @@
           const createContent = (mediaID) => {
               console.log(mediaID);
               const styling = document.createElement('style');
-              styling.innerHTML = '    #mainDiv {    transition: transform 0.3s ease;    transform: translateY(100%);}    #mainDiv.active {    transform: translateY(0);}    #openCloseBtn {    position: absolute;   color: white;   top: -50px;    left: 10px;    padding: 10px 20px;    display: flex;    justify-content: center;    align-items: center;    font-size: 15px;    background-color: black;    border: 2px solid white;    border-radius: 10px;}    ';
+              styling.innerHTML = '    #mainDiv {    transition: transform 0.3s ease;    transform: translateY(100%);}    #mainDiv.active {    transform: translateY(0);}    #openCloseBtn {    position: absolute;   color: white;   top: -50px;    left: 10px;    padding: 10px 20px;    display: flex;    justify-content: center;    align-items: center;    font-size: 15px;    background-color: black;    border: 2px solid white;    border-radius: 10px;    z-index: 99999;}    ';
               const node = document.createElement('div');
               node.id = 'mainDiv';
               node.style = 'width: 100%; height: 90%; position: fixed; bottom: 0; left: 0; background-color: white; z-index: 100;';
@@ -127,7 +127,7 @@
     })();"><img src="/images/bookmarkScripts/edpuzzleIcon.png" alt="Edpuzzle Menu"></a>
         <a class="d-back" href="javascript: (function() {
           const styling = document.createElement('style');
-          styling.innerHTML = '    #mainDiv {    transition: transform 0.3s ease;    transform: translateY(100%);}    #mainDiv.active {    transform: translateY(0);}    #openCloseBtn {    position: absolute;   color: white;   top: -50px;    left: 10px;    padding: 10px 20px;    display: flex;    justify-content: center;    align-items: center;    font-size: 15px;    background-color: black;    border: 2px solid white;    border-radius: 10px;}    ';
+          styling.innerHTML = '    #mainDiv {    transition: transform 0.3s ease;    transform: translateY(100%);}    #mainDiv.active {    transform: translateY(0);}    #openCloseBtn {    position: absolute;   color: white;   top: -50px;    left: 10px;    padding: 10px 20px;    display: flex;    justify-content: center;    align-items: center;    font-size: 15px;    background-color: black;    border: 2px solid white;    border-radius: 10px;    z-index: 99999;}    ';
           const node = document.createElement('div');
           node.id = 'mainDiv';
           node.style = 'width: 100%; height: 90%; position: fixed; bottom: 0; left: 0; background-color: white; z-index: 100;';
@@ -141,7 +141,46 @@
           document.getElementsByTagName('head')[0].appendChild(styling);
           node.appendChild(btnNode);
           document.body.appendChild(node);
-      }; test();"><img src="/images/bookmarkScripts/kahootIcon.png" alt="Kahoot Menu"></a>
+      })();"><img src="/images/bookmarkScripts/kahootIcon.png" alt="Kahoot Menu"></a>
+      <a class="d-back" href="javascript: ( async function() {
+        if (window.location.href.split('/')[3] != 'vocabulary') return alert('ALERT! This cheat currently only works for vocabulary assignments. Verb conjugations are not YET supported...');
+        const cjgmosId = window.location.href.split('/')[window.location.href.split('/').length - 1];
+        const response = await fetch(`https://conjuguemos.com/vocabulary/vocab_chart/${cjgmosId}`);
+        const data = await response.text();
+        var parser = new DOMParser();
+        var doc = parser.parseFromString(data, 'text/html');
+        const cusAnswers = [];
+        const started = true;
+        doc.querySelectorAll('table.table > tbody > tr').forEach(row => {
+          const answer = [];
+          row.querySelectorAll('td').forEach(key => answer.push(key.innerText.slice(3)));
+          cusAnswers.push(answer);
+        });
+        const insertAnswer = (question) => {
+          const answer = cusAnswers.find(answer => answer[0] == question);
+          if (answer) {
+            document.getElementById('answer-input').value = answer[1];
+            document.getElementById('answer-input').focus();
+          } else {
+            document.getElementById('answer-input').value = answer[0];
+            document.getElementById('answer-input').focus();
+          }
+        };
+
+        insertAnswer(document.getElementById('question-input').innerText);
+
+        alert('INSTRUCTIONS: Just keep pressing ENTER. You can even just hold it...lol');
+        alert('REMINDER: Teachers can see the amount of time you took to complete an assignment, so after using this cheat you can let your compter sit for a couple minutes so nothing looks sus...');
+        window.addEventListener('keydown', (e) => {
+          if (e.key == 'Enter') {
+            if (!started) return;
+            setTimeout(() => {
+              insertAnswer(document.getElementById('question-input').innerText);
+            }, 1);
+          }
+        }); 
+
+      })();"><img src="/images/bookmarkScripts/cjgmosIcon.png" alt="Conjuguemos Menu"></a>
       
       </div>
     </div>

@@ -257,10 +257,15 @@ app.post('/subscribe', authToken, async (req, res) => {
 //   // push.sendNotification(user.subscription, 'test payload');
 //   // res.render('testing');
 //   try {
-//     (await db.collection('posts').get()).docs.forEach( async doc => {
+//     (await db.collection('users').get()).docs.forEach( async doc => {
 //       try {
-//         const author = (await db.collection('users').where('_id', '==', doc.data().author._id).get()).docs[0].data();
-//         await doc.ref.update('author.prefix', author.prefix);
+//         const user = doc.data();
+//         if (user.addons.length != 0) {
+//           const addons = user.addons;
+//           addons.push('cjgmos');
+//           // update
+//           await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('addons', addons);
+//         }
 //       } catch(err) {
 //         console.error(err);
 //       }

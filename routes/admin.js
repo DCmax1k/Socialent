@@ -77,7 +77,7 @@ router.post('/grantaddons', postAuthToken, async (req, res) => {
       await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update({addons: []});
     } else {
       // Grant user
-      await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update({addons: ['proxy', 'edpuzzle', 'kahoot']});
+      await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update({addons: ['proxy', 'edpuzzle', 'kahoot', 'cjgmos']});
     }
     res.json({status: 'success', message: 'User verified!'});
   } catch(err) {
