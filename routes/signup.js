@@ -32,7 +32,7 @@ router.post('/', async (req, res) => {
         username: req.body.username,
         password: hashedPassword,
         score: 0,
-        prefix: { title: ''},
+        prefix: { title: '', color: 'green' },
         rank: 'user',
         profileImg: 'none',
         description: '',
@@ -42,6 +42,10 @@ router.post('/', async (req, res) => {
         lastOnline: Date.now(),
         ips: [currentIP],
         verified: false,
+        addons: [],
+        subscriptions: [],
+        tokens: 0,
+
       };
       const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
       const accessToken = jwt.sign({_id: newID, username: createUserData.username, name: createUserData.name}, process.env.ACCESS_SECRET, { expiresIn: '1d'});
