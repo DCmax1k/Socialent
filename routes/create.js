@@ -94,6 +94,7 @@ router.post('/createpost', [postAuthToken, upload], async (req, res) => {
           rank: user.rank,
           prefix: {
             title: user.prefix.title,
+            color: user.prefix.color,
           },
         },
         url: url,

@@ -581,7 +581,7 @@ router.post('/editprofile/changeuser', authToken, async (req, res) => {
           username: req.body.username,
           password: user.password,
           score: user.score,
-          prefix: { title: user.prefix.title },
+          prefix: { title: user.prefix.title, color: 'green' },
           status: user.status,
           rank: user.rank,
           profileImg: user.profileImg,

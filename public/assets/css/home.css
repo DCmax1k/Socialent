@@ -138,6 +138,7 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 50px;
+  width: calc(100% - 150px);
 }
 
 .all-posts * {
@@ -149,16 +150,18 @@
 }
 
 .post-cont {
-  width: 300px;
+  width: 100%;
   position: relative;
   background-color: white;
   margin: 5px;
+  border-radius: 10px;
 }
 
 .author {
   border-left: 0.5px solid #cbcbcb;
   border-top: 0.5px solid #cbcbcb;
   border-right: 0.5px solid #cbcbcb;
+  border-radius: 10px 10px 0 0;
   height: 40px;
   width: 100%;
   display: flex;
@@ -245,8 +248,6 @@
 }
 
 .post-img {
-  width: 100%;
-  max-height: 300px;
   background-color: #2e2e2e;
   overflow: hidden;
   display: flex;
@@ -257,8 +258,10 @@
 
 .post-img > img,
 .post-img > video {
-  width: 100%;
   z-index: 4;
+  width: 100%;
+  max-height: 100vh;
+  object-fit: contain;
 }
 
 .post-img > .play-btn {
@@ -371,6 +374,7 @@
   height: 30px;
   width: 100%;
   border: 1px solid #c4c4c4;
+  border-radius: 10px;
 }
 
 .add-comment > input {
@@ -380,6 +384,7 @@
   padding: 8px;
   font-size: 10px;
   border: none;
+  border-radius: 10px;
 }
 
 .add-comment > i {
@@ -555,13 +560,13 @@
   .all-posts {
     top: 40px;
   }
-}
-
-@media screen and (max-width: 310px) {
   .all-posts {
     width: 100%;
+    left: 0;
+    transform: none;
   }
   .post-cont {
     width: 100%;
   }
 }
+
