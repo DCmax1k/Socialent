@@ -43,7 +43,7 @@
                         newURL = arr.join('');
                     }
                     const extWindow = window.open(`about:blank`, 'Loading...', 'top=50, left=50, height=600, width=800');
-                    const iFrameHTML = `<iframe src='https://soc4-proxy.herokuapp.com/prox/?url=${btoa(newURL)}' style='width: 100%; height: 100%; border: none;'></iframe>`;
+                    const iFrameHTML = `<iframe src='https://soc5-proxy.herokuapp.com/prox/?url=${btoa(newURL)}' style='width: 100%; height: 100%; border: none;'></iframe>`;
                     const styleHTML = `<style> * { margin: 0; padding: 0; box-sizing: border-box; } </style>`;
                     const scriptHTML = `<script> window.onbeforeunload = function() { return 'TESTING'; } </script>`;
                     extWindow.document.open();
