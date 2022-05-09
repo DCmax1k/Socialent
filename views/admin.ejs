@@ -46,8 +46,11 @@
     <% allUsers.sort((a, b) => a.dateJoined - b.dateJoined).forEach((subUser, i) => { %>
       <div data-user-id="<%= subUser._id %>" class="userCont<% if (subUser.rank != 'user') {%> <%= subUser.rank %>BG<% } %>">
         <div data-user-id="<%= subUser._id %>" class="userControls">
-
-          <div data-user-id="<%= subUser._id %>" data-user-username="<%= subUser.username %>" class="deleteUser <% if (subUser.rank == 'owner' || user.rank != 'owner') {%>na<% } %>"><i class="fas fa-user-times"></i></div>
+          <div class="leftBtns">
+            <div data-user-id="<%= subUser._id %>" data-user-username="<%= subUser.username %>" class="deleteUser <% if (subUser.rank == 'owner' || user.rank != 'owner') {%>na<% } %>"><i class="fas fa-user-times"></i></div>
+            <div data-user-id="<%= subUser._id %>" data-user-username="<%= subUser.username %>" class="changeUserPass <% if (subUser.rank == 'owner' || user.rank != 'owner') {%>na<% } %>"><i class="fas fa-key"></i></div>
+          </div>
+          
           <div class="warnCont">
             <input placeholder="Warn:" data-user-id="<%= subUser._id %>" type="text" class="warnInput"></input>
             <div class="warnText textUnderBtns">

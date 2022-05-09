@@ -16,7 +16,11 @@ const storage = getStorage();
 router.get('/', authToken, async (req, res) => {
   try {
       // const user = await User.findById(req.query.k);
-      const user = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+      const preUser = (await db.collection('users').where('_id', '==', req.user._id).get()).docs;
+      if (!preUser.length) {
+        return res.cookie('auth-token', null).redirect('/login');
+      }
+      const user = preUser[0].data();
       // const setLastOnline = await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('lastOnline', Date.now());
       // const currentIP = await publicIp.v4();
       // if (!user.ips ) {

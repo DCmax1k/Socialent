@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const firebase_admin = require('firebase-admin');
 const db = firebase_admin.firestore();
+const bcrypt = require('bcrypt');
 
 router.get('/', authToken, async (req, res) => {
     try {
@@ -84,6 +85,19 @@ router.post('/grantaddons', postAuthToken, async (req, res) => {
     console.error(err);
   }
 });
+
+router.post('/changeuserpass', postAuthToken, async (req, res) => {
+  try {
+    const admin = (await db.collection('users').where('_id', '==', req.user._id).get()).docs[0].data();
+    if (admin.rank != 'admin' && admin.rank != 'owner') return res.json({status: 'error', message: 'Not ADMIN!'});
+    const user = (await db.collection('users').where('_id', '==', req.body.userId).get()).docs[0].data();
+    const hashedPassword = await bcrypt.hash(req.body.newPass, 10);
+    await (await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.update('password', hashedPassword);
+    res.json({status: 'success', message: 'User password changed!'});
+  } catch(err) {
+    console.error(err);
+  }
+})
 
 //Delete user from admin
 const deleteUser = require('../globalFunctions/deleteAccount');

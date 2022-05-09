@@ -311,8 +311,19 @@ h1 {
     font-size: 11px;
 }
 
-.deleteUser {
+.leftBtns {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
     width: 5%;
+    margin-right: 10%;
+    margin-left: 5px;
+}
+
+.deleteUser {
+    width: 100%;
     height: 30px;
     display: flex;
     justify-content: center;
@@ -320,8 +331,18 @@ h1 {
     color: white;
     background-color: #5A2222;
     border-radius: 9999px;
-    margin: 10px;
-    margin-right: 10%;
+    cursor: pointer;
+    font-size: 10px;
+}
+.changeUserPass {
+    width: 100%;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: red;
+    background-color: #b6b6b6;
+    border-radius: 9999px;
     cursor: pointer;
     font-size: 10px;
 }

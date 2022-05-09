@@ -6,6 +6,7 @@ const openControls = document.querySelectorAll('.openControls');
 const userControls = document.querySelectorAll('.userControls');
 const closeUserControls = document.querySelectorAll('.closeUserControls');
 const deleteUsers = document.querySelectorAll('.deleteUser');
+const changeUserPassss = document.querySelectorAll('.changeUserPass');
 const warnInputs = document.querySelectorAll('.warnInput');
 const warningsLengthNumbers = document.querySelectorAll('.warningsLengthNumber');
 const warningsActiveNumbers = document.querySelectorAll('.warningsActiveNumber');
@@ -241,6 +242,37 @@ deleteUsers.forEach(deleteUser => {
         }
     });
 });
+
+// Change users password
+changeUserPassss.forEach(changeUserPass => {
+    const dataID = changeUserPass.getAttribute('data-user-id');
+    const dataUsername = changeUserPass.getAttribute('data-user-username');
+    changeUserPass.addEventListener('click', async () => {
+        if (!changeUserPass.classList.contains('na')) {
+            const newPass = prompt(`Enter the new password for ${dataUsername}'s account:`);
+            if (newPass) {
+                const response = await fetch('/admin/changeuserpass', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: dataID,
+                        newPass,
+                    }),
+                });
+                const resJSON = await response.json();
+                if (resJSON.status != 'success') {
+                    alert('An error as occured!');
+                } else if (resJSON.status == 'success') {
+                    alert('Password successfully changed to - ' + newPass + ' -');
+                }
+
+            }
+
+        }
+    })
+})
 
 // Open/close controls
 openControls.forEach(openControl => {

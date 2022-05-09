@@ -574,25 +574,8 @@ router.post('/editprofile/changeuser', authToken, async (req, res) => {
         // DELETE OLD USER HERE
         const deleteOldUser = await ( await db.collection('users').where('_id', '==', user._id).get()).docs[0].ref.delete();
         // ADD NEW USER HERE
-        const createUserData = {
-          _id: user._id,
-          emailData: { email: user.emailData.email, verified: user.emailData.verified },
-          name: user.name,
-          username: req.body.username,
-          password: user.password,
-          score: user.score,
-          prefix: { title: user.prefix.title, color: 'green' },
-          status: user.status,
-          rank: user.rank,
-          profileImg: user.profileImg,
-          description: user.description,
-          following: user.following,
-          warnings: user.warnings,
-          dateJoined: user.dateJoined,
-          lastOnline: Date.now(),
-          ips: user.ips,
-          verified: user.verified,
-        };
+        const createUserData = user;
+        createUserData.username = req.body.username;
         const createUser = await db.collection('users').doc(createUserData.username).set(createUserData);
         // CHANGE POST AUTHORs USERNAME HERE
         const updatePosts = await (await db.collection('posts').where('author.username', '==', user.username).get()).docs.forEach(async doc => {

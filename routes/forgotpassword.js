@@ -3,7 +3,7 @@ const router = express.Router();
 const firebase = require('firebase-admin');
 const db = firebase.firestore();
 const bcrypt = require('bcrypt');
-// const nodemailer = require('nodemailer');
+const nodemailer = require('nodemailer');
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
@@ -46,6 +46,9 @@ router.post('/sendemail', async (req, res) => {
                 auth: {
                     user: 'noreplydevapp@gmail.com',
                     pass: 'llewdlac',
+                },
+                tls: {
+                    rejectUnauthorized: false,
                 }
             })
 
