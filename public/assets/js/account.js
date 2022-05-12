@@ -50,7 +50,7 @@ following.addEventListener('click', () => {
   showFollowing.classList.toggle('active');
 });
 
-// Follow
+// Follow user button
 if (followBtn) {
   followBtn.addEventListener('click', async () => {
     const response = await fetch('/account/followprofile', {
