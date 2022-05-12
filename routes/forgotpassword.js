@@ -45,7 +45,8 @@ router.post('/sendemail', async (req, res) => {
                 service: 'gmail',
                 auth: {
                     user: 'noreplydevapp@gmail.com',
-                    pass: 'llewdlac',
+                    //pass: 'llewdlac',        
+                    pass: 'avxyrwztucrulqgu',        
                 },
                 tls: {
                     rejectUnauthorized: false,
