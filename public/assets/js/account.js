@@ -41,11 +41,13 @@ const colorOptions = document.querySelectorAll('.color-option');
 
 
 followers.addEventListener('click', () => {
-  showFollowers.focus();
+  showFollowing.classList.remove('active');
+  showFollowers.classList.toggle('active');
   
 });
 following.addEventListener('click', () => {
-  showFollowing.focus();
+  showFollowers.classList.remove('active');
+  showFollowing.classList.toggle('active');
 });
 
 // Follow
