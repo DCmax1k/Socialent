@@ -282,6 +282,6 @@ app.post('/subscribe', authToken, async (req, res) => {
 
 
 // PORT
-server.listen(process.env.PORT || 80, () => {
+server.listen(process.env.PORT || 3004, () => {
   console.log('Listening...');
 });
