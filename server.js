@@ -131,7 +131,7 @@ app.get('/proxy', authToken, async (req, res) => {
     }
 });
 
-app.get('/downloadimage', authToken, async (req, res) => {
+app.get('/downloadimage', async (req, res) => {
   res.render('extras/downloadimage');
 });
 
